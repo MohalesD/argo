@@ -13,7 +13,7 @@ const hostPart = noScheme.slice(at + 1);
 const colon = creds.indexOf(':');
 const user = creds.slice(0, colon);
 const rawPass = creds.slice(colon + 1);
-const [hostPort, database = 'postgres'] = hostPart.split('/');
+const [hostPort = '', database = 'postgres'] = hostPart.split('/');
 const [host, port = '5432'] = hostPort.split(':');
 
 console.log('user:', user, '| host:', host, '| port:', port, '| db:', database);

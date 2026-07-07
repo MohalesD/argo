@@ -62,6 +62,44 @@ just this one.
    Re-screening was rejected: it would re-spend the classifier budget
    and re-roll the two known conservative false positives.
 8. **Incident I-G2-2 (see below).**
+9. **Production API transport proven**: first real claude-haiku-4-5 and
+   claude-sonnet-4-6 calls through AnthropicApiTransport, logged to
+   hosted ai_calls ($0.000037 and $0.000111). Closes Goal 1
+   could-not-verify item 2.
+10. **Goal 2 schema layer applied** (local and hosted): 0009 FTS +
+    notification triggers, 0010 definer functions (get_shared_brief,
+    accept_share_invite, clone_qstack), 0011 EXECUTE grant hygiene from
+    the Supabase security advisor pass. Deny-all RLS on ai_calls and
+    eval_runs confirmed intentional (advisor INFO items).
+11. **Next.js 15 scaffold builds clean**: App Router, @supabase/ssr,
+    Tailwind v4 with PRD Section 7 tokens, middleware session refresh,
+    server-only pg pool. Surface contract v1.0 written; all tests and
+    surfaces are written against it.
+12. **Strict TDD in effect**: five Test Author subagents own every test
+    file (Playwright launch-of-friends + UI-consent, eval 8.1 fixtures
+    and suite, eval 8.3 transcripts and suite, suite fixture hygiene,
+    anon-browse probe). The fixture-hygiene author landed first: probe
+    questions are now born flagged; rls_probe re-verified 35/35 green.
+13. **Eval 8.1 GREEN, local and hosted** (tests authored first, verified
+    failing on the missing module): mean P@5 0.880 local / 0.896 hosted
+    against the 0.6 threshold; zero flagged or pending questions at any
+    stage; re-ranker id integrity held, and the discard-and-log path for
+    alien ids fired once in real traffic during the local run, proving
+    D7's validation is live, not theoretical. Caveat on the record: the
+    25 relevance sets are model-judged (Test Author), standing in for
+    the PRD's human judgment; flagged for Mo's spot check.
+14. **Eval 8.3 GREEN, local and hosted** (tests authored first, 10 of 15
+    transcripts adversarial): zero unsupported claims (204 local, 188
+    hosted) under a strict Haiku judge; all starred moments covered;
+    open_questions non-empty on all four contradiction transcripts. The
+    pipeline drafts extractively and passes every claim through a
+    grounding gate (purpose brief_grounding_check, Haiku) before it
+    survives; zero surviving claims throws rather than shipping.
+15. **Anon-browse suite GREEN, local and hosted, 34/34** (closes Goal 1
+    watched item 3): the signed-out read surface is exactly public
+    qstacks, their items, passed questions, public profiles and posts,
+    and listings of public qstacks; all other reads and all anon writes
+    are refused.
 
 ## Incidents
 

@@ -13,52 +13,49 @@ append-only scores trigger binding all callers, consent state machine
 with 30-day default expiry, ai_calls CHECK allowlist.
 
 ## Phase A: Hosted Supabase (closes Goal 1 could-not-verify 1 and 6)
-- [ ] A1. Provision new dedicated Supabase project (cost-confirmed),
-      separate from any other project in the account
-- [ ] A2. Apply all 8 migrations via MCP, in order
-- [ ] A3. Parameterize eval-suite DB connection (DATABASE_URL override in
-      src/lib/db.ts), rerun rls_probe and consent_8_5 against hosted,
-      results persisted to hosted eval_runs
-- [ ] A4. Copy the screened seed bank from local embedded PG to hosted
-      (screening results are data; do not re-spend the screening run)
+- [x] A1. Provision new dedicated Supabase project (cost-confirmed),
+      separate from any other project in the account (ref
+      rtqgisbotvxidvzphyhn, us-east-1, $10/month)
+- [x] A2. Apply all 8 migrations via MCP, in order (clean)
+- [x] A3. Parameterize eval-suite DB connection; hosted rls_probe 35/35
+      GREEN, hosted consent_8_5 9/9 GREEN, persisted to hosted eval_runs
+- [x] A4. Seed bank copied to hosted (305 rows, ids and screening
+      preserved; probe-fixture pollution neutralized, see I-G2-2)
 - [ ] A5. Magic-link auth config verified end to end (signup collects
-      first name + email only)
+      first name + email only) — auth/confirm handles token_hash and
+      code paths; real-email verification pending app surfaces
 
 ## Phase B: Schema additions for Goal 2 (new migrations only, never edit
 old ones)
-- [ ] B1. 0009: FTS index on questions (text + rationale), notification
-      triggers (mention -> notify, publish -> notify followers,
-      question accepted -> contribution credit), invites view/conversion
-      instrumentation columns if needed
-- [ ] B2. 0010: definer functions for anonymous tokenized brief access
-      (get_shared_brief(token), record_share_view, accept_share_invite),
-      never a plain RLS path; clone_qstack() atomic clone with lineage
-- [ ] B3. Anon-browse probe suite: marketplace surface reads exactly what
-      anon RLS allows (public qstacks, passed questions, public profiles,
-      listings), nothing more (closes watched item 3)
+- [x] B1. 0009: FTS (generated tsvector + GIN), notification triggers
+      (mention, publish-to-followers, contribution credit)
+- [x] B2. 0010: get_shared_brief + accept_share_invite definer functions
+      (view rows in invites; conversion rows with accepted_user_id),
+      clone_qstack atomic clone with lineage; 0011: EXECUTE grant
+      hygiene per security advisors
+- [x] B3. Anon-browse probe suite green local and hosted, 34/34; anon
+      surface matches the marketplace design exactly (closes watched
+      item 3)
 
 ## Phase C: Production API transport proof
-- [ ] C1. One real Haiku call + one real Sonnet call through
-      AnthropicApiTransport, logged in hosted ai_calls
+- [x] C1. Real Haiku + real Sonnet through AnthropicApiTransport, logged
+      in hosted ai_calls with cost accounting
 
 ## Phase D: Next.js app scaffold
-- [ ] D1. Next.js App Router + @supabase/ssr auth (magic link), Tailwind,
-      design tokens from PRD Section 7 (gold #E3A81C, cream #FBF6E9,
-      warm gray #2B2A26, forest green #2E4A3A accent)
-- [ ] D2. Route/surface contract doc (routes, key testids) so tests and
-      implementation agree before either is written
+- [x] D1. Next.js 15 + @supabase/ssr + Tailwind v4 + design tokens;
+      builds clean; middleware session refresh; server pool
+- [x] D2. Surface contract v1.0 written
+      (docs/argo-goal2-surface-contract-v1_0-2026-07-07.md)
 
 ## Phase E: Tests first (Test Author subagents, strict TDD)
-- [ ] E1. Playwright launch-of-friends e2e spec (signup, clone, interview
-      with consent, score with override, brief with citations, share,
-      second account via link, star, follow) written by Test Author,
-      failing for valid reasons
-- [ ] E2. Eval 8.1 retrieval suite + 25 fixtures (P@5 >= 0.6, zero
-      flagged/pending in results) by Test Author
-- [ ] E3. Eval 8.3 brief faithfulness suite + 15 synthetic transcripts
-      (zero unsupported claims, citations resolve) by Test Author
-- [ ] E4. UI-path consent test (Playwright: no route to capture without
-      consent step) by Test Author
+- [ ] E1. Playwright launch-of-friends e2e spec (Test Author running)
+- [x] E2. Eval 8.1 authored, verified failing, then GREEN after
+      src/lib/retrieval.ts: mean P@5 0.880 local / 0.896 hosted
+- [x] E3. Eval 8.3 authored, verified failing, then GREEN after
+      src/lib/brief.ts: 0/204 unsupported local, 0/188 hosted
+- [ ] E4. UI-path consent test (bundled with E1)
+- [x] E5. Suite fixture hygiene: probe questions born flagged, suites
+      green (Test Author complete)
 
 ## Phase F: Surfaces (implementation to make Phase E pass)
 - [ ] F1. QStack library: list + stack views, Kanban drag/drop with undo,

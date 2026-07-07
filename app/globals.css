@@ -1,0 +1,45 @@
+@import 'tailwindcss';
+
+/* Argo design tokens, PRD Section 7. Bright human-legible gold as
+   primary, dark forest green as minor accent only, generous white and
+   light cream, dark warm gray body text, never pure black. */
+@theme {
+  --color-gold: #e3a81c;
+  --color-gold-hover: #c9971a;
+  --color-gold-soft: #f7e8c3;
+  --color-cream: #fbf6e9;
+  --color-ink: #2b2a26;
+  --color-ink-soft: #55524a;
+  --color-forest: #2e4a3a;
+  --color-forest-soft: #e6efe9;
+  --color-flag: #b3402a;
+  --color-flag-soft: #f7e5e0;
+  --color-line: #e9e2d0;
+
+  --font-display: var(--font-source-serif), Georgia, serif;
+  --font-body: var(--font-inter), system-ui, sans-serif;
+
+  --shadow-card: 0 1px 2px rgb(43 42 38 / 0.06), 0 4px 16px rgb(43 42 38 / 0.07);
+  --shadow-lift: 0 2px 4px rgb(43 42 38 / 0.08), 0 12px 32px rgb(43 42 38 / 0.12);
+}
+
+html {
+  background: var(--color-cream);
+  color: var(--color-ink);
+  font-family: var(--font-body);
+}
+
+h1, h2, h3 {
+  font-family: var(--font-display);
+}
+
+/* Visible focus for every actionable element (Locality-First 12.4). */
+:focus-visible {
+  outline: 2px solid var(--color-gold);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+::selection {
+  background: var(--color-gold-soft);
+}
