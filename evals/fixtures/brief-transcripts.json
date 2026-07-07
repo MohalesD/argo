@@ -1,0 +1,741 @@
+{
+  "description": "Synthetic eval set for PRD 8.3 brief faithfulness. 15 transcripts across 5 role families (engineering, sales, people ops, product, finance), 3 per family: one clean control and two adversarial variants. The traits field is suite-only metadata, not part of the generateBrief input contract; it is used by the suite to select which transcripts feed the open_questions report-only metric and to document intent, and it is stripped before the transcript is passed to generateBrief. Every candidateName is a deliberately unusual, clearly fictional name.",
+  "transcripts": [
+    {
+      "name": "eng-control-01",
+      "candidateName": "Wrenley Castellane",
+      "role": "Senior Backend Engineer",
+      "traits": [],
+      "responses": [
+        {
+          "id": "r1",
+          "questionText": "Tell me about a time you led a technical project end to end.",
+          "responseText": "I led the redesign of our payment retry system last year. I scoped the problem, wrote the technical design document, and coordinated with three other engineers on my team to implement it over six weeks. We cut failed payment recovery time from four hours to twenty minutes. I also ran the rollout in stages, watching error rates at each step before expanding to full traffic.",
+          "starred": true,
+          "scoreValue": 4,
+          "scoreAnchor": "concrete scope, measurable outcome, staged rollout described"
+        },
+        {
+          "id": "r2",
+          "questionText": "Describe a time you disagreed with a technical decision.",
+          "responseText": "My tech lead wanted to move our service to a new message queue mid quarter. I pushed back because we had two other migrations already in flight and I was worried about operational load. We compromised by scheduling the queue migration for the following quarter, and I wrote up the tradeoffs so the team could revisit the decision with data instead of gut feel.",
+          "starred": false,
+          "scoreValue": 3,
+          "scoreAnchor": "reasoned pushback, compromise reached, no measurable outcome cited"
+        },
+        {
+          "id": "r3",
+          "questionText": "How do you approach testing your code?",
+          "responseText": "I write unit tests alongside the implementation, not after. For anything touching money or user data I also write integration tests that hit a real test database. On the payment retry project I mentioned earlier, test coverage on the retry logic was around ninety percent before we shipped, which caught two edge cases in review that would have caused duplicate charges.",
+          "starred": true,
+          "scoreValue": 4,
+          "scoreAnchor": "specific practice, ties back to a named project with a concrete catch"
+        },
+        {
+          "id": "r4",
+          "questionText": "Tell me about a mistake you made and what you learned.",
+          "responseText": "I once shipped a database migration without a rollback plan. It ran fine in staging but locked a production table for eleven minutes during a traffic spike. I learned to always write and test the rollback script before the forward migration, and I now require that step in our team's migration checklist.",
+          "starred": false,
+          "scoreValue": 3,
+          "scoreAnchor": "honest account, clear lesson, process change named"
+        },
+        {
+          "id": "r5",
+          "questionText": "How do you handle competing priorities from different stakeholders?",
+          "responseText": "I ask each stakeholder what happens if their request slips a week, which usually surfaces the real urgency fast. On the retry project, product wanted a dashboard feature at the same time infra wanted the migration finished. I got both parties on a fifteen minute call, laid out the tradeoff, and we agreed the migration went first since it blocked a compliance deadline.",
+          "starred": false,
+          "scoreValue": 3,
+          "scoreAnchor": "clear method, specific example, no measured result"
+        }
+      ]
+    },
+    {
+      "name": "eng-unstated-01",
+      "candidateName": "Thistlewood Byrne",
+      "role": "Staff Software Engineer",
+      "traits": ["unstated-fact"],
+      "responses": [
+        {
+          "id": "r1",
+          "questionText": "Tell me about the biggest project you've led.",
+          "responseText": "I led the migration of our monolith's checkout flow into a separate service. I was the technical owner from design through launch, and I ran the weekly syncs that kept the effort on track. The migration took about four months from kickoff to full traffic cutover. It was the most complex piece of infrastructure work I've owned.",
+          "starred": true,
+          "scoreValue": 4,
+          "scoreAnchor": "clear ownership language, timeline given, complexity described"
+        },
+        {
+          "id": "r2",
+          "questionText": "What was the hardest technical decision on that project?",
+          "responseText": "Deciding whether to run the old and new checkout paths in parallel or do a hard cutover. I chose parallel running with a feature flag so we could compare error rates before fully switching over. That decision added about three weeks to the timeline but meant we caught a currency rounding bug before it ever reached a real customer.",
+          "starred": true,
+          "scoreValue": 4,
+          "scoreAnchor": "tradeoff explained, outcome tied to the decision"
+        },
+        {
+          "id": "r3",
+          "questionText": "How did you communicate progress to stakeholders?",
+          "responseText": "I sent a short written update every Friday with what shipped, what slipped, and what was blocked. I kept it to five bullet points so people would actually read it. When the timeline moved by three weeks I flagged it as soon as I knew, not at the next scheduled update, so finance could adjust their quarter end assumptions.",
+          "starred": false,
+          "scoreValue": 3,
+          "scoreAnchor": "concrete communication habit, proactive escalation example"
+        },
+        {
+          "id": "r4",
+          "questionText": "Tell me about a time you mentored someone.",
+          "responseText": "One of the engineers on the checkout migration was newer to distributed systems, so I paired with them twice a week on the trickiest parts of the service boundary work. By the end of the project they were writing design docs on their own for smaller pieces of the system. I still don't know if they'd call it mentoring exactly, but that's what it felt like from my side.",
+          "starred": false,
+          "scoreValue": 3,
+          "scoreAnchor": "specific pairing cadence, growth described, mild hedge on framing"
+        },
+        {
+          "id": "r5",
+          "questionText": "How do you decide when a system is ready to launch?",
+          "responseText": "I look at error budgets, not gut feel. For the checkout migration, I set a threshold of matching the old system's error rate within half a percentage point before we could remove the feature flag. We hit that threshold in the third week of parallel running and cut over the following Monday.",
+          "starred": false,
+          "scoreValue": 4,
+          "scoreAnchor": "objective launch criteria, specific threshold and timing"
+        }
+      ]
+    },
+    {
+      "name": "eng-contradiction-01",
+      "candidateName": "Sable Marchetti",
+      "role": "Platform Engineer",
+      "traits": ["contradiction"],
+      "responses": [
+        {
+          "id": "r1",
+          "questionText": "What infrastructure tools are you weakest on?",
+          "responseText": "Kubernetes is honestly a gap for me. I've read about it and set up a toy cluster once for a side project, but I've never run it in production, and I'd want to pair with someone who has before I owned a cluster on my own. My production experience is mostly with plain virtual machines and Docker Compose.",
+          "starred": false,
+          "scoreValue": 2,
+          "scoreAnchor": "honest gap disclosure, limited depth"
+        },
+        {
+          "id": "r2",
+          "questionText": "Tell me about the most complex infrastructure change you've made.",
+          "responseText": "Last year I led the migration of our production workloads onto a new Kubernetes cluster to replace an aging virtual machine fleet. I planned the node pool sizing, wrote the deployment manifests, and handled the cutover for around forty services over six weeks with almost no downtime. It's the project I'm proudest of from the last two years.",
+          "starred": true,
+          "scoreValue": 4,
+          "scoreAnchor": "detailed, confident, contradicts an earlier disclosed gap"
+        },
+        {
+          "id": "r3",
+          "questionText": "How do you approach learning a new tool under deadline pressure?",
+          "responseText": "I start by finding the smallest real task I can do with the tool rather than reading documentation cover to cover. I ask a teammate who already knows it to review my first attempt closely. That approach got me productive with Terraform in about a week when we adopted it two years ago.",
+          "starred": false,
+          "scoreValue": 3,
+          "scoreAnchor": "clear learning method, example from a different tool"
+        },
+        {
+          "id": "r4",
+          "questionText": "Describe a time you had to push back on a deadline.",
+          "responseText": "We were asked to finish a database sharding project in three weeks that I estimated would take six. I brought data on our current write throughput and showed the team lead why the compressed timeline would risk data loss during the cutover. We settled on five weeks with a smaller initial scope.",
+          "starred": false,
+          "scoreValue": 3,
+          "scoreAnchor": "data backed pushback, negotiated outcome"
+        },
+        {
+          "id": "r5",
+          "questionText": "How do you handle on-call incidents?",
+          "responseText": "I follow the runbook first and resist the urge to start debugging live in production. On a recent incident, a service was returning errors under load, and I rolled back the last deploy within four minutes of the page instead of trying to root cause live. I did the actual investigation afterward, once the fire was out.",
+          "starred": true,
+          "scoreValue": 4,
+          "scoreAnchor": "disciplined incident response, fast mitigation, deferred root cause"
+        }
+      ]
+    },
+    {
+      "name": "sales-control-01",
+      "candidateName": "Indigo Wexford",
+      "role": "Account Executive",
+      "traits": [],
+      "responses": [
+        {
+          "id": "r1",
+          "questionText": "Walk me through your sales process from prospecting to close.",
+          "responseText": "I start with account research to understand where a prospect's current tooling is likely falling short, then I lead with a question instead of a pitch on the first call. For deals over fifty thousand dollars I loop in a solutions engineer by the second meeting. My average sales cycle last year was about seven weeks from first call to signed contract.",
+          "starred": true,
+          "scoreValue": 4,
+          "scoreAnchor": "structured process, threshold criteria, specific cycle length"
+        },
+        {
+          "id": "r2",
+          "questionText": "Tell me about a deal you lost and why.",
+          "responseText": "I lost a mid market logistics account to a competitor mainly on price. I had built a strong relationship with the buyer, but I didn't loop in my manager early enough to get approval for a bigger discount, and by the time I did the competitor had already closed. I now flag any deal at risk of a price objection to my manager by the second call.",
+          "starred": false,
+          "scoreValue": 3,
+          "scoreAnchor": "honest loss analysis, process change named"
+        },
+        {
+          "id": "r3",
+          "questionText": "How do you handle a prospect who goes quiet mid-cycle?",
+          "responseText": "I send one direct check in asking if priorities have shifted rather than a generic follow up. If I don't hear back within a week, I try reaching a second stakeholder I met earlier in the process. That approach revived a deal with a regional retailer last quarter that closed about three weeks after I re-engaged their operations lead.",
+          "starred": true,
+          "scoreValue": 4,
+          "scoreAnchor": "specific tactic with a named outcome"
+        },
+        {
+          "id": "r4",
+          "questionText": "How do you prioritize your pipeline?",
+          "responseText": "I rank by a combination of deal size and stage momentum, not just size alone. A smaller deal that's moved forward twice in two weeks gets more of my time than a large one that's been stalled for a month. I review this ranking every Monday morning before planning my calls for the week.",
+          "starred": false,
+          "scoreValue": 3,
+          "scoreAnchor": "clear prioritization method, regular cadence"
+        },
+        {
+          "id": "r5",
+          "questionText": "Tell me about your relationship with your sales engineering team.",
+          "responseText": "I loop in solutions engineering early, usually by the second call, because technical objections are easier to head off than to reverse late in a cycle. On one enterprise deal, my solutions engineer caught a compliance requirement in week two that would have stalled the deal in week six if we'd found it later.",
+          "starred": false,
+          "scoreValue": 4,
+          "scoreAnchor": "specific collaboration example, timing detail"
+        }
+      ]
+    },
+    {
+      "name": "sales-unstated-01",
+      "candidateName": "Petra Lindqvist",
+      "role": "Enterprise Account Executive",
+      "traits": ["unstated-fact"],
+      "responses": [
+        {
+          "id": "r1",
+          "questionText": "How did you perform against quota last year?",
+          "responseText": "I finished the year well ahead of plan and was recognized at our annual sales kickoff for it. My manager pulled me aside more than once to ask how I was doing it, since a few of my peers were struggling to hit their numbers in the same territory. It was a strong year for me overall.",
+          "starred": true,
+          "scoreValue": 4,
+          "scoreAnchor": "confident self-report, recognition mentioned, no figure given"
+        },
+        {
+          "id": "r2",
+          "questionText": "What's the largest deal you've closed?",
+          "responseText": "The largest one I closed was with a national retailer that had been evaluating us for almost a year before I took over the account. I rebuilt the relationship from scratch after the previous rep left the company, and it took me about five months to get it across the line. It's still one of our reference customers.",
+          "starred": true,
+          "scoreValue": 4,
+          "scoreAnchor": "specific account history, timeline given, no dollar figure stated"
+        },
+        {
+          "id": "r3",
+          "questionText": "How do you build a territory plan?",
+          "responseText": "I segment my territory by account maturity rather than just company size, since a large company that's early in evaluating a new category behaves very differently from one that's already budgeted for it. I spend most of my prospecting time on accounts showing budget signals, like a recent leadership change or a public funding round.",
+          "starred": false,
+          "scoreValue": 3,
+          "scoreAnchor": "clear segmentation logic, no outcome tied yet"
+        },
+        {
+          "id": "r4",
+          "questionText": "Tell me about a time you had to rebuild trust with a customer.",
+          "responseText": "A customer felt burned by a previous rep who had overpromised on integration timelines. I spent the first meeting just listening to their frustration without trying to sell anything, then came back a week later with a realistic implementation plan reviewed by our solutions team. They renewed at the end of that cycle.",
+          "starred": false,
+          "scoreValue": 3,
+          "scoreAnchor": "specific trust rebuilding approach, outcome named without figures"
+        }
+      ]
+    },
+    {
+      "name": "sales-contradiction-01",
+      "candidateName": "Bramwell Osei",
+      "role": "Mid-Market Account Executive",
+      "traits": ["contradiction"],
+      "responses": [
+        {
+          "id": "r1",
+          "questionText": "What segment of the market do you sell into?",
+          "responseText": "I've focused exclusively on enterprise accounts for my whole career, generally companies with a thousand or more employees. I like the complexity of enterprise deals, multiple stakeholders, procurement processes, security reviews. Smaller deals move too fast for the kind of relationship building I'm good at.",
+          "starred": false,
+          "scoreValue": 3,
+          "scoreAnchor": "clear segment preference stated"
+        },
+        {
+          "id": "r2",
+          "questionText": "Tell me about a deal that required you to adapt your usual approach.",
+          "responseText": "I once sold to a twenty person startup that needed a much lighter touch process than what I was used to. There was no procurement team and one decision maker who also happened to be the CEO, so I compressed a normally six week cycle into about ten days. It taught me to read the room and not force a heavyweight process onto a deal that didn't need one.",
+          "starred": true,
+          "scoreValue": 4,
+          "scoreAnchor": "adaptability shown, contradicts earlier enterprise-only claim"
+        },
+        {
+          "id": "r3",
+          "questionText": "How do you handle multiple stakeholders in a deal?",
+          "responseText": "I map out who the economic buyer, technical evaluator, and end user are as early as possible, usually by the first or second call. On a recent deal there were six people in the buying committee, and I made sure each one got a version of the pitch relevant to what they cared about instead of one generic deck.",
+          "starred": false,
+          "scoreValue": 4,
+          "scoreAnchor": "specific stakeholder mapping practice, concrete example"
+        },
+        {
+          "id": "r4",
+          "questionText": "How do you handle a competitive deal?",
+          "responseText": "I try to find out early which competitor is in the deal so I can position around their known weaknesses instead of guessing. On one deal I learned a competitor was being evaluated that had a history of slow implementation times, so I brought a reference customer who could speak directly to our onboarding speed.",
+          "starred": false,
+          "scoreValue": 3,
+          "scoreAnchor": "competitive positioning, specific tactic"
+        },
+        {
+          "id": "r5",
+          "questionText": "Tell me about a time you missed quota.",
+          "responseText": "I missed quota one quarter when two large deals slipped to the following quarter due to procurement delays outside my control. I still closed them both about six weeks later, but the timing hurt that quarter's number. I learned to build more procurement buffer into my forecast for large accounts.",
+          "starred": false,
+          "scoreValue": 3,
+          "scoreAnchor": "honest account of a miss, lesson stated"
+        }
+      ]
+    },
+    {
+      "name": "peopleops-control-01",
+      "candidateName": "Marlow Achterberg",
+      "role": "People Operations Manager",
+      "traits": [],
+      "responses": [
+        {
+          "id": "r1",
+          "questionText": "Tell me about a people process you built from scratch.",
+          "responseText": "I built our first structured onboarding program when the company was around thirty people and growing fast. Before that, new hires got a laptop and a Slack invite and figured out the rest. I designed a two week plan with check ins on day one, day seven, and day thirty, and time-to-productivity feedback from managers improved noticeably within two quarters.",
+          "starred": true,
+          "scoreValue": 4,
+          "scoreAnchor": "clear before and after, specific structure, outcome referenced"
+        },
+        {
+          "id": "r2",
+          "questionText": "How do you handle a manager who resists a people process?",
+          "responseText": "I ask what specifically feels burdensome rather than defending the process on principle. One manager thought performance reviews took too much of his time, so I showed him a lighter template that cut his writing time roughly in half while keeping the parts that mattered for compensation decisions. He became one of the process's better advocates after that.",
+          "starred": true,
+          "scoreValue": 4,
+          "scoreAnchor": "specific resistance, concrete resolution, changed outcome"
+        },
+        {
+          "id": "r3",
+          "questionText": "How do you measure whether a people program is working?",
+          "responseText": "I look at both quantitative signals, like time to fill or ninety day retention, and qualitative ones from exit interviews and pulse surveys. For onboarding specifically, I track how long it takes a new hire to ship their first piece of work, since that's a decent proxy for whether the ramp is working.",
+          "starred": false,
+          "scoreValue": 3,
+          "scoreAnchor": "clear measurement framework, specific proxy metric named"
+        },
+        {
+          "id": "r4",
+          "questionText": "Tell me about a difficult employee relations situation you handled.",
+          "responseText": "I managed a conflict between two team leads whose disagreement had started affecting their teams' morale. I met with each of them separately first to understand their side, then brought them together with a specific, narrow issue to resolve rather than trying to fix the whole relationship at once. It took about three sessions over a month before things settled.",
+          "starred": false,
+          "scoreValue": 3,
+          "scoreAnchor": "structured conflict resolution, timeline given"
+        },
+        {
+          "id": "r5",
+          "questionText": "How do you stay current on employment law changes?",
+          "responseText": "I subscribe to a couple of employment law newsletters and I have a standing quarterly call with outside counsel to review anything that's changed. When a new state pay transparency law affected one of our remote hiring locations, I caught it from the newsletter about six weeks before it took effect, which gave us time to update our job postings.",
+          "starred": false,
+          "scoreValue": 4,
+          "scoreAnchor": "proactive practice, specific catch with lead time"
+        }
+      ]
+    },
+    {
+      "name": "peopleops-unstated-01",
+      "candidateName": "Junie Okafor-Hale",
+      "role": "HR Business Partner",
+      "traits": ["unstated-fact"],
+      "responses": [
+        {
+          "id": "r1",
+          "questionText": "Tell me about a program you're proud of.",
+          "responseText": "I redesigned our new hire onboarding from a scattered set of documents into a single guided flow with a dedicated buddy system. Managers told me it made a real difference in how quickly new people felt like part of the team. It's the piece of work from the last year I'd point to first if someone asked what I've built.",
+          "starred": true,
+          "scoreValue": 4,
+          "scoreAnchor": "clear pride and ownership, no volume or hours metric given"
+        },
+        {
+          "id": "r2",
+          "questionText": "How do you partner with hiring managers?",
+          "responseText": "I sit in on a manager's first few debrief calls after an interview loop so I can coach them on giving specific, behavior based feedback instead of vague impressions. Once a manager gets the hang of it, I step back and just spot check occasionally. It changes the quality of hiring decisions more than people expect.",
+          "starred": false,
+          "scoreValue": 3,
+          "scoreAnchor": "specific coaching method, general claim of impact"
+        },
+        {
+          "id": "r3",
+          "questionText": "Tell me about a time you had to deliver difficult feedback.",
+          "responseText": "I had to tell a manager that their team's engagement scores were the lowest in the department and that people were naming a specific behavior of his in exit interviews. I brought the data rather than my own opinion, and we built an action plan together instead of me just delivering a verdict. He was defensive at first but came around within the conversation.",
+          "starred": true,
+          "scoreValue": 4,
+          "scoreAnchor": "data led feedback, specific de-escalation described"
+        },
+        {
+          "id": "r4",
+          "questionText": "How do you handle a request from a manager that conflicts with policy?",
+          "responseText": "A manager once asked me to backdate a termination date to avoid paying out a bonus that was about to vest. I explained why that exposed the company to real legal risk and offered an alternative path that addressed his underlying budget concern without touching the termination date. He took the alternative.",
+          "starred": false,
+          "scoreValue": 4,
+          "scoreAnchor": "clear boundary held, alternative offered"
+        },
+        {
+          "id": "r5",
+          "questionText": "What's a process you inherited that you changed?",
+          "responseText": "I inherited an exit interview process that was just a form nobody read. I switched it to a short live conversation with a standard set of questions and started actually synthesizing the themes for leadership each quarter. It surfaced a pattern around a specific manager that led to a broader look at that team.",
+          "starred": false,
+          "scoreValue": 3,
+          "scoreAnchor": "specific change, pattern surfaced, no volume metric given"
+        }
+      ]
+    },
+    {
+      "name": "peopleops-ambiguous-01",
+      "candidateName": "Callum Vasquez-Reyes",
+      "role": "People Operations Generalist",
+      "traits": ["ambiguous"],
+      "responses": [
+        {
+          "id": "r1",
+          "questionText": "Tell me about a time you improved a process.",
+          "responseText": "I think I made things a bit better with how we handled PTO requests, though I'm not totally sure how much of a difference it made in the end. People seemed to complain less about it afterward, at least from what I noticed. It probably saved some back and forth emails, but I never really measured it.",
+          "starred": false,
+          "scoreValue": 2,
+          "scoreAnchor": "heavily hedged, no clear outcome, self-assessed as uncertain"
+        },
+        {
+          "id": "r2",
+          "questionText": "How do you approach a sensitive employee situation?",
+          "responseText": "I try to be pretty careful and thoughtful about it, I guess, and listen more than I talk at first. I've been in a few situations like that and I think it usually goes okay, though it depends a lot on the specific case. I'd rather not get into the details of a particular one if that's alright.",
+          "starred": false,
+          "scoreValue": 2,
+          "scoreAnchor": "vague method, declines specifics, no concrete example"
+        },
+        {
+          "id": "r3",
+          "questionText": "What's your approach to compliance training rollout?",
+          "responseText": "We usually just send out the training and follow up if people haven't done it. I think most people get to it eventually. I'm not sure what our completion rate typically looks like, but it seems fine most of the time.",
+          "starred": false,
+          "scoreValue": 2,
+          "scoreAnchor": "no concrete process, uncertain about outcomes"
+        },
+        {
+          "id": "r4",
+          "questionText": "Tell me about a policy you disagreed with.",
+          "responseText": "There was a policy around remote work that I wasn't totally on board with, but I mostly just implemented it as written since it wasn't really my call. I might have mentioned my concerns to my manager at some point, though I don't remember exactly what came of that conversation.",
+          "starred": false,
+          "scoreValue": 2,
+          "scoreAnchor": "disengaged account, no clear action or outcome"
+        },
+        {
+          "id": "r5",
+          "questionText": "How do you handle competing requests from multiple managers?",
+          "responseText": "I usually just try to get to things in the order they came in, more or less. Sometimes something more urgent jumps the line if someone makes it sound important enough. It works out most of the time, I think.",
+          "starred": false,
+          "scoreValue": 1,
+          "scoreAnchor": "no prioritization method, purely reactive, low confidence"
+        }
+      ]
+    },
+    {
+      "name": "product-control-01",
+      "candidateName": "Story Ashworth",
+      "role": "Senior Product Manager",
+      "traits": [],
+      "responses": [
+        {
+          "id": "r1",
+          "questionText": "Tell me about a feature you shipped that moved a key metric.",
+          "responseText": "I shipped a redesigned checkout flow that cut cart abandonment by reducing the steps from five to three. I ran the change as an A/B test over three weeks before rolling it out to all users, and it held up in the full rollout. It's one of the clearer wins I've had in terms of a direct line from a shipped feature to a business metric.",
+          "starred": true,
+          "scoreValue": 4,
+          "scoreAnchor": "specific metric, test methodology, validated at full rollout"
+        },
+        {
+          "id": "r2",
+          "questionText": "How do you prioritize your roadmap?",
+          "responseText": "I weigh expected impact against effort, but I also weight strategic fit heavily, since a high impact feature that pulls us off our core positioning can cost more than it earns. I review the roadmap with engineering leads every two weeks so effort estimates stay current as we learn more.",
+          "starred": false,
+          "scoreValue": 3,
+          "scoreAnchor": "clear framework, regular review cadence"
+        },
+        {
+          "id": "r3",
+          "questionText": "Tell me about a time you had to say no to a stakeholder request.",
+          "responseText": "Our VP of sales wanted a custom reporting feature for one large account. I showed data that only two other accounts had asked for anything similar in the past year, and proposed a smaller, more general reporting improvement that could serve more customers. We built the general version instead, and it shipped in the next release.",
+          "starred": true,
+          "scoreValue": 4,
+          "scoreAnchor": "data backed pushback, alternative proposed and shipped"
+        },
+        {
+          "id": "r4",
+          "questionText": "How do you validate a new feature idea before building it?",
+          "responseText": "I start with five to eight customer conversations to understand the underlying problem, not just the requested solution. For the checkout redesign, those conversations revealed people were dropping off due to an unexpected shipping cost late in the flow, which shaped the actual fix more than the original request had.",
+          "starred": false,
+          "scoreValue": 4,
+          "scoreAnchor": "specific validation method, insight tied to the earlier win"
+        },
+        {
+          "id": "r5",
+          "questionText": "Tell me about a launch that didn't go as planned.",
+          "responseText": "I launched a notification preferences center that had much lower adoption than I expected, around four percent of active users in the first month. I dug into the usage data and found most users never discovered the entry point, since it was buried three menus deep. We moved it to a more visible spot and adoption roughly tripled the next month.",
+          "starred": false,
+          "scoreValue": 3,
+          "scoreAnchor": "honest miss, root cause found, measurable recovery"
+        },
+        {
+          "id": "r6",
+          "questionText": "Tell me about how you use data versus intuition in decisions.",
+          "responseText": "I use data to validate or kill a hypothesis, but I still rely on instinct to generate the hypothesis in the first place, especially early in a project when there isn't much data yet. For the checkout redesign, the initial hunch about the extra shipping cost step came from watching a handful of user sessions, and the A/B test data confirmed it afterward.",
+          "starred": false,
+          "scoreValue": 3,
+          "scoreAnchor": "balanced data and intuition, tied back to earlier project"
+        },
+        {
+          "id": "r7",
+          "questionText": "How do you handle a feature that's technically feasible but you don't think is a good idea?",
+          "responseText": "I ask engineering to help me understand the actual cost, since sometimes a feature that sounds simple has a much bigger footprint than expected, and that changes the conversation with the stakeholder who requested it. In one case, a request that looked like a small UI tweak turned out to touch a legacy pricing system, and once the stakeholder saw the real cost they dropped the request themselves.",
+          "starred": false,
+          "scoreValue": 3,
+          "scoreAnchor": "specific technique for surfacing hidden cost, outcome named"
+        }
+      ]
+    },
+    {
+      "name": "product-unstated-01",
+      "candidateName": "Rune Delacroix-Kim",
+      "role": "Product Manager",
+      "traits": ["unstated-fact"],
+      "responses": [
+        {
+          "id": "r1",
+          "questionText": "Tell me about the most significant feature you've shipped.",
+          "responseText": "I shipped a self-serve billing portal that let customers manage their own subscriptions instead of emailing support for every change. It was a cross-functional effort with engineering and support, and it changed how a meaningful chunk of our support tickets got handled. Leadership referenced it in the next board update as a highlight.",
+          "starred": true,
+          "scoreValue": 4,
+          "scoreAnchor": "significant scope described, leadership recognition, no numbers given"
+        },
+        {
+          "id": "r2",
+          "questionText": "How did you decide what to include in the first version?",
+          "responseText": "I cut the scope down to the three actions customers asked for most in support tickets: updating a payment method, changing a plan, and canceling. Everything else, like usage based add-ons, got pushed to a later phase. That kept the first version shippable in a single quarter instead of sprawling.",
+          "starred": false,
+          "scoreValue": 3,
+          "scoreAnchor": "clear scoping rationale, timeline given"
+        },
+        {
+          "id": "r3",
+          "questionText": "How do you work with engineering during a build?",
+          "responseText": "I try to stay close during implementation without hovering, so I join standups but let the engineering lead run technical tradeoff conversations. When the billing portal hit a scope question around partial refunds, I got pulled in for one conversation to make the product call, then stepped back out.",
+          "starred": false,
+          "scoreValue": 3,
+          "scoreAnchor": "clear working style, specific example"
+        },
+        {
+          "id": "r4",
+          "questionText": "Tell me about feedback you received that changed how you work.",
+          "responseText": "An engineering lead once told me my specs were too prescriptive about implementation details that weren't really product decisions. I started writing specs that focused on the problem and the constraints, and left more of the how to the engineers. The billing portal spec was the first one I wrote that way, and the team said it was easier to work from.",
+          "starred": false,
+          "scoreValue": 3,
+          "scoreAnchor": "specific feedback, behavior change, referenced back to the earlier project"
+        },
+        {
+          "id": "r5",
+          "questionText": "How do you know when to sunset a feature?",
+          "responseText": "I look at usage trend over time rather than a single snapshot, since a feature can look low usage but still be sticky for the people who rely on it. We sunset a legacy export tool last year after confirming usage had been flat and low for over a year and that the handful of remaining users had a workable alternative.",
+          "starred": false,
+          "scoreValue": 3,
+          "scoreAnchor": "clear decision criteria, specific example"
+        }
+      ]
+    },
+    {
+      "name": "product-contradiction-01",
+      "candidateName": "Wisteria Nakamura",
+      "role": "Product Manager",
+      "traits": ["contradiction"],
+      "responses": [
+        {
+          "id": "r1",
+          "questionText": "What kind of product work have you done, zero to one or scaling existing products?",
+          "responseText": "Almost all of my experience has been scaling existing products, taking something that already has customers and making it better. I've never actually taken a product from a blank page through to launch. That's honestly one of the gaps in my background I'd want to address in my next role.",
+          "starred": false,
+          "scoreValue": 2,
+          "scoreAnchor": "clear self-assessment of a gap"
+        },
+        {
+          "id": "r2",
+          "questionText": "Tell me about a product you built from scratch.",
+          "responseText": "When I joined my current company, I built and launched our first mobile app from scratch, from the initial concept through the app store release. I owned everything from the feature list to coordinating the design and engineering work over about four months. It's still the thing I'm proudest of in my career so far.",
+          "starred": true,
+          "scoreValue": 4,
+          "scoreAnchor": "detailed zero to one account, contradicts an earlier stated gap"
+        },
+        {
+          "id": "r3",
+          "questionText": "How do you handle ambiguity in a product problem?",
+          "responseText": "I try to name the specific unknowns instead of treating the whole problem as one big fog. On a recent project I broke an ambiguous request into three concrete questions we could actually answer with a week of research, which turned a stalled conversation into a plan within a few days.",
+          "starred": false,
+          "scoreValue": 3,
+          "scoreAnchor": "clear method for structuring ambiguity"
+        },
+        {
+          "id": "r4",
+          "questionText": "Tell me about a time you had to change your mind on a product decision.",
+          "responseText": "I was convinced a certain onboarding flow needed a tutorial video, and user testing showed almost nobody watched it and most people found it patronizing. I killed the video and replaced it with three short inline tooltips instead. Completion of onboarding went up slightly after the change.",
+          "starred": false,
+          "scoreValue": 3,
+          "scoreAnchor": "willingness to reverse a decision, small measured result"
+        },
+        {
+          "id": "r5",
+          "questionText": "How do you communicate a product decision that stakeholders disagree with?",
+          "responseText": "I write a short decision doc that states the decision, the reasoning, and what would change my mind, and I share it before the meeting rather than springing it live. That gives people time to raise real objections instead of reacting in the room. It's cut down on decisions getting relitigated weeks later.",
+          "starred": false,
+          "scoreValue": 3,
+          "scoreAnchor": "specific communication practice, described benefit"
+        }
+      ]
+    },
+    {
+      "name": "finance-control-01",
+      "candidateName": "Fenwick Adeyemi",
+      "role": "FP&A Manager",
+      "traits": [],
+      "responses": [
+        {
+          "id": "r1",
+          "questionText": "Tell me about a forecasting model you built.",
+          "responseText": "I built our first rolling twelve month cash forecast, replacing a static annual budget that was often stale by the second quarter. I based it on actuals updated weekly and tied it to hiring and revenue assumptions from the sales and people teams directly. It cut our forecast variance roughly in half within two quarters of adoption.",
+          "starred": true,
+          "scoreValue": 4,
+          "scoreAnchor": "specific model, methodology described, measured improvement"
+        },
+        {
+          "id": "r2",
+          "questionText": "How do you communicate financial results to non-finance stakeholders?",
+          "responseText": "I lead with the three numbers that matter most for the decision at hand rather than a full financial statement walk through. For a board update, that usually means cash runway, burn rate, and the one metric tied to whatever strategic question is live that quarter. I've had a couple of board members tell me it's the clearest finance update they get.",
+          "starred": false,
+          "scoreValue": 4,
+          "scoreAnchor": "clear communication approach, external validation referenced"
+        },
+        {
+          "id": "r3",
+          "questionText": "Tell me about a time you found an error in a financial report.",
+          "responseText": "I caught a double counted revenue entry during a monthly close that would have overstated revenue by about three percent for the quarter. I traced it back to a duplicate invoice import from a new billing system integration. I flagged it before the report went to leadership and fixed the underlying import bug so it wouldn't recur.",
+          "starred": true,
+          "scoreValue": 4,
+          "scoreAnchor": "specific error found, root cause traced, prevented recurrence"
+        },
+        {
+          "id": "r4",
+          "questionText": "How do you approach budget season with department heads?",
+          "responseText": "I start budget conversations by asking department heads what they're trying to achieve, not just what they want to spend. That usually surfaces a smaller, more defensible number than if I just asked for a wish list. I hold one working session per department before the numbers go into the consolidated model.",
+          "starred": false,
+          "scoreValue": 3,
+          "scoreAnchor": "clear process, described technique"
+        },
+        {
+          "id": "r5",
+          "questionText": "Tell me about a time you had to say no to a spending request.",
+          "responseText": "A department head wanted to bring on two new contractors mid quarter outside the approved budget. I showed him the impact on our runway if the request was approved as is, and we agreed to bring on one contractor instead and revisit the second at the next budget cycle. He appreciated seeing the actual tradeoff instead of just hearing no.",
+          "starred": false,
+          "scoreValue": 3,
+          "scoreAnchor": "data backed pushback, negotiated outcome"
+        }
+      ]
+    },
+    {
+      "name": "finance-unstated-01",
+      "candidateName": "Solene Iversen",
+      "role": "Finance Manager",
+      "traits": ["unstated-fact"],
+      "responses": [
+        {
+          "id": "r1",
+          "questionText": "Tell me about the budget you're most proud of managing.",
+          "responseText": "I managed the marketing department's budget through a period when the company was scrutinizing spend much more closely than before. I worked closely with the marketing lead to reforecast monthly instead of quarterly so we could catch overspend early. By the end of the year, marketing was one of the only departments that came in on plan.",
+          "starred": true,
+          "scoreValue": 4,
+          "scoreAnchor": "specific process change, on-plan outcome, no dollar figure given"
+        },
+        {
+          "id": "r2",
+          "questionText": "How do you handle a department that consistently overspends?",
+          "responseText": "I sit down with the department head to understand whether the overspend is a planning problem or a real change in their needs. In one case it turned out their vendor contract had a built in annual increase nobody had accounted for in the original budget. Once we found that, we adjusted the forecast instead of treating every month as a surprise.",
+          "starred": false,
+          "scoreValue": 3,
+          "scoreAnchor": "specific diagnostic approach, root cause found"
+        },
+        {
+          "id": "r3",
+          "questionText": "Tell me about a variance you had to explain to leadership.",
+          "responseText": "There was a quarter where actual spend came in well above forecast in one department, and I had to walk leadership through why before they'd approve the next quarter's numbers. I broke the variance down into a one time item and an ongoing trend so they could see which part was structural. That distinction changed how they reacted to the number.",
+          "starred": false,
+          "scoreValue": 3,
+          "scoreAnchor": "clear variance analysis, framing shaped the outcome"
+        },
+        {
+          "id": "r4",
+          "questionText": "How do you build trust with department heads who see finance as the department that says no?",
+          "responseText": "I try to show up with options instead of just rejections. When I can't approve something as requested, I usually bring one or two alternatives that get closer to what they actually need within the constraint. That's slowly changed how a couple of department heads approach me, from avoidance to bringing me in earlier.",
+          "starred": false,
+          "scoreValue": 3,
+          "scoreAnchor": "relationship building approach, described shift in behavior"
+        },
+        {
+          "id": "r5",
+          "questionText": "Tell me about a process improvement you made in the close cycle.",
+          "responseText": "I automated a reconciliation step that used to take one of our analysts most of a day each month. It now runs as a script that flags exceptions for review instead of requiring a full manual check every time. That freed up time for more analysis work instead of pure data wrangling.",
+          "starred": false,
+          "scoreValue": 3,
+          "scoreAnchor": "specific automation, described time reallocation without a number"
+        }
+      ]
+    },
+    {
+      "name": "finance-ambiguous-contradiction-01",
+      "candidateName": "Ember Kowalczyk",
+      "role": "FP&A Analyst",
+      "traits": ["ambiguous", "contradiction"],
+      "responses": [
+        {
+          "id": "r1",
+          "questionText": "How much FP&A experience do you have?",
+          "responseText": "Honestly, I don't have a ton of dedicated FP&A experience. Most of my background is more general accounting, and FP&A has been a smaller part of what I've done. I'd say I'm still building depth there rather than being an expert.",
+          "starred": false,
+          "scoreValue": 2,
+          "scoreAnchor": "self-assessed limited experience"
+        },
+        {
+          "id": "r2",
+          "questionText": "Tell me about a forecasting model you built in an FP&A capacity.",
+          "responseText": "In my FP&A role at my last company, I built the headcount forecasting model that finance used for quarterly planning. I designed it to pull actuals directly from the HRIS so it didn't rely on manual updates from recruiting. It became the standard model the finance team used for the next two planning cycles.",
+          "starred": true,
+          "scoreValue": 4,
+          "scoreAnchor": "specific model, ownership language, contradicts the earlier self-assessed limited experience"
+        },
+        {
+          "id": "r3",
+          "questionText": "How do you approach a request for a report you've never built before?",
+          "responseText": "I usually just try to figure it out as I go, I guess, maybe ask around a bit if I get stuck. It normally comes together somehow, even if it takes a few tries. I couldn't really say how long it typically takes me.",
+          "starred": false,
+          "scoreValue": 2,
+          "scoreAnchor": "vague method, no concrete example, uncertain timeline"
+        },
+        {
+          "id": "r4",
+          "questionText": "Tell me about a time you worked closely with a business partner outside finance.",
+          "responseText": "I worked with a sales ops person on cleaning up how deals flowed into our revenue recognition process. There were a few meetings, I think three or four, where we worked through the mismatches. I don't remember all the specifics of what changed by the end, but it seemed to help.",
+          "starred": false,
+          "scoreValue": 2,
+          "scoreAnchor": "partial account, hedged on specifics and outcome"
+        },
+        {
+          "id": "r5",
+          "questionText": "What financial systems have you worked with?",
+          "responseText": "I've used a couple of different ERP systems, though I don't remember all their names off the top of my head. I picked things up pretty quickly whenever I had to learn a new one. I think one of them was NetSuite, but I'm not totally sure that's right.",
+          "starred": false,
+          "scoreValue": 1,
+          "scoreAnchor": "very vague, uncertain about basic facts"
+        },
+        {
+          "id": "r6",
+          "questionText": "Tell me about a mistake in a financial model you caught.",
+          "responseText": "I caught a circular reference in a model that was quietly overstating a growth assumption. I traced it to a formula that referenced its own output from a prior period incorrectly. Once I fixed it, the growth number dropped by a few points, which changed the story the model was telling leadership.",
+          "starred": true,
+          "scoreValue": 3,
+          "scoreAnchor": "specific catch and fix, some detail on downstream impact"
+        }
+      ]
+    }
+  ]
+}

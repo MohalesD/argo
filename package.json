@@ -5,6 +5,10 @@
   "type": "module",
   "description": "Argo: the interview layer. Goal 1 backbone: schema, RLS, model allowlist, screened seed bank, evals.",
   "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "e2e": "playwright test",
     "db:fresh": "tsx scripts/db-fresh.ts",
     "db:stop": "tsx scripts/db-stop.ts",
     "seed": "tsx seed/seed.ts",
@@ -12,7 +16,10 @@
     "eval:allowlist": "tsx evals/suites/model-allowlist.ts",
     "eval:compliance": "tsx evals/suites/compliance.ts",
     "eval:consent": "tsx evals/suites/consent.ts",
-    "type-check": "tsc --noEmit",
+    "eval:retrieval": "tsx evals/suites/retrieval.ts",
+    "eval:brief": "tsx evals/suites/brief-faithfulness.ts",
+    "eval:anon": "tsx evals/suites/anon-browse.ts",
+    "type-check": "tsc --noEmit && tsc -p tsconfig.scripts.json",
     "db:start": "tsx scripts/db-start.ts"
   },
   "dependencies": {

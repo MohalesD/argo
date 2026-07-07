@@ -25,6 +25,9 @@ export const MODEL_ROUTING = {
   transport_smoke_test: 'claude-haiku-4-5',
   // Eval-harness judge (suite 8.3), not a production surface call.
   brief_faithfulness_judge: 'claude-haiku-4-5',
+  // In-pipeline grounding gate for brief claims (PRD 8.3: ungrounded
+  // claims do not survive generation).
+  brief_grounding_check: 'claude-haiku-4-5',
 } as const satisfies Record<string, AllowedModel>;
 
 export type Purpose = keyof typeof MODEL_ROUTING;
