@@ -12,8 +12,8 @@ const run = randomUUID().slice(0, 8);
 // Fixture: a full org-scoped object graph for one user.
 async function buildOrgGraph(userId: string, orgId: string, tag: string) {
   const q = await pool.query(
-    `insert into questions (text, category, role_family, level, rationale, screening_status, verification, contributed_by)
-     values ($1, 'skill', 'engineering', 'mid', 'probe fixture', 'passed', 'screened', $2) returning id`,
+    `insert into questions (text, category, role_family, level, rationale, screening_status, flag_reason, verification, contributed_by)
+     values ($1, 'skill', 'engineering', 'mid', 'probe fixture', 'flagged', 'suite fixture, not bank content', null, $2) returning id`,
     [`Probe question ${tag}`, userId],
   );
   const pendingQ = await pool.query(

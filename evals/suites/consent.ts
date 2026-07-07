@@ -19,8 +19,8 @@ const { userId, orgId } = await createUserWithOrg(
   `Consent Org ${run}`,
 );
 const q = await pool.query(
-  `insert into questions (text, category, role_family, level, screening_status, verification)
-   values ('Consent probe question', 'skill', 'engineering', 'mid', 'passed', 'screened') returning id`,
+  `insert into questions (text, category, role_family, level, screening_status, flag_reason, verification)
+   values ('Consent probe question', 'skill', 'engineering', 'mid', 'flagged', 'suite fixture, not bank content', null) returning id`,
 );
 const stack = await pool.query(
   `insert into qstacks (org_id, owner_id, title) values ($1, $2, 'Consent stack') returning id`,
