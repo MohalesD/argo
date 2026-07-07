@@ -35,7 +35,7 @@ export interface BriefInput {
   responses: BriefResponseInput[];
 }
 
-const DRAFT_SYSTEM = `You draft a candidate brief from captured interview responses. The brief structures what was actually said; it never evaluates, recommends, or infers.
+const DRAFT_SYSTEM = `You draft a candidate brief from captured interview responses. Each response is the interviewer's typed capture of what the candidate said, and it is the complete record: sometimes verbatim, sometimes shorthand notes. The brief structures what was captured; it never evaluates, recommends, or infers.
 
 Output ONLY a JSON object, no markdown fences, no commentary:
 {
@@ -55,7 +55,7 @@ Hard rules for every claim in sections and starred_moments:
 7. open_questions are questions for the hiring team (gaps, contradictions, things worth probing next round). They are not claims and carry no citations.
 8. Group section claims under 2 to 4 sensible category themes for the role.`;
 
-const GROUNDING_SYSTEM = `You are a strict grounding checker for one candidate-brief claim. You get the claim and the full text of the interview response(s) it cites. The claim survives only if the cited text literally states or directly contains what the claim asserts, including any hedges. A reasonable inference, a generalization, an added number or detail, or a confident restatement of a hedged answer is NOT grounded. When in doubt, answer false.
+const GROUNDING_SYSTEM = `You are a strict grounding checker for one candidate-brief claim. You get the claim and the cited capture(s): the interviewer's typed record of the response. The capture IS the complete record; there is no fuller transcript behind it, so never reject a claim merely because the capture is brief or note-like. The claim survives only if the capture's content states or directly contains what the claim asserts, including any hedges. A reasonable inference, a generalization, an added number or detail, or a confident restatement of a hedged answer is NOT grounded; a claim that accurately mirrors the capture (including summary-style captures) IS grounded. When in doubt about content mismatch, answer false.
 
 Respond with ONLY a JSON object: {"grounded": true | false, "why": "<one short sentence>"}`;
 
@@ -175,6 +175,7 @@ async function validateDraft(
       .filter((cl) => {
         if (cl.citations.length === 0 || cl.text === '') {
           dropped.push(cl.text || '(empty claim)');
+          console.warn(`brief grounding: dropped structurally (no valid citation): ${cl.text.slice(0, 120)}`);
           return false;
         }
         return true;
@@ -183,6 +184,9 @@ async function validateDraft(
     return structural.filter((cl, i) => {
       if (!verdicts[i]?.grounded) {
         dropped.push(cl.text);
+        console.warn(
+          `brief grounding: dropped (${verdicts[i]?.why ?? 'no verdict'}): ${cl.text.slice(0, 120)}`,
+        );
         return false;
       }
       return true;
@@ -215,7 +219,33 @@ export async function generateBrief(
     throw new Error('cannot generate a brief from zero captured responses');
   }
 
-  const first = await validateDraft(pool, await draft(pool, input, ''), input);
+  // The model sees short stable aliases (r1..rN) instead of raw UUIDs:
+  // long ids get mangled in citation copying often enough to sink a
+  // whole draft structurally. Aliases are mapped back to the real ids
+  // before validation, so the stored content still cites real response
+  // ids (PRD 5.7).
+  const aliasById = new Map(input.responses.map((r, i) => [r.id, `r${i + 1}`]));
+  const idByAlias = new Map(input.responses.map((r, i) => [`r${i + 1}`, r.id]));
+  const aliasedInput: BriefInput = {
+    ...input,
+    responses: input.responses.map((r) => ({ ...r, id: aliasById.get(r.id)! })),
+  };
+  const unalias = (content: BriefContent): BriefContent => ({
+    ...content,
+    sections: content.sections.map((s) => ({
+      ...s,
+      claims: s.claims.map((c) => ({
+        ...c,
+        citations: c.citations.map((id) => idByAlias.get(id.trim()) ?? id),
+      })),
+    })),
+    starred_moments: content.starred_moments.map((c) => ({
+      ...c,
+      citations: c.citations.map((id) => idByAlias.get(id.trim()) ?? id),
+    })),
+  });
+
+  const first = await validateDraft(pool, unalias(await draft(pool, aliasedInput, '')), input);
   let final = first;
 
   // One tighter-grounding regeneration when the first draft lost claims
@@ -225,7 +255,11 @@ export async function generateBrief(
       `A previous draft was rejected because these claims were not literally supported by their cited responses:\n` +
       first.dropped.map((d) => `- ${d}`).join('\n') +
       `\nRedraft. State ONLY what the cited responses literally say; carry every hedge; move anything uncertain into open_questions instead of claiming it.`;
-    const second = await validateDraft(pool, await draft(pool, input, feedback), input);
+    const second = await validateDraft(
+      pool,
+      unalias(await draft(pool, aliasedInput, feedback)),
+      input,
+    );
     final = second;
   }
 

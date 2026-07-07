@@ -65,17 +65,28 @@ export default function SharePage() {
     setSaved(true);
   }
 
+  const [signupNote, setSignupNote] = useState('');
+
   async function signup(e: React.FormEvent) {
     e.preventDefault();
     setSignupState('sending');
-    await supabase.auth.signInWithOtp({
+    const { error } = await supabase.auth.signInWithOtp({
       email,
       options: {
         data: { first_name: firstName },
         emailRedirectTo: `${window.location.origin}/auth/confirm?next=/share/${params.token}`,
       },
     });
-    setSignupState('sent');
+    if (!error) {
+      setSignupState('sent');
+    } else {
+      setSignupState('idle');
+      setSignupNote(
+        error.code === 'over_email_send_rate_limit'
+          ? 'Our mailer just hit its hourly limit; no link went out. Nothing is wrong with your address, try again shortly.'
+          : `The link could not be sent (${error.message}). Check the address and try again.`,
+      );
+    }
   }
 
   if (state === 'loading') {
@@ -227,6 +238,7 @@ export default function SharePage() {
                   {signupState === 'sending' ? 'Sending...' : 'Create free account'}
                 </button>
               </form>
+              {signupNote ? <p className="mt-2 text-xs text-ink-soft">{signupNote}</p> : null}
             </>
           )}
         </div>

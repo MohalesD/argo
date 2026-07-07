@@ -162,21 +162,55 @@ export default function QStackPage() {
     );
   }
 
+  // The workspace hook resolves asynchronously; actions must not
+  // silently no-op when clicked faster than it loads.
+  async function resolveOrgId(): Promise<string | null> {
+    if (ws) return ws.orgId;
+    const { data } = await supabase
+      .from('org_members')
+      .select('org_id')
+      .order('created_at', { ascending: true })
+      .limit(1)
+      .maybeSingle();
+    return (data?.org_id as string) ?? null;
+  }
+
   async function clone() {
-    if (!ws || !qstack) return;
+    if (!qstack) return;
+    const orgId = await resolveOrgId();
+    if (!orgId) {
+      flash('Could not find your workspace; try again');
+      return;
+    }
     const { data, error } = await supabase.rpc('clone_qstack', {
       p_source: qstack.id,
-      p_org: ws.orgId,
+      p_org: orgId,
     });
     if (!error && data) router.push(`/qstacks/${data}`);
+    else flash(`Clone failed (${error?.message ?? 'unknown'})`);
   }
 
   async function setVisibility(v: 'private' | 'org' | 'public', alsoProfile: boolean) {
-    if (!qstack || !ws) return;
+    if (!qstack) return;
     setVisibilityOpen(false);
-    await supabase.from('qstacks').update({ visibility: v }).eq('id', qstack.id);
+    // Verify the write landed: an RLS refusal comes back as zero rows,
+    // and a state change must never claim success it did not have.
+    const { data, error } = await supabase
+      .from('qstacks')
+      .update({ visibility: v })
+      .eq('id', qstack.id)
+      .select('id, visibility');
+    if (error || !data || data.length === 0) {
+      flash(`Visibility unchanged (${error?.message ?? 'no permission to change this QStack'})`);
+      return;
+    }
     if (alsoProfile) {
-      await supabase.from('profiles').update({ visibility: 'public' }).eq('user_id', ws.userId);
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (user) {
+        await supabase.from('profiles').update({ visibility: 'public' }).eq('user_id', user.id);
+      }
     }
     setQstack({ ...qstack, visibility: v });
     flash(v === 'public' ? 'Published to the marketplace' : `Visibility set to ${v}`);

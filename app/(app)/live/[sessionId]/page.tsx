@@ -299,15 +299,27 @@ function CaptureSurface({
   const responseIdRef = useRef<string | null>(null);
 
   const existing = item ? responses.get(item.question_id) : undefined;
+  const editorQuestionRef = useRef<string | null>(null);
 
+  // Reset the editor only when the active QUESTION changes; refreshed
+  // server data for the same question must not clobber typing in
+  // progress or wipe the just-saved indicators.
   useEffect(() => {
-    setText(existing?.response_text ?? '');
-    responseIdRef.current = existing?.id ?? null;
-    setSaveState('idle');
-    setScoreState('idle');
-    setOverrideArmed(false);
-    setMentionNote('');
-  }, [active, existing]);
+    if (!item) return;
+    if (editorQuestionRef.current !== item.question_id) {
+      editorQuestionRef.current = item.question_id;
+      setText(existing?.response_text ?? '');
+      responseIdRef.current = existing?.id ?? null;
+      setSaveState('idle');
+      setScoreState('idle');
+      setOverrideArmed(false);
+      setMentionNote('');
+    } else if (existing) {
+      if (!responseIdRef.current) responseIdRef.current = existing.id;
+      // Adopt server text into an untouched editor (resume after reload).
+      setText((cur) => (cur === '' && existing.response_text ? existing.response_text : cur));
+    }
+  }, [item, existing]);
 
   const persistResponse = useCallback(
     async (value: string) => {

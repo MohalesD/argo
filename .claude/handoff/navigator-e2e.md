@@ -203,3 +203,40 @@ they matter once real pages exist.
 and not yet in `.gitignore`. Left it as-is since `.gitignore` isn't
 one of the four files in scope; worth adding `test-results/` and
 `playwright-report/` there before this suite runs in CI.
+
+## Addendum, post-implementation run (coordinator-directed fixes)
+
+After the main session's first run against the implemented app
+(consent-ui PASSED end to end; launch-of-friends failed at step 1 for
+two environmental reasons), two surgical changes landed, in
+`tests/e2e/helpers/auth.ts` and `tests/e2e/launch-of-friends.spec.ts`
+only:
+
+1. Test email domain changed from `@argo.test` to `@example.com` in
+   `testEmail()`. GoTrue's public signInWithOtp endpoint rejects the
+   reserved .test TLD with 400 email_address_invalid (verified live);
+   the admin generateLink path accepted it fine, which is exactly why
+   consent-ui (admin-only auth) passed while the real /signin form
+   submission in launch-of-friends step 1 failed. One change point,
+   since every test email flows through `testEmail()`; this also
+   covers step 9's share signup form for user B.
+2. Step 1's post-submit assertion now accepts either terminal state
+   the form honestly renders: `signin-sent` (send succeeded) or
+   `signin-rate-limited` (GoTrue returned 429
+   over_email_send_rate_limit, verified live; the hosted mailer has a
+   low hourly cap, so real sends cannot anchor a rerunnable
+   assertion). Implemented as a single union locator,
+   `getByTestId('signin-sent').or(getByTestId('signin-rate-limited'))`,
+   asserted visible. Either state proves the form wired a real GoTrue
+   call; the admin-minted link that follows signs A in regardless.
+   Step 9 makes no sent-state assertion after `share-signup-submit`,
+   so it needed only the domain fix. The earlier note in this file
+   about "one real rate-limited send per run" still applies, but a
+   429 no longer fails the suite.
+
+Sanity check after the edits: `npx tsc --noEmit -p tsconfig.json`
+clean, exit 0. The full suite was deliberately not rerun from here
+(it spends rate-limited sends and live model calls); the main session
+runs it. The ambiguity list above is unchanged; `signin-rate-limited`
+is a coordinator-supplied testid from the implemented form, not one I
+invented.

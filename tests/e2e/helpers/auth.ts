@@ -35,14 +35,17 @@ export interface TestUser {
 export const runId = Math.random().toString(36).slice(2, 8);
 
 // A unique, disposable address for this run:
-// e2e_<runId>_<name>@example.com. Not @argo.test: GoTrue's public
-// signInWithOtp endpoint rejects the reserved .test TLD with 400
-// email_address_invalid (verified live against the hosted project),
-// while @example.com passes its validation. The admin generateLink
-// path accepted .test fine, which is why only flows that submit the
-// real signin forms ever tripped on it.
+// e2e_<runId>_<name>@simulator.amazonses.com. Not @argo.test (GoTrue's
+// public signInWithOtp rejects the reserved .test TLD with 400
+// email_address_invalid) and not @example.com (GoTrue also runs
+// MX-record deliverability validation before the send-rate check, and
+// example.com has no MX; both verified live against the hosted
+// project). The SES mailbox simulator passes GoTrue MX validation and
+// absorbs mail with no bounces. The admin generateLink path accepted
+// all of these fine, which is why only flows that submit the real
+// signin forms ever tripped on it.
 export function testEmail(name: string): string {
-  return `e2e_${runId}_${name}@example.com`;
+  return `e2e_${runId}_${name}@simulator.amazonses.com`;
 }
 
 const createdUserIds = new Map<string, string>();
