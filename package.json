@@ -1,0 +1,28 @@
+{
+  "name": "argo",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Argo: the interview layer. Goal 1 backbone: schema, RLS, model allowlist, screened seed bank, evals.",
+  "scripts": {
+    "db:fresh": "tsx scripts/db-fresh.ts",
+    "db:stop": "tsx scripts/db-stop.ts",
+    "seed": "tsx seed/seed.ts",
+    "eval:rls": "tsx evals/suites/rls-probe.ts",
+    "eval:allowlist": "tsx evals/suites/model-allowlist.ts",
+    "eval:compliance": "tsx evals/suites/compliance.ts",
+    "eval:consent": "tsx evals/suites/consent.ts",
+    "type-check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.110.0",
+    "pg": "^8.16.0"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "@types/pg": "^8.15.0",
+    "embedded-postgres": "17.10.0-beta.17",
+    "tsx": "^4.20.0",
+    "typescript": "^5.8.0"
+  }
+}
