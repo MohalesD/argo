@@ -12,7 +12,8 @@
     "eval:allowlist": "tsx evals/suites/model-allowlist.ts",
     "eval:compliance": "tsx evals/suites/compliance.ts",
     "eval:consent": "tsx evals/suites/consent.ts",
-    "type-check": "tsc --noEmit"
+    "type-check": "tsc --noEmit",
+    "db:start": "tsx scripts/db-start.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.110.0",
