@@ -53,11 +53,11 @@ never pure black. Full voice and microcopy discipline:
 ## Architecture, resolved
 
 Argo is multi-user and shared-record from day one (interviewer, hiring
-manager, team). There is no prior backend. The only codebase in Mo's
-history that touches this space is a 2020 intro-to-coding capstone
-project, explicitly ruled out as a foundation. Do not design around a
-backend that doesn't exist. This is settled; it is not an open question
-to re-confirm.
+manager, team). There is no prior backend. Argo is greenfield, confirmed.
+The only prior code tied to Mo is a 2020 intro to programming class
+exercise, his first personal project learning to code, never connected to
+Argo's actual product research, and explicitly not a foundation to build
+on. There is no backend to check or extend.
 
 Stack, per the approved PRD (decision D1): Next.js (App Router)
 frontend, Supabase for Postgres, auth, row-level security, and storage.
@@ -89,6 +89,12 @@ repository, add real commands here rather than guessing at them.
 4. Design and build your own evals against the Workday AI-hiring
    discrimination litigation as the failure mode to avoid. Establish
    your own success criteria and log what you decided.
+5. A permission denial from the auto-mode classifier means stop and
+   report to Mo, never attempt a different technical path to the same
+   blocked result. This happened once already during Goal 2 (an ALTER
+   ROLE password change blocked, followed by a SCRAM-verifier workaround
+   attempt, also blocked). If this pattern recurs, log it in the build
+   log as an incident, separate from a routine credential request.
 
 ## Project files
 
