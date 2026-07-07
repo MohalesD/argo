@@ -26,5 +26,19 @@ const row = await pool.query(
   "select model, cost_usd from ai_calls where purpose = 'transport_smoke_test' order by created_at desc limit 1",
 );
 console.log(`ai_calls row: model=${row.rows[0]?.model}, cost_usd=${row.rows[0]?.cost_usd}`);
+
+// Sonnet leg: the retrieval_rerank purpose routes to claude-sonnet-4-6.
+const sonnet = await callModel(pool, 'retrieval_rerank', {
+  prompt: 'Reply with exactly the word OK and nothing else.',
+  maxTokens: 16,
+});
+console.log(`sonnet replied: ${JSON.stringify(sonnet.text.trim())} (in=${sonnet.tokensIn}, out=${sonnet.tokensOut})`);
+const sonnetRow = await pool.query(
+  "select model, cost_usd from ai_calls where purpose = 'retrieval_rerank' order by created_at desc limit 1",
+);
+console.log(`ai_calls row: model=${sonnetRow.rows[0]?.model}, cost_usd=${sonnetRow.rows[0]?.cost_usd}`);
+
 await pool.end();
-process.exit(res.text.trim().length > 0 && row.rows.length === 1 ? 0 : 1);
+process.exit(
+  res.text.trim().length > 0 && row.rows.length === 1 && sonnetRow.rows.length === 1 ? 0 : 1,
+);
