@@ -23,6 +23,8 @@ export const MODEL_ROUTING = {
   followup_suggestion: 'claude-sonnet-4-6',
   brief_drafting: 'claude-sonnet-4-6',
   transport_smoke_test: 'claude-haiku-4-5',
+  // Eval-harness judge (suite 8.3), not a production surface call.
+  brief_faithfulness_judge: 'claude-haiku-4-5',
 } as const satisfies Record<string, AllowedModel>;
 
 export type Purpose = keyof typeof MODEL_ROUTING;
