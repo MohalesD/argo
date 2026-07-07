@@ -83,20 +83,28 @@
 - [x] `seed/questions/*.json`: 10 role families, ~36 questions each, authored with text, category (motivation/culture/role/skill), level, rationale, honest provenance
 - [x] `seed/known-flagged.json`: ~5 deliberately non-compliant items to prove the flag path stores and isolates correctly
 - [x] `seed/seed.ts`: screen every question through the classifier (concurrency 8), insert with resulting status, log ai_calls, print per-family/status summary
-- [ ] Run seed; verify bank queryable with badges (screening_status + verification populated on every row)
-- [ ] Commit
+- [x] Run seed; verify bank queryable with badges (screening_status + verification populated on every row)
+- [x] Commit
 
 ### Task 11: Remote Supabase project (best effort)
 - [x] Loaded Supabase MCP tools and listed projects: the active project belongs to another product (ada-coach-01), the other is paused with unknown contents; neither reused
 - [x] Deferred new-project creation to Goal 2 (decision D-G1-12): it requires a user cost confirmation that should not be buried in an autonomous run, and local verification covers every Goal 1 done criterion
 
 ### Task 12: Build log and review
-- [ ] `buildlog/goal1-build-log.md` (human) + `buildlog/goal1-build-log.json` (machine): decisions table, eval results, could-not-verify section, cost breakdown from ai_calls
-- [ ] Update this file: mark tasks complete, add Review section
-- [ ] Final commit
+- [x] `buildlog/goal1-build-log.md` (human) + `buildlog/goal1-build-log.json` (machine): decisions table, eval results, could-not-verify section, cost breakdown from ai_calls
+- [x] Update this file: mark tasks complete, add Review section
+- [x] Final commit
 
 ---
 
 ## Review
 
-(To be written when the work is done. Nothing here is claimable yet.)
+All five done criteria verified on 2026-07-07:
+
+1. Migrations run clean on a fresh database (`npm run db:fresh`, embedded Postgres 17.5, 8 migrations, repeated clean runs).
+2. Two-user RLS probe green: 35/35 checks across every org_id table, the chained interview tables, private profiles, notifications, and unscreened questions; persisted to eval_runs as `rls_probe`.
+3. Fable/Mythos-tier inserts into ai_calls fail: 9/9 checks, four forbidden model strings rejected with SQLSTATE 23514 as a privileged caller; the registry also rejects in-process. Persisted as `model_allowlist`.
+4. Seed bank queryable with badges: 305 questions, 10 role families, 298 passed / 7 flagged / 0 pending; all 5 planted violations caught; flagged rows invisible to authenticated users.
+5. Suites 8.2 and 8.5 green in eval_runs: compliance illegal-recall 1.0 with flagged precision 1.0 over 64 fixtures; consent 9/9 including privileged-path bypass attempts.
+
+Deviations: Task 11 (remote Supabase) deferred by decision D-G1-12 rather than executed; one mid-run incident (classifier JSON refusal) fixed with a retry and resumable seeding. Judgment calls D-G1-1 through D-G1-15 and the could-not-verify list live in `buildlog/goal1-build-log.md`.

@@ -1,0 +1,98 @@
+{
+  "goal": "argo-goal-1-backbone",
+  "date": "2026-07-07",
+  "prd": "docs/argo-prd-v1_0-2026-07-05.md",
+  "status": "complete",
+  "done_criteria": {
+    "migrations_run_clean_on_fresh_db": {
+      "verified": true,
+      "method": "npm run db:fresh wipes and rebuilds embedded Postgres 17.5 from zero, applies shim plus 8 migrations; repeated clean runs"
+    },
+    "two_user_rls_probe": {
+      "verified": true,
+      "suite": "rls_probe",
+      "checks_passed": 35,
+      "checks_total": 35
+    },
+    "mythos_fable_insert_fails": {
+      "verified": true,
+      "suite": "model_allowlist",
+      "checks_passed": 9,
+      "checks_total": 9,
+      "rejected_models": ["claude-fable-5", "claude-mythos-5", "claude-opus-4-8", "claude-3-opus-20240229"],
+      "sqlstate": "23514"
+    },
+    "seed_bank_queryable_with_status": {
+      "verified": true,
+      "total_questions": 305,
+      "role_families": 10,
+      "passed": 298,
+      "flagged": 7,
+      "pending": 0,
+      "plants_caught": 5,
+      "plants_seeded": 5,
+      "flagged_invisible_to_authenticated": true
+    },
+    "suites_8_2_and_8_5_green_in_eval_runs": {
+      "verified": true,
+      "compliance_8_2": {
+        "passed": true,
+        "fixtures": 64,
+        "illegal_recall": 1.0,
+        "illegal_labeled_safe": 0,
+        "flagged_precision": 1.0,
+        "model": "claude-haiku-4-5"
+      },
+      "consent_8_5": { "passed": true, "checks_passed": 9, "checks_total": 9 }
+    }
+  },
+  "environment": {
+    "database": "embedded-postgres 17.10.0-beta.17 (Postgres 17.5), no Docker available",
+    "model_transport": "claude-cli headless (no ANTHROPIC_API_KEY in environment)",
+    "node": "24.14.1"
+  },
+  "decisions": [
+    { "id": "D-G1-1", "decision": "Embedded Postgres with Supabase parity shim as local verification database", "rejected": "remote-only verification; pg-mem" },
+    { "id": "D-G1-2", "decision": "Claude CLI headless as dev transport; registry enforces allowlist regardless of transport", "rejected": "stub classifier; pausing to request API key" },
+    { "id": "D-G1-3", "decision": "questions.role_family and questions.level as first-class indexed columns", "rejected": "provenance jsonb keys" },
+    { "id": "D-G1-4", "decision": "questions.flag_reason column for author-visible flag reasons", "rejected": "reason inside provenance" },
+    { "id": "D-G1-5", "decision": "verification badge null until earned; 'screened' set only on classifier pass", "rejected": "default 'screened' at insert" },
+    { "id": "D-G1-6", "decision": "pending questions author-only visible, same isolation as flagged", "rejected": "pending publicly visible" },
+    { "id": "D-G1-7", "decision": "only 'safe' earns passed; risky and illegal both flag; 8.2 threshold operationalized as zero illegal classified safe", "rejected": "risky as pending-review surfacing state" },
+    { "id": "D-G1-8", "decision": "interviews.status in scheduled/completed/canceled", "rejected": "unconstrained text" },
+    { "id": "D-G1-9", "decision": "atomic security-definer create_org() for org plus owner membership", "rejected": "permissive first-member insert policy" },
+    { "id": "D-G1-10", "decision": "scores append-only via trigger binding all roles; supersede chain must stay on the same response; sessions born only in 'created'; ended terminal", "rejected": "RLS-only enforcement" },
+    { "id": "D-G1-11", "decision": "rls_probe and model_allowlist persisted to eval_runs alongside numbered suites", "rejected": "console-only results" },
+    { "id": "D-G1-12", "decision": "remote Supabase provisioning deferred to Goal 2", "rejected": "reusing ada-coach-01 (different product); creating a project inside an autonomous run (cost confirmation belongs to Mo)" },
+    { "id": "D-G1-13", "decision": "briefs.generated_by_model carries the same allowlist CHECK, nullable", "rejected": "unconstrained model attribution" },
+    { "id": "D-G1-14", "decision": "brief_shares defaults: random 32-hex token, 30-day expiry in schema", "rejected": "application-level defaults" },
+    { "id": "D-G1-15", "decision": "seed provenance names Fable 5 drafting and Haiku screening honestly", "rejected": "vague expert-curated language" }
+  ],
+  "could_not_verify": [
+    { "item": "hosted-Supabase parity of local auth shim", "mitigation": "Goal 2 applies migrations to a hosted project and reruns rls_probe and consent_8_5 there" },
+    { "item": "Anthropic API transport path (no key in environment)", "mitigation": "same registry and allowlist gate both transports; test on first key availability" },
+    { "item": "UI path of eval 8.5 (no UI until Goal 2)", "mitigation": "API and privileged paths covered; UI path is a Goal 2 must-do" },
+    { "item": "classifier variance across reruns (single full 8.2 run)", "mitigation": "suite is cheap to rerun and persists to eval_runs" },
+    { "item": "dev-transport token accounting includes CLI wrapper overhead", "mitigation": "treat ai_calls costs from this run as an upper bound" },
+    { "item": "magic-link auth end to end (needs hosted project and UI)", "mitigation": "schema-side signup mirror built and exercised by every suite fixture" }
+  ],
+  "cost_usd_total": 0.7769,
+  "ai_calls_total": 374,
+  "incidents": [
+    {
+      "what": "first seed run crashed at ~250/305 when Haiku returned commentary instead of JSON for one meta-sounding question",
+      "fix": "never-refuse rule added to classifier prompt, strict-JSON retry, seed made resumable and error-tolerant; resumed run completed with zero failures"
+    },
+    {
+      "what": "tasks/todo.md was briefly written with tasks pre-marked complete before work started",
+      "fix": "corrected immediately to unchecked state; noted here for the record"
+    }
+  ],
+  "carried_to_goal_2": [
+    "rerun rls_probe and consent_8_5 on hosted Supabase after migrations apply",
+    "UI-path consent test in interview mode",
+    "confirm marketplace anon-browse policies match surface design",
+    "tokenized brief access needs definer or edge function, not direct anon RLS",
+    "editorial review of 2 conservative false-positive flags in the bank"
+  ]
+}

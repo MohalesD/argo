@@ -47,7 +47,14 @@ families. No UI surfaces, per scope.
    additionally rejects disallowed models in-process before any
    transport is touched.
 4. **Seed bank queryable, every question carries screening_status.**
-   [PENDING-SEED]
+   305 questions across 10 role families (engineering, product
+   management, sales, customer success, people ops, data and analytics,
+   marketing, finance, operations, design). 298 passed with the
+   'screened' badge, 7 flagged, zero pending. All five deliberately
+   planted non-compliant questions were caught and flagged as illegal.
+   Verified invariants: no passed row without a badge, no flagged row
+   without an author-visible reason, and an authenticated user with no
+   contributions sees zero flagged questions (303 visible, all badged).
 5. **Suites 8.2 and 8.5 green in eval_runs.**
    `compliance_8_2`: 64 labeled fixtures, illegal recall 1.0
    (22/22, zero illegal classified safe), flagged precision 1.0,
@@ -91,11 +98,46 @@ families. No UI surfaces, per scope.
 
 ## Seed bank
 
-[PENDING-SEED]
+| Family | Passed | Flagged |
+| --- | --- | --- |
+| customer_success | 29 | 1 |
+| data_analytics | 30 | 0 |
+| design | 30 | 0 |
+| engineering | 30 | 5 (all deliberate plants) |
+| finance | 30 | 0 |
+| marketing | 30 | 0 |
+| operations | 30 | 0 |
+| people_ops | 29 | 1 |
+| product_management | 30 | 0 |
+| sales | 30 | 0 |
+
+The two non-plant flags are conservative false positives worth knowing
+about: a customer-success question about account "health scores" was
+read as a medical-history proxy (a domain-term collision), and a
+people-ops question inviting reflection on HR perception was judged
+likely to elicit protected disclosures. Both sit flagged with
+author-visible reasons, which is the designed behavior: a false flag
+costs one question; a false pass costs the honesty claim. These are
+first candidates for the future editorial review tier (D14).
+
+One classifier fragility surfaced during seeding: a meta-sounding
+product question drew commentary instead of JSON from Haiku, crashing
+the first seed run partway. Fixed with a never-refuse rule in the
+classifier prompt, a strict-JSON retry, and a resumable, error-tolerant
+seed pipeline. The resumed run completed with zero failures.
 
 ## Cost review (ai_calls)
 
-[PENDING-SEED]
+| Purpose | Model | Calls | Cost (USD) |
+| --- | --- | --- | --- |
+| question_compliance_classification | claude-haiku-4-5 | 373 | 0.7757 |
+| transport_smoke_test | claude-haiku-4-5 | 1 | 0.0012 |
+| **Total** | | **374** | **0.7769** |
+
+Covers eval suite 8.2 (64 fixtures plus spot checks) and the full seed
+screen (305 questions plus retries). Dev-transport caveat: the CLI
+reports usage including its own wrapper overhead, so these figures are
+an upper bound (see could-not-verify item 5).
 
 ## Could not verify
 
