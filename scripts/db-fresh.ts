@@ -3,6 +3,8 @@
 // Supabase shim, then applies every migration in order. Stays alive so
 // eval suites and seeds can connect; stop with SIGINT/SIGTERM.
 import EmbeddedPostgres from 'embedded-postgres';
+import { spawnSync } from 'node:child_process';
+import { existsSync } from 'node:fs';
 import { readdir, readFile, rm } from 'node:fs/promises';
 import path from 'node:path';
 import pg from 'pg';
@@ -10,6 +12,15 @@ import { DB_CONFIG } from '../src/lib/db.js';
 
 const DATA_DIR = path.resolve('.pgdata');
 const MIGRATIONS_DIR = path.resolve('supabase', 'migrations');
+const PG_CTL = path.resolve(
+  'node_modules', '@embedded-postgres', 'windows-x64', 'native', 'bin', 'pg_ctl.exe',
+);
+
+function stopStaleServer(): void {
+  if (existsSync(PG_CTL) && existsSync(DATA_DIR)) {
+    spawnSync(PG_CTL, ['-D', DATA_DIR, 'stop', '-m', 'fast', '-t', '15'], { stdio: 'ignore' });
+  }
+}
 
 async function applySqlFile(client: pg.Client, filePath: string): Promise<void> {
   const sql = await readFile(filePath, 'utf8');
@@ -17,6 +28,7 @@ async function applySqlFile(client: pg.Client, filePath: string): Promise<void> 
 }
 
 async function main(): Promise<void> {
+  stopStaleServer();
   await rm(DATA_DIR, { recursive: true, force: true });
 
   const server = new EmbeddedPostgres({
