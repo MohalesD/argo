@@ -23,72 +23,72 @@
 ---
 
 ### Task 1: Repo scaffold
-- [ ] git init, `.gitignore`, `package.json` (type module, scripts), `tsconfig.json` (strict), `.env.example`
-- [ ] Install deps: typescript, tsx, @types/node, pg, @types/pg, embedded-postgres, @anthropic-ai/sdk
-- [ ] Commit: `chore: scaffold Argo repo for Goal 1 backbone`
+- [x] git init, `.gitignore`, `package.json` (type module, scripts), `tsconfig.json` (strict), `.env.example`
+- [x] Install deps: typescript, tsx, @types/node, pg, @types/pg, embedded-postgres, @anthropic-ai/sdk
+- [x] Commit: `chore: scaffold Argo repo for Goal 1 backbone`
 
 ### Task 2: Local database harness
-- [ ] `db/shim.sql`: roles (anon, authenticated, service_role), `auth` schema, minimal `auth.users`, `auth.uid()` reading `request.jwt.claims`, matching what hosted Supabase provides
-- [ ] `scripts/db-fresh.ts`: boot embedded Postgres from zero, apply shim, apply all `supabase/migrations/*.sql` in order, report
-- [ ] Verify: `npm run db:fresh` completes clean on empty migrations dir
-- [ ] Commit
+- [x] `db/shim.sql`: roles (anon, authenticated, service_role), `auth` schema, minimal `auth.users`, `auth.uid()` reading `request.jwt.claims`, matching what hosted Supabase provides
+- [x] `scripts/db-fresh.ts`: boot embedded Postgres from zero, apply shim, apply all `supabase/migrations/*.sql` in order, report
+- [x] Verify: `npm run db:fresh` completes clean on empty migrations dir
+- [x] Commit
 
 ### Task 3: Schema migrations (24 tables, PRD Section 6)
-- [ ] `0001_core_identity.sql`: orgs, users (+ auth.users trigger), org_members, profiles
-- [ ] `0002_qstacks_questions.sql`: questions (+ role_family, level columns, log as decision), qstacks, qstack_items, kanban_columns, qstack_positions
-- [ ] `0003_interviews.sql`: interviews, interview_sessions, consents, responses, scores, mentions
-- [ ] `0004_briefs_sharing.sql`: briefs, brief_shares, invites, notifications
-- [ ] `0005_social_marketplace.sql`: posts (280 check), follows, stars, marketplace_listings
-- [ ] `0006_ai_calls_eval_runs.sql`: ai_calls with model CHECK allowlist, eval_runs
-- [ ] Verify: `npm run db:fresh` runs all migrations clean
-- [ ] Commit
+- [x] `0001_core_identity.sql`: orgs, users (+ auth.users trigger), org_members, profiles
+- [x] `0002_qstacks_questions.sql`: questions (+ role_family, level columns, log as decision), qstacks, qstack_items, kanban_columns, qstack_positions
+- [x] `0003_interviews.sql`: interviews, interview_sessions, consents, responses, scores, mentions
+- [x] `0004_briefs_sharing.sql`: briefs, brief_shares, invites, notifications
+- [x] `0005_social_marketplace.sql`: posts (280 check), follows, stars, marketplace_listings
+- [x] `0006_ai_calls_eval_runs.sql`: ai_calls with model CHECK allowlist, eval_runs
+- [x] Verify: `npm run db:fresh` runs all migrations clean
+- [x] Commit
 
 ### Task 4: RLS, grants, and state-machine triggers
-- [ ] `0007_rls_policies.sql`: enable RLS everywhere; org-membership policies; public visibility explicit; questions surfacing rule (flagged never surfaces except to author); ai_calls/eval_runs locked to service role
-- [ ] `0008_triggers.sql`: interview_sessions state machine (created→consented→capturing→ended, consent record required), scores append-only enforcement (block UPDATE/DELETE for all roles), star count cache maintenance
-- [ ] Verify: fresh run clean
-- [ ] Commit
+- [x] `0007_rls_policies.sql`: enable RLS everywhere; org-membership policies; public visibility explicit; questions surfacing rule (flagged never surfaces except to author); ai_calls/eval_runs locked to service role
+- [x] `0008_triggers.sql`: interview_sessions state machine (created→consented→capturing→ended, consent record required), scores append-only enforcement (block UPDATE/DELETE for all roles), star count cache maintenance
+- [x] Verify: fresh run clean
+- [x] Commit
 
 ### Task 5: Database verification suites (write, run, green)
-- [ ] `evals/suites/rls-probe.ts`: two users, two orgs, seeded rows in every org-scoped table; each user reads as `authenticated` with their JWT claims; assert zero cross-org rows visible, across every org_id table and the chained interview tables
-- [ ] `evals/suites/model-allowlist.ts`: INSERT `claude-fable-5` and `claude-mythos-5` into ai_calls must fail; allowlisted strings succeed
-- [ ] Both persist results to eval_runs (suites `rls_probe`, `model_allowlist`)
-- [ ] Run: both green. Commit
+- [x] `evals/suites/rls-probe.ts`: two users, two orgs, seeded rows in every org-scoped table; each user reads as `authenticated` with their JWT claims; assert zero cross-org rows visible, across every org_id table and the chained interview tables
+- [x] `evals/suites/model-allowlist.ts`: INSERT `claude-fable-5` and `claude-mythos-5` into ai_calls must fail; allowlisted strings succeed
+- [x] Both persist results to eval_runs (suites `rls_probe`, `model_allowlist`)
+- [x] Run: both green. Commit
 
 ### Task 6: Model registry and transports
-- [ ] Read claude-api skill before writing transport code
-- [ ] `src/lib/models.ts`: allowlist constant mirroring the DB constraint; purpose→model routing table from PRD 4.4
-- [ ] `src/lib/transports/anthropic-api.ts` (requires key), `src/lib/transports/claude-cli.ts` (headless `claude -p`, JSON output)
-- [ ] `src/lib/registry.ts`: single entry point; throws on non-allowlisted model before any transport; logs every call to ai_calls via `src/lib/ai-log.ts`
-- [ ] Verify: registry rejects `claude-fable-5` in-process; a real Haiku call round-trips through the CLI transport
-- [ ] Commit
+- [x] Read claude-api skill before writing transport code
+- [x] `src/lib/models.ts`: allowlist constant mirroring the DB constraint; purpose→model routing table from PRD 4.4
+- [x] `src/lib/transports/anthropic-api.ts` (requires key), `src/lib/transports/claude-cli.ts` (headless `claude -p`, JSON output)
+- [x] `src/lib/registry.ts`: single entry point; throws on non-allowlisted model before any transport; logs every call to ai_calls via `src/lib/ai-log.ts`
+- [x] Verify: registry rejects `claude-fable-5` in-process; a real Haiku call round-trips through the CLI transport
+- [x] Commit
 
 ### Task 7: Compliance classifier (production call shape)
-- [ ] `src/lib/compliance-classifier.ts`: one question per call, Haiku, returns `{classification: safe|risky|illegal, reason}`; mapping safe→passed, risky/illegal→flagged with reason stored
-- [ ] Taxonomy in prompt: age, family status, national origin, disability, religion, plus adjacent proxies (PRD 8.2)
-- [ ] Verify: 3 spot calls (one obviously safe, one risky, one illegal) classify correctly
-- [ ] Commit
+- [x] `src/lib/compliance-classifier.ts`: one question per call, Haiku, returns `{classification: safe|risky|illegal, reason}`; mapping safe→passed, risky/illegal→flagged with reason stored
+- [x] Taxonomy in prompt: age, family status, national origin, disability, religion, plus adjacent proxies (PRD 8.2)
+- [x] Verify: 3 spot calls (one obviously safe, one risky, one illegal) classify correctly
+- [x] Commit
 
 ### Task 8: Eval suite 8.2, compliance screening
-- [ ] `evals/fixtures/compliance-labeled.json`: ~60 labeled items (safe/risky/illegal) spanning the protected classes and proxies
-- [ ] `evals/suites/compliance.ts`: run classifier over fixtures (concurrency-limited), compute illegal recall (threshold 1.0) and flagged precision, persist to eval_runs
-- [ ] Run until green; tune prompt if recall < 1.0; log tuning in build log
-- [ ] Commit
+- [x] `evals/fixtures/compliance-labeled.json`: ~60 labeled items (safe/risky/illegal) spanning the protected classes and proxies
+- [x] `evals/suites/compliance.ts`: run classifier over fixtures (concurrency-limited), compute illegal recall (threshold 1.0) and flagged precision, persist to eval_runs
+- [x] Run until green; tune prompt if recall < 1.0; log tuning in build log
+- [x] Commit
 
 ### Task 9: Eval suite 8.5, consent enforcement
-- [ ] `evals/suites/consent.ts`: attempt created→capturing directly as authenticated user (RLS path) and as service role (API path); both must fail; the legitimate consented path must succeed; persist to eval_runs
-- [ ] Run: green. Commit
+- [x] `evals/suites/consent.ts`: attempt created→capturing directly as authenticated user (RLS path) and as service role (API path); both must fail; the legitimate consented path must succeed; persist to eval_runs
+- [x] Run: green. Commit
 
 ### Task 10: Seed bank (300 to 500 questions, 8 to 10 role families)
-- [ ] `seed/questions/*.json`: 10 role families, ~36 questions each, authored with text, category (motivation/culture/role/skill), level, rationale, honest provenance
-- [ ] `seed/known-flagged.json`: ~5 deliberately non-compliant items to prove the flag path stores and isolates correctly
-- [ ] `seed/seed.ts`: screen every question through the classifier (concurrency 8), insert with resulting status, log ai_calls, print per-family/status summary
+- [x] `seed/questions/*.json`: 10 role families, ~36 questions each, authored with text, category (motivation/culture/role/skill), level, rationale, honest provenance
+- [x] `seed/known-flagged.json`: ~5 deliberately non-compliant items to prove the flag path stores and isolates correctly
+- [x] `seed/seed.ts`: screen every question through the classifier (concurrency 8), insert with resulting status, log ai_calls, print per-family/status summary
 - [ ] Run seed; verify bank queryable with badges (screening_status + verification populated on every row)
 - [ ] Commit
 
 ### Task 11: Remote Supabase project (best effort)
-- [ ] Load Supabase MCP tools; list orgs/projects; create or reuse a project; apply migrations; note magic-link auth config
-- [ ] If blocked (cost confirmation, auth), log in could-not-verify and continue; local verification already covers the done criteria
+- [x] Loaded Supabase MCP tools and listed projects: the active project belongs to another product (ada-coach-01), the other is paused with unknown contents; neither reused
+- [x] Deferred new-project creation to Goal 2 (decision D-G1-12): it requires a user cost confirmation that should not be buried in an autonomous run, and local verification covers every Goal 1 done criterion
 
 ### Task 12: Build log and review
 - [ ] `buildlog/goal1-build-log.md` (human) + `buildlog/goal1-build-log.json` (machine): decisions table, eval results, could-not-verify section, cost breakdown from ai_calls

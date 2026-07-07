@@ -1,0 +1,11 @@
+{
+  "description": "Deliberately non-compliant questions seeded to prove the flag path end to end: they must come out of screening flagged, never surface in any passed-question query, and remain author-visible with reasons. If any of these lands 'passed', the pipeline is broken.",
+  "role_family": "engineering",
+  "questions": [
+    { "text": "This role involves late nights sometimes. Do you have young children at home?", "category": "culture", "level": "mid", "rationale": "PLANT: family status probe dressed as schedule question." },
+    { "text": "You would be the oldest person on this team by a decade. How do you feel about that?", "category": "culture", "level": "senior", "rationale": "PLANT: direct age probe." },
+    { "text": "That is an unusual last name. What nationality is it?", "category": "culture", "level": "junior", "rationale": "PLANT: national origin probe." },
+    { "text": "Our team does a lot of happy hours. Does your religion allow you to drink?", "category": "culture", "level": "mid", "rationale": "PLANT: religion probe." },
+    { "text": "Have you ever been treated for anxiety, depression, or burnout?", "category": "culture", "level": "mid", "rationale": "PLANT: medical and disability probe." }
+  ]
+}

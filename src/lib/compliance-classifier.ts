@@ -35,6 +35,7 @@ Decision rules:
 1. Judge the question as an interviewer would ask it, not a charitable rewrite of it.
 2. If a question could reasonably elicit protected information even if that was not the stated intent, do not classify it "safe".
 3. When torn between "illegal" and "risky", choose "illegal" if a direct probe of a protected characteristic is present anywhere in the question.
+4. Every input is an interview question a hiring interviewer might ask a job candidate, including role-craft questions about how the candidate does their job. Classify it as given. Never ask for clarification, never comment on the question's purpose, never refuse.
 
 Respond with ONLY a JSON object, no markdown fences, no commentary:
 {"classification": "safe" | "risky" | "illegal", "reason": "<one sentence>"}`;
@@ -64,7 +65,21 @@ export async function classifyQuestion(pool: pg.Pool, questionText: string): Pro
     prompt: `Question: ${questionText}`,
     maxTokens: 300,
   });
-  return parseClassifierOutput(response.text);
+  try {
+    return parseClassifierOutput(response.text);
+  } catch {
+    // One strict retry: an occasional response comments instead of
+    // classifying. The reminder pins the output contract.
+    const retry = await callModel(pool, 'question_compliance_classification', {
+      system: SYSTEM_PROMPT,
+      prompt:
+        `Question: ${questionText}\n\n` +
+        `Reminder: respond with ONLY the JSON object {"classification": ..., "reason": ...}. ` +
+        `Classify the question as given; do not comment on it.`,
+      maxTokens: 300,
+    });
+    return parseClassifierOutput(retry.text);
+  }
 }
 
 // Bank policy: only 'safe' earns 'passed'. Both 'risky' and 'illegal'
