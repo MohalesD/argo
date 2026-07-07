@@ -6,6 +6,7 @@
   "description": "Argo: the interview layer. Goal 1 backbone: schema, RLS, model allowlist, screened seed bank, evals.",
   "scripts": {
     "dev": "next dev",
+    "dev:signin": "tsx scripts/dev-signin.ts",
     "build": "next build",
     "start": "next start",
     "e2e": "playwright test",

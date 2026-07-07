@@ -1,6 +1,7 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { supabaseBrowser } from '@/lib/supabase/client';
 
 // Magic-link signup and sign-in (PRD 5.1, D3): first name and email
@@ -12,6 +13,15 @@ export default function SignInPage() {
     'idle',
   );
   const [errorText, setErrorText] = useState('');
+  const searchParams = useSearchParams();
+
+  useEffect(() => {
+    const error = searchParams.get('error');
+    if (error === 'link') {
+      setErrorText('The sign-in link was invalid or expired.');
+      setState('error');
+    }
+  }, [searchParams]);
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();

@@ -2,9 +2,8 @@ import { createServerClient } from '@supabase/ssr';
 import { cookies } from 'next/headers';
 
 // Server client: reads the user session from cookies in server
-// components and route handlers. Writes are attempted and ignored in
-// contexts where Next forbids cookie mutation (middleware handles
-// refresh).
+// components and route handlers. Route handlers can set cookies;
+// server components cannot (middleware handles refresh there).
 export async function supabaseServer() {
   const cookieStore = await cookies();
   return createServerClient(
@@ -14,12 +13,8 @@ export async function supabaseServer() {
       cookies: {
         getAll: () => cookieStore.getAll(),
         setAll: (all) => {
-          try {
-            for (const { name, value, options } of all) {
-              cookieStore.set(name, value, options);
-            }
-          } catch {
-            // Server components cannot set cookies; middleware refreshes.
+          for (const { name, value, options } of all) {
+            cookieStore.set(name, value, options);
           }
         },
       },
