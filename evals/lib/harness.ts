@@ -78,9 +78,10 @@ export async function createUserWithOrg(
   firstName: string,
   orgName: string,
 ): Promise<{ userId: string; orgId: string }> {
+  // id supplied explicitly: hosted auth.users has no column default.
   const user = await pool.query(
-    `insert into auth.users (email, raw_user_meta_data)
-     values ($1, jsonb_build_object('first_name', $2::text))
+    `insert into auth.users (id, email, raw_user_meta_data)
+     values (gen_random_uuid(), $1, jsonb_build_object('first_name', $2::text))
      returning id`,
     [email, firstName],
   );
