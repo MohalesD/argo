@@ -12,6 +12,7 @@ export class AnthropicApiTransport implements Transport {
       model: req.model,
       max_tokens: req.maxTokens,
       ...(req.system ? { system: req.system } : {}),
+      ...(req.temperature !== undefined ? { temperature: req.temperature } : {}),
       messages: [{ role: 'user', content: req.prompt }],
     });
     const text = response.content

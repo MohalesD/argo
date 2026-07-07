@@ -28,7 +28,7 @@ export function getTransport(): Transport {
 export async function callModel(
   pool: pg.Pool,
   purpose: Purpose,
-  req: { system?: string; prompt: string; maxTokens: number },
+  req: { system?: string; prompt: string; maxTokens: number; temperature?: number },
 ): Promise<ModelResponse> {
   const model = MODEL_ROUTING[purpose];
   assertAllowedModel(model);

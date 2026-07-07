@@ -49,6 +49,9 @@ export interface ModelRequest {
   system?: string;
   prompt: string;
   maxTokens: number;
+  // Classifier and judge calls run at temperature 0 to cut run-to-run
+  // variance (Goal 1 could-not-verify item 4, measured in Goal 2).
+  temperature?: number;
 }
 
 export interface ModelResponse {

@@ -77,23 +77,28 @@ export default function ProfilePage() {
   }, [load]);
 
   async function toggleFollow() {
-    if (!ws) {
+    if (!profile) return;
+    // Resolve identity at call time; a fast click is not a signed-out
+    // click while the workspace hook is still loading.
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) {
       router.push('/signin');
       return;
     }
-    if (!profile) return;
     if (following) {
       setFollowing(false);
       await supabase
         .from('follows')
         .delete()
-        .eq('follower_id', ws.userId)
+        .eq('follower_id', user.id)
         .eq('followee_id', profile.user_id);
     } else {
       setFollowing(true);
       await supabase
         .from('follows')
-        .insert({ follower_id: ws.userId, followee_id: profile.user_id });
+        .insert({ follower_id: user.id, followee_id: profile.user_id });
     }
   }
 

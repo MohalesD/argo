@@ -76,11 +76,30 @@ export default function MarketPage() {
     void load();
   }, [load]);
 
-  async function toggleStar(q: MarketQStack) {
-    if (!ws) {
+  // Actions must not depend on the async workspace hook having
+  // resolved; a fast click is not a signed-out click.
+  async function requireIdentity(): Promise<{ userId: string; orgId: string } | null> {
+    if (ws) return { userId: ws.userId, orgId: ws.orgId };
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) {
       router.push('/signin');
-      return;
+      return null;
     }
+    const { data: m } = await supabase
+      .from('org_members')
+      .select('org_id')
+      .order('created_at', { ascending: true })
+      .limit(1)
+      .maybeSingle();
+    if (!m) return null;
+    return { userId: user.id, orgId: m.org_id as string };
+  }
+
+  async function toggleStar(q: MarketQStack) {
+    const identity = await requireIdentity();
+    if (!identity) return;
     const starred = myStars.has(q.id);
     // Optimistic count change with immediate visible feedback.
     setQstacks((cur) =>
@@ -95,11 +114,11 @@ export default function MarketPage() {
       return next;
     });
     if (starred) {
-      await supabase.from('stars').delete().eq('user_id', ws.userId).eq('qstack_id', q.id);
+      await supabase.from('stars').delete().eq('user_id', identity.userId).eq('qstack_id', q.id);
     } else {
       const { error } = await supabase
         .from('stars')
-        .insert({ user_id: ws.userId, qstack_id: q.id });
+        .insert({ user_id: identity.userId, qstack_id: q.id });
       if (error) {
         // Unique violation under concurrency: reconcile with the truth.
         await load();
@@ -108,13 +127,11 @@ export default function MarketPage() {
   }
 
   async function getQStack(q: MarketQStack) {
-    if (!ws) {
-      router.push('/signin');
-      return;
-    }
+    const identity = await requireIdentity();
+    if (!identity) return;
     const { data, error } = await supabase.rpc('clone_qstack', {
       p_source: q.id,
-      p_org: ws.orgId,
+      p_org: identity.orgId,
     });
     if (error || !data) {
       setNotice(`Could not clone (${error?.message ?? 'unknown'}). Nothing changed.`);

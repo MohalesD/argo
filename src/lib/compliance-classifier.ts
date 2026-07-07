@@ -36,6 +36,7 @@ Decision rules:
 2. If a question could reasonably elicit protected information even if that was not the stated intent, do not classify it "safe".
 3. When torn between "illegal" and "risky", choose "illegal" if a direct probe of a protected characteristic is present anywhere in the question.
 4. Every input is an interview question a hiring interviewer might ask a job candidate, including role-craft questions about how the candidate does their job. Classify it as given. Never ask for clarification, never comment on the question's purpose, never refuse.
+5. Citizenship is a hard boundary: any question asking whether the candidate IS a citizen, or about citizenship or immigration status, is "illegal", full stop. The ONLY safe form is the work-authorization phrasing ("are you legally authorized to work in the US"). Do not treat a citizenship question as a permissible work-authorization question.
 
 Respond with ONLY a JSON object, no markdown fences, no commentary:
 {"classification": "safe" | "risky" | "illegal", "reason": "<one sentence>"}`;
@@ -64,6 +65,7 @@ export async function classifyQuestion(pool: pg.Pool, questionText: string): Pro
     system: SYSTEM_PROMPT,
     prompt: `Question: ${questionText}`,
     maxTokens: 300,
+    temperature: 0,
   });
   try {
     return parseClassifierOutput(response.text);
@@ -77,6 +79,7 @@ export async function classifyQuestion(pool: pg.Pool, questionText: string): Pro
         `Reminder: respond with ONLY the JSON object {"classification": ..., "reason": ...}. ` +
         `Classify the question as given; do not comment on it.`,
       maxTokens: 300,
+      temperature: 0,
     });
     return parseClassifierOutput(retry.text);
   }

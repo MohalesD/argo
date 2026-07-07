@@ -59,13 +59,30 @@ export default function InterviewsPage() {
 
   async function saveInterview(e: React.FormEvent) {
     e.preventDefault();
-    if (!ws || !qstackId) return;
+    if (!qstackId) return;
     setBusy(true);
     setError('');
+    // Resolve the org at call time rather than gating on the async
+    // workspace hook; a fast submit must not silently no-op.
+    let orgId = ws?.orgId;
+    if (!orgId) {
+      const { data: m } = await supabase
+        .from('org_members')
+        .select('org_id')
+        .order('created_at', { ascending: true })
+        .limit(1)
+        .maybeSingle();
+      orgId = (m?.org_id as string) ?? undefined;
+    }
+    if (!orgId) {
+      setError('could not find your workspace; try again');
+      setBusy(false);
+      return;
+    }
     const { data, error: err } = await supabase
       .from('interviews')
       .insert({
-        org_id: ws.orgId,
+        org_id: orgId,
         qstack_id: qstackId,
         candidate_name: candidateName,
       })

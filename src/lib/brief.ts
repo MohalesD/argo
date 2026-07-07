@@ -147,6 +147,7 @@ async function checkGrounding(
       system: GROUNDING_SYSTEM,
       prompt,
       maxTokens: 200,
+      temperature: 0,
     });
     return parse(res.text);
   } catch {
@@ -154,6 +155,7 @@ async function checkGrounding(
       system: GROUNDING_SYSTEM,
       prompt: `${prompt}\n\nReminder: respond with ONLY the JSON object {"grounded": ..., "why": ...}.`,
       maxTokens: 200,
+      temperature: 0,
     });
     return parse(retry.text);
   }

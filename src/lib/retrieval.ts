@@ -108,6 +108,7 @@ export async function rerankQuestions(
       system: RERANK_SYSTEM,
       prompt,
       maxTokens: 2500,
+      temperature: 0,
     });
     items = parseRerank(res.text);
   } catch {
@@ -115,6 +116,7 @@ export async function rerankQuestions(
       system: RERANK_SYSTEM,
       prompt: `${prompt}\n\nReminder: respond with ONLY the JSON array of {"id", "reason"} objects, ids copied exactly from the list.`,
       maxTokens: 2500,
+      temperature: 0,
     });
     items = parseRerank(retry.text);
   }
