@@ -69,7 +69,21 @@ export async function signInAsTestUser(page: Page, user: TestUser, next = '/libr
   }
   if (data.user?.id) createdUserIds.set(user.email, data.user.id);
 
+  const expectedPath = next.startsWith('/') ? next : '/library';
   await page.goto(`/auth/confirm?token_hash=${data.properties.hashed_token}&type=email&next=${encodeURIComponent(next)}`);
+
+  // Verify auth succeeded and we landed on the expected page, not redirected to /signin
+  const finalUrl = page.url();
+  if (finalUrl.includes('/signin')) {
+    throw new Error(
+      `auth/confirm redirect failed for ${user.email}: ended up at ${finalUrl} instead of ${expectedPath}. Token hash may be invalid or session setup failed.`
+    );
+  }
+  if (!finalUrl.includes(expectedPath)) {
+    throw new Error(
+      `auth/confirm redirect went to wrong page for ${user.email}: expected ${expectedPath} but got ${finalUrl}`
+    );
+  }
 }
 
 // Best-effort teardown. Some rows are deliberately undeletable (scores
