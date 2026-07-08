@@ -1,12 +1,10 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { Suspense, useState, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { supabaseBrowser } from '@/lib/supabase/client';
 
-// Magic-link signup and sign-in (PRD 5.1, D3): first name and email
-// only, matching the PLG promise. One form serves both.
-export default function SignInPage() {
+function SignInContent() {
   const [firstName, setFirstName] = useState('');
   const [email, setEmail] = useState('');
   const [state, setState] = useState<'idle' | 'sending' | 'sent' | 'rate-limited' | 'error'>(
@@ -108,5 +106,13 @@ export default function SignInPage() {
         </form>
       )}
     </main>
+  );
+}
+
+export default function SignInPage() {
+  return (
+    <Suspense fallback={null}>
+      <SignInContent />
+    </Suspense>
   );
 }
