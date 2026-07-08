@@ -19,15 +19,27 @@ export function useWorkspace(): Workspace | null {
     void (async () => {
       const {
         data: { user },
+        error: userError,
       } = await supabase.auth.getUser();
-      if (!user) return;
-      const { data: membership } = await supabase
+      if (!user) {
+        console.debug('[useWorkspace] No user from getUser():', userError);
+        return;
+      }
+      const { data: membership, error: memberError } = await supabase
         .from('org_members')
         .select('org_id')
+        .eq('user_id', user.id)
         .order('created_at', { ascending: true })
         .limit(1)
         .maybeSingle();
-      if (!membership) return;
+      if (memberError) {
+        console.debug('[useWorkspace] org_members error:', memberError);
+        return;
+      }
+      if (!membership) {
+        console.debug('[useWorkspace] No membership found for user', user.id);
+        return;
+      }
       setWs({
         userId: user.id,
         orgId: membership.org_id as string,
