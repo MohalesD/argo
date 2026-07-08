@@ -1,5 +1,4 @@
 import { NextResponse, type NextRequest } from 'next/server';
-import { cookies } from 'next/headers';
 import { supabaseServer } from '@/lib/supabase/server';
 import type { SupabaseClient } from '@supabase/supabase-js';
 
@@ -89,14 +88,5 @@ export async function GET(request: NextRequest) {
     console.error('[auth/confirm] bootstrap failed:', e instanceof Error ? e.message : String(e));
   }
 
-  const response = NextResponse.redirect(new URL(next.startsWith('/') ? next : '/library', request.url));
-
-  // Explicitly copy all cookies from the cookie store to the response,
-  // ensuring the session established by verifyOtp is sent to the browser.
-  const cookieStore = await cookies();
-  for (const cookie of cookieStore.getAll()) {
-    response.cookies.set(cookie.name, cookie.value, cookie);
-  }
-
-  return response;
+  return NextResponse.redirect(new URL(next.startsWith('/') ? next : '/library', request.url));
 }
