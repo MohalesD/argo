@@ -65,7 +65,17 @@ export async function signInAsTestUser(page: Page, user: TestUser, next = '/libr
     options: { data: { first_name: user.firstName } },
   });
   if (error || !data?.properties?.hashed_token) {
-    throw new Error(`generateLink failed for ${user.email}: ${error?.message ?? 'no hashed_token returned'}`);
+    const fullErrorDump = error
+      ? JSON.stringify(error, Object.getOwnPropertyNames(error))
+      : 'null';
+    console.error('[signInAsTestUser] generateLink raw error:', fullErrorDump);
+    console.error('[signInAsTestUser] generateLink error.status:', (error as any)?.status);
+    console.error('[signInAsTestUser] generateLink error.code:', (error as any)?.code);
+    console.error('[signInAsTestUser] generateLink error.name:', (error as any)?.name);
+    console.error('[signInAsTestUser] generateLink data:', JSON.stringify(data));
+    throw new Error(
+      `generateLink failed for ${user.email}: ${error?.message ?? 'no hashed_token returned'} | raw: ${fullErrorDump}`,
+    );
   }
   if (data.user?.id) createdUserIds.set(user.email, data.user.id);
 
