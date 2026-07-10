@@ -107,9 +107,19 @@ in Argo's discovery history.
 BHAG (Big Hairy Audacious Goal), business model canvas.
 `docs/argo-product-development-notes-*.md`: the QStack object model,
 surfaces, marketplace, intelligence layer, PLG (product-led growth) loop.
-`docs/argo-prd-*.md`: the PRD. Check its status line, currently v0.1,
-awaiting markup.
+`docs/argo-prd-*.md`: the PRD, v1.0, approved by Mo without markup on
+July 5, 2026 (supersedes v0.1). Corrections surface in the build log's
+decisions table, not by reopening the PRD.
 `docs/build-philosophy-v2-*.md`: Mo's stable cross-project preferences.
+`docs/architecture/`: how-we-build docs. `watch-items.md` is the running
+log of structural findings from graphify traces to check before touching
+related code; `agentic-engineering-*.md` is the guardrails spec for
+autonomous Fable passes.
+`docs/qa/`: per-task QA notes plus `CHECKLIST.md`, the running quiz log.
+`buildlog/`: per-goal build logs (md and json), the closest thing to a
+changelog; each goal's decisions table carries corrections forward.
+`tasks/todo.md`: the current plan and backlog; superseded goal plans
+archived beside it (for example `goal1-todo-archive.md`).
 
 Always read the current PRD before starting build work. If a file here
 conflicts with something in `docs/`, the file in `docs/` wins; this file
