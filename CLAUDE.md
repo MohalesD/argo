@@ -7,6 +7,20 @@ polish push is happening July 10-12. Hypothesis-driven product development, JTBD
 structure, the opposite of how Recruiter OS's own documentation history
 developed.
 
+## Positioning guardrail (non-negotiable)
+
+Argo is not an enterprise ATS and is not competing with Workday, Lever, or
+Loxo. Do not benchmark Argo against enterprise incumbents, do not propose
+features on the basis of enterprise parity, and do not treat scale as the
+success measure. The target is a small tribe of recruiters and people ops
+professionals who love the product, not a large market that tolerates it.
+
+Personality, taste, and craft are load-bearing product requirements, not
+decoration. When a conventional design rule conflicts with Argo having a
+distinct point of view, surface the tension rather than silently choosing
+convention. Full statement:
+docs/argo-positioning-v1_0-2026-07-11.md
+
 ## Decision rights
 
 Kellan Vance is principal lead for this sprint: full vote on speed and
