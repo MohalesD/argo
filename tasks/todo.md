@@ -25,11 +25,25 @@ ticking off a fixed acceptance list.
    Playwright as a stop condition, model and effort routing per step.
 4. Mo reviews this file between passes and redirects.
 
-## Themes (to be defined in plan mode)
+## Themes
 
-1. TBD (first plan-mode session output lands here).
-2. TBD.
-3. TBD.
+1. QStack visual and interaction identity. Cards on a canvas, Kanban as the
+   default view, a genuine collectibles feel to the library instead of a
+   plain list. Mode: Plan Mode first, not /goal, this is a judgment call on
+   feel. HTML prototypes reviewed before any wiring. Reuses the existing
+   KanbanBoard() and dnd-kit drag mechanic, does not rebuild it.
+2. Hardening, carried from the original Goal 3 scope. Keyboard and touch
+   parity on the interview surface, empty and error states to the microcopy
+   standard, PDF visual check, custom SMTP before real invites, the
+   could-not-verify items from both build logs, the step-9 flakiness watch
+   item, marketplace owner listing creation UI decision. Mode: mostly
+   /goal-ready.
+3. Not yet written. Only fill this in if Theme 1's output surfaces a real
+   third direction.
+
+Parking lot (not an active theme): ShareRow/SharedBrief type asymmetry
+from docs/architecture/watch-items.md. Only becomes a theme if a future
+theme touches sharing or interview record contracts directly.
 
 ## Standing constraints carried from Goal 1 and 2
 
