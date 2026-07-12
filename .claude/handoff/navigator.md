@@ -397,3 +397,132 @@ green run:
    that is a sign the real constraint under test still is not wired up.
 2. Re-run `schema-qdeck-canvas.ts` alongside this suite once both land,
    the same cross-suite regression posture used for this pass.
+
+---
+
+# PUBLIC EXECUTE grant hygiene (D-ST-10): Test Author handoff (third suite)
+
+Failing-test suite for build-log finding D-ST-10
+(`buildlog/schema-track-build-log.md`): migration
+`0011_function_grant_hygiene.sql` revoked EXECUTE on a set of
+security-definer functions from the `anon` role only. Postgres grants
+EXECUTE to PUBLIC by default on function creation, and every database
+role implicitly inherits PUBLIC's grants regardless of a role-specific
+revoke, so the `anon`-only revoke never closed the door. Migration 0018
+(not written by this suite, not yet built) is expected to explicitly
+`revoke execute ... from public` on five named functions. Written before
+that migration exists, per the strict-TDD rule; do not modify this file
+or the test file to make it pass -- implement the migration instead.
+This suite is separate from `schema-qdeck-canvas.ts` and
+`schema-deck-stars.ts` (both untouched) and does not duplicate their
+checks.
+
+## File created
+
+`evals/suites/schema-grant-hygiene.ts` (one new file; no existing files
+touched, `package.json` untouched, both sibling suites untouched).
+
+## Run command
+
+```
+npx tsx evals/suites/schema-grant-hygiene.ts
+```
+
+Requires the local database up on `127.0.0.1:5799` with migrations 0001
+through 0017 applied (confirmed running at write time, already had all
+17 applied; did not run `db:fresh` or `db:start`, only `db-check.ts` to
+confirm the server was up). No seed data or fixtures required -- this
+suite reads only catalog state (`pg_proc`, `pg_namespace`,
+`pg_roles`), it creates no rows.
+
+## Status: RED (expected)
+
+Ran once against the local database (migrations through 0017, no grant
+migration for these five functions beyond 0011's `anon`-only revoke).
+**5 checks total, 5 FAIL / 0 PASS**, exit code 1, recorded to
+`eval_runs` under suite name `schema_grant_hygiene`. No fixture rows are
+created by this suite, so there is nothing to clean up.
+
+Every check's failure detail confirms the correct reason -- PUBLIC is
+currently present in the function's EXECUTE grantee list, not a
+connection error, a typo, or a missing function:
+
+| Function | Detail |
+| --- | --- |
+| `is_org_member(uuid)` | `EXECUTE currently granted to: [PUBLIC, postgres, authenticated, service_role]` |
+| `clone_qstack(uuid, uuid)` | `EXECUTE currently granted to: [PUBLIC, postgres, authenticated, service_role]` |
+| `accept_share_invite(text)` | `EXECUTE currently granted to: [PUBLIC, postgres, authenticated, service_role]` |
+| `create_org(text)` | `EXECUTE currently granted to: [PUBLIC, postgres, authenticated, service_role]` |
+| `set_stack_deck(uuid, uuid)` | `EXECUTE currently granted to: [PUBLIC, postgres, authenticated, service_role]` |
+
+All five functions exist and resolved to a single, unambiguous `pg_proc`
+oid each; none of the five failed on "function not found" or "ambiguous
+overload" (the two structural failure modes the suite's own oid
+resolution would otherwise report). Confirmed directly against
+`pg_proc.proacl` (via `aclexplode`) before writing the suite: each
+function's ACL includes `=X/postgres` (the `=` before `X` with no
+grantee name is Postgres's ACL notation for the PUBLIC pseudo-role),
+which is exactly what `information_schema.routine_privileges` surfaces
+as `grantee = 'PUBLIC'`.
+
+## How the check works
+
+For each of the five functions:
+
+1. Resolve its exact `pg_proc` oid via `public.<name>` joined to
+   `pg_namespace`, filtered by argument types parsed from
+   `pg_get_function_identity_arguments` (not name alone) -- this
+   guards against a future accidental overload silently matching the
+   wrong function, per the task's request for precision even though
+   none of these five are overloaded today. A resolution failure
+   (function not found, or more than one oid matches the parsed
+   argument types) fails the check with that structural reason instead
+   of silently treating it as "PUBLIC absent."
+2. Expand that oid's `pg_proc.proacl` via `aclexplode(...)`, resolving
+   grantee oid `0` to the literal string `'PUBLIC'` (falling back to
+   `acldefault('f', proowner)` if `proacl` were null, i.e. untouched
+   default privileges -- not the case for any of these five today,
+   since 0011 already touched their ACLs).
+3. The check passes only when `'PUBLIC'` does not appear among the
+   `EXECUTE` grantees for that oid.
+
+## Expected-green criteria after migration 0018 lands
+
+All 5 checks should flip to PASS with no test-file changes, once 0018
+adds `revoke execute on function public.<name>(<args>) from public;`
+for each of the five. Concretely, `green` means:
+
+1. Each function's EXECUTE grantee list (as printed in this suite's own
+   check detail on a passing run) no longer contains `PUBLIC` --
+   `authenticated` and `service_role` (and `postgres`, the owner)
+   remain, since a `PUBLIC` revoke does not touch role-specific grants
+   already in place from 0011 or function creation. `is_org_member` in
+   particular still needs `authenticated` (it is called from RLS
+   policies evaluated as `authenticated`) and this suite does not
+   assert anything about `authenticated`'s or `service_role`'s grants,
+   only PUBLIC's absence -- do not read a green run here as also having
+   verified `authenticated` access still works; that is
+   `rls-probe.ts`/`schema-qdeck-canvas.ts`/`schema-deck-stars.ts`'s
+   territory (unchanged, still green, not re-verified as part of this
+   pass since 0018 does not exist yet).
+2. `recordEvalRun` should show `passed: true` for suite
+   `schema_grant_hygiene` in `eval_runs`, and exit code 0.
+3. No new failure mode should appear (e.g. a function-not-found error
+   would mean 0018 accidentally dropped or renamed one of these
+   functions, not that the grant fix worked) -- re-check the detail
+   strings on the green run, not just the exit code.
+
+## Type-check fix (fourth Test Author pass, post-0018)
+
+`npm run type-check` failed with two `TS2532: Object is possibly
+'undefined'` errors (a stricter array-index-access tsconfig setting)
+at `parts[parts.length - 1]` in `parseArgTypes` (line 48) and
+`argTypes[i]` inside the `.every` callback in `resolveOid` (line 68).
+Fixed with a non-null assertion at each site plus a one-line comment
+explaining the invariant that guarantees non-undefined (a trimmed
+split always has >=1 element; the `.every` only runs after
+`parsed.length === argTypes.length` is confirmed true). No check
+names, suite behavior, or any other line changed. `npm run type-check`
+is now clean and `schema-grant-hygiene.ts` is still GREEN, 5/5 PASS
+(now exercising the real 0018 grant revoke rather than the pre-0018
+RED baseline documented above).

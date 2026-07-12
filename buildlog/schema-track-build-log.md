@@ -41,12 +41,25 @@ nothing under `prototypes/`.**
    invariant green), fully green after the migrations.
 10. `docs/argo-goal2-surface-contract-v1_2-2026-07-12.md`: deck star
     controls and the set_stack_deck guarantee; v1.1 stays archived.
+11. `supabase/migrations/0018_revoke_public_execute.sql`: the D-ST-10
+    fix. `revoke execute ... from public` on the exact five signatures
+    confirmed live against pg_proc twice (no overloads):
+    is_org_member(uuid), clone_qstack(uuid, uuid),
+    accept_share_invite(text), create_org(text),
+    set_stack_deck(uuid, uuid). Role-specific grants (authenticated,
+    service_role) untouched, since revoking PUBLIC doesn't remove them.
+12. `evals/suites/schema-grant-hygiene.ts`: 5-check suite, written
+    red-first by a Test Author (5/5 red on PUBLIC-still-granted before
+    0018), green after. A second Test Author fixed two type-check
+    errors in the suite (strict array-index typing) without touching
+    check names or behavior; suite stayed 5/5 green throughout.
 
 ## Verification state
 
-Local embedded Postgres (17.10): fresh rebuild applies shim plus all 17
+Local embedded Postgres (17.10): fresh rebuild applies shim plus all 18
 migrations clean. `schema-qdeck-canvas` 39/39 PASS, `schema-deck-stars`
-37/37 PASS, `rls-probe` fully green, `type-check` clean.
+37/37 PASS, `schema-grant-hygiene` 5/5 PASS, `rls-probe` fully green,
+`type-check` clean.
 
 Hosted (17.6, project rtqgisbotvxidvzphyhn): 0013 through 0017 applied
 2026-07-12, one migration per `apply_migration` call, in order. Applying
@@ -112,7 +125,7 @@ local run):
 | D-ST-7 | Cross-org UPDATE/DELETE blocking is asserted as zero-rows-plus-unchanged-content, not as a thrown error | expectReject on RLS-filtered writes; Postgres filters invisible rows silently, it does not throw. Two checks misreported failure until a fresh Test Author fixed the assertion style |
 | D-ST-8 | Deck assignment currently restricted to stack owner or org admin only, an accident of column placement (deck_id sits on the qstack row and inherits qstacks_update), not a deliberate decision. Correct model is any org member, same gesture class as Kanban placement; the design doc's deck page assumes assembly from stacks the caller does not own. | Fix is a narrow security-definer function set_stack_deck(p_stack, p_deck) per the 0010_definer_functions.sql precedent, not widening qstacks_update. Built in 0017, red-first tested. |
 | D-ST-9 | Deck-owned stars share the stars table via XOR subject (nullable qstack_id/deck_id, exactly one set), scarcity per subject via partial unique indexes, cached qdecks.star_count, seal parity at 25+ | A separate deck_stars table (two tables for one concept fragments the seal rule and the scarcity story); a status field on qdecks (rejected: decks carry the seal, never the fleece edge, per design decisions v1.0) |
-| D-ST-10 | The 0011 grant-hygiene pattern (revoke EXECUTE from anon) does not close PUBLIC's default EXECUTE grant; every definer function on hosted, including set_stack_deck, remains PUBLIC-executable. Left unfixed here: pre-existing, systemic, Goal 1 scope. Practical exposure on set_stack_deck is low (its own auth.uid() membership check rejects anon regardless). | Fixing it inside this track's migrations; a systemic revoke-from-PUBLIC pass belongs to whichever track owns Goal 1 grant hygiene, not a one-off patch buried in 0017 |
+| D-ST-10 | The 0011 grant-hygiene pattern (revoke EXECUTE from anon) does not close PUBLIC's default EXECUTE grant; every definer function on hosted, including set_stack_deck, remains PUBLIC-executable. Fixed in 0018 (revoke ... from public on all five signatures, confirmed against pg_proc directly, no overloads); local verified green, held for Mo's go-ahead before hosted. | Leaving it unfixed (original call, before Mo asked for the fix); folding it into 0017 instead of its own migration (mixes an unrelated systemic fix into a feature migration) |
 
 ## Watched items
 

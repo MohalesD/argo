@@ -94,6 +94,24 @@ types, schema only. No UI components, nothing under `prototypes/`.
       already committed; versioning discipline forced the bump):
       `docs/argo-goal2-surface-contract-v1_2-2026-07-12.md`, testid
       item 38 plus guarantees 6, 11, 12. Committed in 006946f.
+
+## D-ST-10 fix: 0018_revoke_public_execute.sql (separate from track scope,
+   flagged 2026-07-12; same red-first + local-then-hosted discipline)
+
+- [x] Test Author writes red-first checks (evals/suites/schema-grant-hygiene.ts):
+      PUBLIC does not have EXECUTE on is_org_member(uuid),
+      clone_qstack(uuid, uuid), accept_share_invite(text),
+      create_org(text), set_stack_deck(uuid, uuid) -- 5/5 FAIL confirmed
+      for the correct reason (PUBLIC present in ACL), not a lookup bug
+- [x] Write `0018_revoke_public_execute.sql`: revoke execute from public
+      on the five exact signatures, confirmed twice against pg_proc
+      directly, no overloads
+- [x] Apply locally, suite goes 5/5 green (grantee list now
+      [postgres, authenticated, service_role], PUBLIC absent); existing
+      suites + rls-probe green; type-check hit 2 strict-array-index
+      errors in the new suite, fixed by a second Test Author without
+      changing behavior, suite stayed 5/5 green throughout
+- [x] STOP and present; hold for Mo's go-ahead before hosted
 - [x] Mo's final word, then apply 0013-0016/0017 to hosted in ONE pass
       (0017 hit an auto-mode classifier block on first attempt over the
       cross-org bypass-test precondition; Mo re-authorized explicitly,
