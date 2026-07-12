@@ -1,3 +1,119 @@
+# Keyboard/touch parity, live interview surface: Test Author handoff (2026-07-12)
+
+Failing-test suite for the untested PRD 5.5 / Goal 3 requirement: "a full
+mock interview runs start to finish with keyboard only," plus touch
+parity on the same surface. Written per the strict-TDD rule; no
+implementation code was written or modified.
+
+## Files created
+
+1. `tests/e2e/interview-keyboard.spec.ts`
+2. `tests/e2e/interview-touch.spec.ts`
+
+No other file was touched. `app/`, `src/`, `tests/e2e/helpers/auth.ts`,
+and the other existing spec files are all untouched.
+
+## Fixture approach (both specs)
+
+A service-role admin client (same credential pattern as
+`tests/e2e/helpers/auth.ts`'s private `adminClient()`, redefined locally
+in each spec since it is not exported) is used in `beforeAll` to: sign
+in a fresh test user via `signInAsTestUser` (this also runs
+`/auth/confirm`'s bootstrap, creating the org/profile), resolve that
+user's `org_members.org_id`, query 2 `questions` rows with
+`screening_status = 'passed'`, insert a `qstacks` row, insert 2
+`qstack_items` rows against those two questions (rubric anchors reused
+from `src/lib/rubric.ts`'s `DEFAULT_ANCHORS`), and insert one
+`interviews` row. This deliberately never touches the QStack-library UI.
+The keyboard/touch-only portion begins at `page.goto('/interviews')`,
+the real dashboard entry point, and finds the fixture's `interview-row`
+by `candidateName` before activating `start-session`.
+
+Two questions (not one) are required in fixture setup so `prev-question`
+/ `next-question` have an observable effect to assert against.
+
+## Run command
+
+```
+npx playwright test tests/e2e/interview-keyboard.spec.ts tests/e2e/interview-touch.spec.ts
+```
+
+(equivalently `npm run e2e -- tests/e2e/interview-keyboard.spec.ts tests/e2e/interview-touch.spec.ts`)
+
+## Status: BLOCKED on environment, not a defect in the app or the specs
+
+`node_modules` did not exist at the start of this task; ran `npm
+install` once (155 packages resolved against the existing lockfile, no
+`package.json`/lockfile edits). After that, `.env.local` does not exist
+in this workspace (only `.env.example` is present), and no
+`SUPABASE_SECRET_KEY` / `NEXT_PUBLIC_SUPABASE_URL` are set in the shell
+environment. Per this repo's memory note, Mo manages `.env.local`
+credentials personally; I did not attempt to source them from any other
+credential (e.g. the `SUPABASE_ACCESS_TOKEN` present in the shell) --
+that would be the same kind of credential workaround CLAUDE.md's hard
+boundary 6 flags as a stop-and-report condition, not something to route
+around.
+
+Both specs were run once against the current, unmodified app (dev
+server started fine via Playwright's `webServer` block; Next.js
+compiled and served `/interviews` and `/live/...` routes with no errors
+of its own). Both failed at the exact same point, for the exact same
+reason `tests/e2e/consent-ui.spec.ts` and `tests/e2e/launch-of-friends.spec.ts`
+would also fail in this same environment:
+
+```
+Error: NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SECRET_KEY must be set (see .env.local);
+auth helper cannot mint sign-in links without them.
+    at helpers\auth.ts:20
+    at adminClient (tests\e2e\helpers\auth.ts:20:11)
+    at signInAsTestUser (tests\e2e\helpers\auth.ts:61:17)
+    at interview-keyboard.spec.ts:59:11   (interview-touch.spec.ts:57:11, same line role)
+```
+
+This is `signInAsTestUser`'s own guard clause in the untouched
+`helpers/auth.ts`, thrown before either spec reaches a single keyboard
+or touch interaction. It confirms the two new specs are wired correctly
+into Playwright's config, discovery, and the dev-server harness, and
+that they fail for the same structural, pre-existing reason any e2e
+spec in this repo would fail without live Supabase credentials -- not a
+typo, not a wrong selector, and not (yet) a finding about keyboard or
+touch behavior on the live-interview surface itself. That behavioral
+question -- does `start-session`, the consent checkboxes,
+`prev-question`/`next-question`, `response-field`, the `score-anchor-N`
+buttons, `override-score`, and `end-session` actually respond correctly
+to real key events and real tap events -- remains unanswered pending a
+run with `.env.local` populated. Given every control on this surface is
+a native `<button>`, `<input type="checkbox">`, or `<textarea>` with a
+plain `onClick`/`onChange` handler (no custom keydown handling, no
+`role="button"` on a non-interactive element, no dnd-kit sensor), I
+expect both specs to pass once credentials are supplied, but that is an
+expectation, not a verified result -- do not report these as green
+without an actual credentialed run.
+
+## No defect found in Goal 2 dnd-kit keyboard sensor / ARIA config
+
+Nothing in the files read for this task (`app/(app)/live/[sessionId]/page.tsx`,
+`app/(app)/interviews/page.tsx`) touches dnd-kit; this surface has no
+drag-and-drop. No dnd-kit code was encountered in scope, so there is
+nothing to report here -- not investigated further, per the task's
+instruction not to go looking beyond what was naturally encountered.
+
+## Confirmed constraints
+
+1. Neither spec calls `.click()` anywhere, including in fixture setup
+   (fixture setup is entirely admin-client DB inserts before
+   `page.goto`).
+2. `interview-keyboard.spec.ts` never uses `.tap()` or any
+   `page.touchscreen`/`hasTouch` API.
+3. `interview-touch.spec.ts` never uses `page.keyboard.press()` or
+   `locator.press()` for activation (the response-field text entry uses
+   `locator.tap()` to focus, then `page.keyboard.type()` to enter text,
+   per the task's own allowance that a real touch keyboard ultimately
+   dispatches key events once a field has focus -- no other step in
+   that spec uses a key press for activation).
+
+---
+
 # QDeck / canvas-position schema: Test Author handoff
 
 Failing-test suite for the not-yet-built schema work: qstacks.stage,
