@@ -100,6 +100,81 @@ their own.
 5. A permission denial means stop and report to Mo, never re-route to
    the same blocked result (blocked-means-stop rule).
 
+## Schema/backend track: QStack/QDeck data model (approved 2026-07-12)
+
+Plan approved by Mo in plan mode; full plan with DDL at
+`~/.claude/plans/plan-the-schema-and-eventual-allen.md`. Scope: migrations,
+types, schema only. No UI components, nothing under `prototypes/`.
+
+- [x] Test Author subagent writes failing schema tests (eval-suite style,
+      embedded PG), confirms they fail for a valid reason, hands off to
+      `.claude/handoff/navigator.md` (39 checks: 38 red for valid
+      missing-schema reasons, stars regression guard green)
+- [x] Verify tests fail, then write `0013_qstack_stage.sql`
+- [x] Write `0014_qdecks.sql` (deck table, nullable composite FK on
+      qstacks, RLS)
+- [x] Write `0015_canvas_positions.sql` (XOR subject, cascades, partial
+      unique indexes, spatial-memory-only comment inline and on-table)
+- [x] Write shared row types `src/lib/qdeck.ts`, `src/lib/canvas.ts`
+- [x] `db:fresh` applies 0001-0015 clean; new tests green (39/39, after
+      a fresh Test Author fixed two checks asserting throw instead of
+      RLS zero-row filtering); `eval:rls` still green; type-check passes
+- [x] Test Author writes red-first checks for deck stars + set_stack_deck
+      (evals/suites/schema-deck-stars.ts, 37 checks: 32 red for valid
+      reasons, 5 regression/invariant green)
+- [x] Write `0016_deck_stars.sql`: qdecks.star_count (no status field,
+      decks carry the seal, never the fleece edge), stars XOR subject,
+      partial unique indexes, trigger + stars_insert policy replacement;
+      stars never touch canvas position in either direction
+- [x] Write `0017_set_stack_deck.sql`: security-definer function, caller
+      org membership check, updates only deck_id, qstacks_update NOT
+      widened, grant hygiene per 0011
+- [x] All suites green locally (deck-stars 37/37, qdeck-canvas 39/39,
+      rls-probe, type-check), then STOP and present before hosted
+- [x] Surface contract: add the star control on qdeck-card line that
+      0016 requires. Done as v1.2 (not an edit to v1.1, which was
+      already committed; versioning discipline forced the bump):
+      `docs/argo-goal2-surface-contract-v1_2-2026-07-12.md`, testid
+      item 38 plus guarantees 6, 11, 12. Committed in 006946f.
+
+## D-ST-10 fix: 0018_revoke_public_execute.sql (separate from track scope,
+   flagged 2026-07-12; same red-first + local-then-hosted discipline)
+
+- [x] Test Author writes red-first checks (evals/suites/schema-grant-hygiene.ts):
+      PUBLIC does not have EXECUTE on is_org_member(uuid),
+      clone_qstack(uuid, uuid), accept_share_invite(text),
+      create_org(text), set_stack_deck(uuid, uuid) -- 5/5 FAIL confirmed
+      for the correct reason (PUBLIC present in ACL), not a lookup bug
+- [x] Write `0018_revoke_public_execute.sql`: revoke execute from public
+      on the five exact signatures, confirmed twice against pg_proc
+      directly, no overloads
+- [x] Apply locally, suite goes 5/5 green (grantee list now
+      [postgres, authenticated, service_role], PUBLIC absent); existing
+      suites + rls-probe green; type-check hit 2 strict-array-index
+      errors in the new suite, fixed by a second Test Author without
+      changing behavior, suite stayed 5/5 green throughout
+- [x] STOP and present; hold for Mo's go-ahead before hosted
+- [x] Mo's go-ahead, 0018 applied to hosted. Verified live via
+      aclexplode on pg_proc.proacl (not information_schema): all five
+      functions show EXECUTE granted to exactly
+      {authenticated, postgres, service_role}, PUBLIC absent, matching
+      the local suite's result exactly.
+- [x] Mo's final word, then apply 0013-0016/0017 to hosted in ONE pass
+      (0017 hit an auto-mode classifier block on first attempt over the
+      cross-org bypass-test precondition; Mo re-authorized explicitly,
+      retry succeeded). Verified live against hosted: schema shape,
+      grant hygiene (found and logged D-ST-10, not fixed here), and an
+      11-check hosted-scoped RLS probe run via Supabase MCP since this
+      worktree has no DATABASE_URL_HOSTED. All green; zero leftover
+      fixture rows.
+- [x] `graphify update .`, build log decisions entry (corrected star
+      hypothesis) at `buildlog/schema-track-build-log.md`, QA quiz file +
+      CHECKLIST line
+- [x] Draft surface contract v1.1 amendment (docs only, for UI track):
+      `docs/argo-goal2-surface-contract-v1_1-2026-07-12.md`
+- [ ] Flag to UI track: `QStackRow` in QStackCard.tsx needs `stage` and
+      `deck_id` after migrations land (flag once hosted migration is in)
+
 ## Review
 
 _Empty until the first pass completes._
