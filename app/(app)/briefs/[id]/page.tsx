@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import type { BriefClaim, BriefContent } from '@/lib/brief';
@@ -42,6 +43,7 @@ export default function BriefPage() {
   const [shareOpen, setShareOpen] = useState(false);
   const [share, setShare] = useState<ShareRow | null>(null);
   const [flash, setFlash] = useState('');
+  const [notFound, setNotFound] = useState(false);
 
   const load = useCallback(async () => {
     const { data: b } = await supabase
@@ -49,7 +51,10 @@ export default function BriefPage() {
       .select('id, interview_id, content, generated_by_model, status')
       .eq('id', params.id)
       .maybeSingle();
-    if (!b) return;
+    if (!b) {
+      setNotFound(true);
+      return;
+    }
     setBrief(b as BriefRow);
     const { data: iv } = await supabase
       .from('interviews')
@@ -140,6 +145,20 @@ export default function BriefPage() {
     note('Link revoked; the page behind it now shows a dead end');
   }
 
+  if (notFound) {
+    return (
+      <div className="rounded-lg border border-line bg-white p-8 text-center">
+        <h1 className="text-xl">This brief is not available</h1>
+        <p className="mt-2 text-ink-soft">
+          It may be private to another workspace, or the link is out of date.
+          Nothing of yours was lost.
+        </p>
+        <Link href="/library" className="mt-4 inline-block text-forest underline">
+          Back to your library
+        </Link>
+      </div>
+    );
+  }
   if (!brief) return <p className="text-ink-soft">Loading brief...</p>;
   const content = editing && draftContent ? draftContent : brief.content;
 

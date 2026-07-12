@@ -187,7 +187,10 @@ export default function QStackPage() {
       p_org: orgId,
     });
     if (!error && data) router.push(`/qstacks/${data}`);
-    else flash(`Clone failed (${error?.message ?? 'unknown'})`);
+    else
+      flash(
+        `Clone failed (${error?.message ?? 'unknown'}). Nothing was added to your library; check access and try again.`,
+      );
   }
 
   async function setVisibility(v: 'private' | 'org' | 'public', alsoProfile: boolean) {
@@ -201,7 +204,9 @@ export default function QStackPage() {
       .eq('id', qstack.id)
       .select('id, visibility');
     if (error || !data || data.length === 0) {
-      flash(`Visibility unchanged (${error?.message ?? 'no permission to change this QStack'})`);
+      flash(
+        `Visibility unchanged (${error?.message ?? 'no permission to change this QStack'}). Nothing changed here; ask the owner if this keeps happening.`,
+      );
       return;
     }
     if (alsoProfile) {
@@ -549,7 +554,9 @@ function ContributeQuestion({
       error?: string;
     };
     if (!res.ok || !data.id) {
-      setResult(`Could not save it (${data.error ?? res.status}). Your text is still here.`);
+      setResult(
+        `Could not save it (${data.error ?? res.status}). Your text is still here; edit it and save again.`,
+      );
       setBusy(false);
       return;
     }

@@ -66,7 +66,7 @@ export default function LibraryPage() {
         </Link>
       </div>
 
-      {loaded && qstacks.length === 0 && view !== 'board' ? (
+      {loaded && qstacks.length === 0 ? (
         <div className="mt-12 rounded-lg border border-line bg-white p-8 text-center shadow-card">
           <h2 className="text-xl">Your library starts here</h2>
           <p className="mx-auto mt-2 max-w-md text-ink-soft">

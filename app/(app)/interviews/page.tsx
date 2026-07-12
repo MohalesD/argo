@@ -169,7 +169,8 @@ export default function InterviewsPage() {
 
       {error ? (
         <p className="mt-3 text-sm text-flag">
-          That did not save ({error}). Your entries are still in the form.
+          That did not save ({error}). Your entries are still in the form;
+          adjust and save again.
         </p>
       ) : null}
 
@@ -195,9 +196,20 @@ export default function InterviewsPage() {
           </li>
         ))}
         {interviews.length === 0 ? (
-          <li className="rounded-lg border border-line bg-white p-6 text-center text-ink-soft">
-            No interviews yet. Create one against a QStack and Argo walks you
-            through consent, capture, and scoring live.
+          <li className="rounded-lg border border-line bg-white p-8 text-center shadow-card">
+            <h2 className="text-xl">No interviews yet</h2>
+            <p className="mx-auto mt-2 max-w-md text-ink-soft">
+              Create one against a QStack and Argo walks you through consent,
+              capture, and scoring live.
+            </p>
+            <div className="mt-4 flex justify-center">
+              <button
+                onClick={() => setFormOpen(true)}
+                className="rounded-lg bg-gold px-4 py-2 font-medium hover:bg-gold-hover"
+              >
+                Schedule your first interview
+              </button>
+            </div>
           </li>
         ) : null}
       </ul>

@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { supabaseBrowser } from '@/lib/supabase/client';
@@ -123,9 +124,12 @@ export default function LiveSessionPage() {
 
   if (loadError) {
     return (
-      <p className="rounded-lg border border-line bg-white p-6 text-ink-soft">
-        This session is not available to you. Nothing was changed.
-      </p>
+      <div className="rounded-lg border border-line bg-white p-6 text-ink-soft">
+        <p>This session is not available to you. Nothing was changed.</p>
+        <Link href="/interviews" className="mt-2 inline-block text-forest underline">
+          Back to interviews
+        </Link>
+      </div>
     );
   }
   if (!session || !interview) return <p className="text-ink-soft">Loading session...</p>;
@@ -256,8 +260,8 @@ function ConsentPanel({
       </button>
       {error ? (
         <p className="mt-3 text-sm text-flag">
-          Consent could not be recorded ({error}). Nothing was captured; try
-          again.
+          Consent could not be recorded ({error}). Nothing was captured;
+          recheck the boxes above and confirm again.
         </p>
       ) : null}
     </div>

@@ -178,8 +178,8 @@ export default function BankPanel({
 
       {error ? (
         <p className="text-sm text-flag">
-          The bank search hit a problem ({error}). Your filters are kept; try
-          again.
+          The bank search hit a problem ({error}). Your filters are kept;
+          adjust them or search again.
         </p>
       ) : null}
 
