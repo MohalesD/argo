@@ -58,6 +58,34 @@ theme touches sharing or interview record contracts directly.
 5. A permission denial means stop and report to Mo, never re-route to
    the same blocked result (blocked-means-stop rule).
 
+## Schema/backend track: QStack/QDeck data model (approved 2026-07-12)
+
+Plan approved by Mo in plan mode; full plan with DDL at
+`~/.claude/plans/plan-the-schema-and-eventual-allen.md`. Scope: migrations,
+types, schema only. No UI components, nothing under `prototypes/`.
+
+- [x] Test Author subagent writes failing schema tests (eval-suite style,
+      embedded PG), confirms they fail for a valid reason, hands off to
+      `.claude/handoff/navigator.md` (39 checks: 38 red for valid
+      missing-schema reasons, stars regression guard green)
+- [x] Verify tests fail, then write `0013_qstack_stage.sql`
+- [x] Write `0014_qdecks.sql` (deck table, nullable composite FK on
+      qstacks, RLS)
+- [x] Write `0015_canvas_positions.sql` (XOR subject, cascades, partial
+      unique indexes, spatial-memory-only comment inline and on-table)
+- [x] Write shared row types `src/lib/qdeck.ts`, `src/lib/canvas.ts`
+- [x] `db:fresh` applies 0001-0015 clean; new tests green (39/39, after
+      a fresh Test Author fixed two checks asserting throw instead of
+      RLS zero-row filtering); `eval:rls` still green; type-check passes
+- [ ] Mo's go-ahead, then apply 0013-0015 to hosted via Supabase MCP
+- [x] `graphify update .`, build log decisions entry (corrected star
+      hypothesis) at `buildlog/schema-track-build-log.md`, QA quiz file +
+      CHECKLIST line
+- [x] Draft surface contract v1.1 amendment (docs only, for UI track):
+      `docs/argo-goal2-surface-contract-v1_1-2026-07-12.md`
+- [ ] Flag to UI track: `QStackRow` in QStackCard.tsx needs `stage` and
+      `deck_id` after migrations land (flag once hosted migration is in)
+
 ## Review
 
 _Empty until the first pass completes._
