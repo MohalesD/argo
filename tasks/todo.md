@@ -31,7 +31,14 @@ ticking off a fixed acceptance list.
    default view, a genuine collectibles feel to the library instead of a
    plain list. Mode: Plan Mode first, not /goal, this is a judgment call on
    feel. HTML prototypes reviewed before any wiring. Reuses the existing
-   KanbanBoard() and dnd-kit drag mechanic, does not rebuild it.
+   KanbanBoard() and dnd-kit drag mechanic, does not rebuild it. Status:
+   COMPLETE. Ran as five prototype passes, not one: three competing
+   directions, then Pass A (the card), Pass A2 (a Sonnet fix pass), Pass B
+   (decks and canvas), Pass C (the QDeck page and real canvas), and Pass
+   C2 (canvas geometry). Direction 02, The Fleece Ledger, was chosen by
+   independent three-way consensus. Approved prototype:
+   `prototypes/qstack-library/06-fleece-ledger-deckpage.html`.
+   Implementation now moves to the parallel schema and backend track.
 2. Hardening, carried from the original Goal 3 scope. Keyboard and touch
    parity on the interview surface, empty and error states to the microcopy
    standard, PDF visual check, custom SMTP before real invites, the
@@ -44,6 +51,41 @@ ticking off a fixed acceptance list.
 Parking lot (not an active theme): ShareRow/SharedBrief type asymmetry
 from docs/architecture/watch-items.md. Only becomes a theme if a future
 theme touches sharing or interview record contracts directly.
+
+## Backlog
+
+Agreed, not yet built, not yet scheduled as a theme.
+
+1. Responsive rail count on the Board view. Board currently assumes four
+   stage rails. Once pipelines are customizable by department and by
+   position, stage count becomes user-defined and unbounded, so a board
+   hardcoded around four rails breaks on the first eight-stage
+   engineering loop. This is a consequence of stage being real data, not
+   a polish item. The board must respond to a variable rail count, not
+   just to screen width.
+2. Attribution and marketplace lineage: "forked from," "created by,"
+   clickable through to a seller's marketplace profile.
+3. Question-level navigation: a More affordance opening the full question
+   list, and clicking a question to jump straight into edit mode for it.
+4. Ram logo redesign. The current mark reads as a bee, not a ram.
+5. Boat motif as faded narrative background art on landing and marketing
+   surfaces.
+6. A user-facing motion intensity setting.
+7. The full PLG (product-led growth) sharing flow: tag a teammate,
+   view-without-signup via email, direct-to-marketplace sharing,
+   LinkedIn sharing.
+8. A polish pass on roughly 19 small items captured across the Pass A, B,
+   and C direction notes footers. Sonnet work, not Fable work.
+
+## Icebox
+
+Real ideas, explicitly not scheduled, revisited only if they resurface on
+their own.
+
+1. Fork lineage lines on the canvas connecting a parent stack to its
+   fork. Only earns its complexity once marketplace attribution is real.
+2. A deck-fit intelligence layer that warns when a stack looks mismatched
+   with the deck it is being added to.
 
 ## Standing constraints carried from Goal 1 and 2
 

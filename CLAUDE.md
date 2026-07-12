@@ -104,7 +104,13 @@ repository, add real commands here rather than guessing at them.
 4. Design and build your own evals against the Workday AI-hiring
    discrimination litigation as the failure mode to avoid. Establish
    your own success criteria and log what you decided.
-5. A permission denial from the auto-mode classifier means stop and
+5. Canvas position is spatial memory only, permanently. A card's x and y
+   coordinates must never feed ordering, ranking, sorting, or any scored
+   or assessed output, now or in any future feature. Position lives in
+   its own table and nothing reads it except the canvas renderer. A
+   coordinate that can influence a ranked output is an unaudited,
+   unexplainable input inside an assessment system.
+6. A permission denial from the auto-mode classifier means stop and
    report to Mo, never attempt a different technical path to the same
    blocked result. This happened once already during Goal 2 (an ALTER
    ROLE password change blocked, followed by a SCRAM-verifier workaround
