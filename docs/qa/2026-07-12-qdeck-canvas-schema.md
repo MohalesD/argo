@@ -43,6 +43,20 @@ approving org-shared. PASS.
 ## Verification
 
 Local: fresh embedded Postgres applies all 15 migrations clean; the
-39-check schema suite is green (written red-first by a Test Author);
+56-check schema suite is green (written red-first by a Test Author);
 `eval:rls` green; `type-check` green. Hosted: not yet migrated,
 awaiting Mo's explicit go-ahead.
+
+**Correction, 2026-07-12 (post-merge verification on `main`):** this
+entry originally said "39-check." Re-running `evals/suites/schema-
+qdeck-canvas.ts` against a genuinely fresh database on `main` produced
+56 checks, all passing. Traced the file line by line: every
+`suite.check()` and `scenario()` call is a single, unconditional,
+top-level statement (six under Criterion 1, sixteen under Criterion 2,
+six under Criterion 3, twenty-seven under Criterion 4, one regression
+guard under Criterion 5 = 56); no loop, no conditional gate, and no
+`process.env` reference controls how many checks run, so the count is
+fixed in the source and cannot vary by runtime state. 56 is correct;
+39 was a reporting error made earlier in the same session, not a count
+that ever actually ran. Left as a visible correction rather than a
+silent edit.

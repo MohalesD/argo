@@ -22,9 +22,16 @@ nothing under `prototypes/`.**
 5. `docs/argo-goal2-surface-contract-v1_1-2026-07-12.md`: Canvas as
    fourth surface (testids, locality rule, input parity, three new
    behavioral guarantees). v1.0 stays archived.
-6. `evals/suites/schema-qdeck-canvas.ts`: 39-check schema suite,
+6. `evals/suites/schema-qdeck-canvas.ts`: 56-check schema suite,
    written red-first by a Test Author subagent, green after the
    migrations. Existing `eval:rls` and `type-check` also green.
+   (Corrected 2026-07-12, post-merge: originally recorded as 39-check
+   in this log and in the corresponding QA note. Verified by re-running
+   against a fresh database on `main` and by tracing every
+   `suite.check()`/`scenario()` call in the file, none loop- or
+   env-gated: the real, fixed count is 56, not 39. See
+   `docs/qa/2026-07-12-qdeck-canvas-schema.md` for the full correction
+   note.)
 7. `supabase/migrations/0016_deck_stars.sql`: deck-owned stars.
    `qdecks.star_count` (seal parity at 25+, deliberately no status
    field, decks never carry the fleece edge), `stars` gains an XOR
@@ -57,9 +64,20 @@ nothing under `prototypes/`.**
 ## Verification state
 
 Local embedded Postgres (17.10): fresh rebuild applies shim plus all 18
-migrations clean. `schema-qdeck-canvas` 39/39 PASS, `schema-deck-stars`
+migrations clean. `schema-qdeck-canvas` 56/56 PASS (corrected from a
+mistakenly recorded 39/39; see item 6 above), `schema-deck-stars`
 37/37 PASS, `schema-grant-hygiene` 5/5 PASS, `rls-probe` fully green,
 `type-check` clean.
+
+**Post-merge re-verification, 2026-07-12:** the merge onto `main` was
+re-verified against a genuinely fresh database built from `main`'s own
+code (not reused from `schema-backend-track`'s already-running
+instance; see the merge/verification entry below for the port-collision
+catch that made a first, invalid attempt look green). `schema-qdeck-
+canvas` came back 56/56, not the 39/39 this log originally recorded.
+File-diffed byte-for-byte between `main` and the branch tip (identical)
+and hand-traced every check in the source before accepting 56 as
+correct, per Mo's explicit requirement before pushing.
 
 Hosted (17.6, project rtqgisbotvxidvzphyhn): 0013 through 0018 applied
 2026-07-12, one migration per `apply_migration` call, in order. Applying
