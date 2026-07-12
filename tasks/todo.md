@@ -116,6 +116,24 @@ Agreed, not yet built, not yet scheduled as a theme.
     prototype pass per html-prototype-pass-playbook-v1_0; not
     prose-designed here. Seller onboarding schema and flows go to a
     future Opus Plan Mode session.
+11. Brief PDF redesign. Content parity with web view confirmed
+    2026-07-12 (`docs/qa/pdf-visual-check-2026-07-12.md`), but the PDF
+    has no visual hierarchy: no cards or containers, broken
+    intra-paragraph line spacing (line-height bug in the `@react-pdf`
+    styles), weak section separation. The PDF is the artifact hiring
+    managers actually receive and forward, so it is a first-impression
+    surface, not an export afterthought. Sequence: research pass on
+    what hiring managers scan for and trust in candidate summaries,
+    then a design brief (Fable or Opus judgment), then implementation
+    (Sonnet).
+12. `Nav.tsx` auth-state not reactive on first paint: shows "Sign in"
+    while genuinely authenticated (proven by PDF fetch succeeding in
+    the same session, 2026-07-12).
+13. Silent-failure paths in `CaptureSurface` write handlers and
+    `BriefPage` edit/finalize/share: flagged during the empty/error-states
+    pass, not fixed there because error-surfacing is a behavioral
+    change. This is the same banned silent no-op class Goal 2 fixed
+    three times, so it should be scheduled, not parked indefinitely.
 
 ## Icebox
 
