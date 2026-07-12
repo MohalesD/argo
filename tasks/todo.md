@@ -112,6 +112,11 @@ types, schema only. No UI components, nothing under `prototypes/`.
       errors in the new suite, fixed by a second Test Author without
       changing behavior, suite stayed 5/5 green throughout
 - [x] STOP and present; hold for Mo's go-ahead before hosted
+- [x] Mo's go-ahead, 0018 applied to hosted. Verified live via
+      aclexplode on pg_proc.proacl (not information_schema): all five
+      functions show EXECUTE granted to exactly
+      {authenticated, postgres, service_role}, PUBLIC absent, matching
+      the local suite's result exactly.
 - [x] Mo's final word, then apply 0013-0016/0017 to hosted in ONE pass
       (0017 hit an auto-mode classifier block on first attempt over the
       cross-org bypass-test precondition; Mo re-authorized explicitly,

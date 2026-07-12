@@ -61,12 +61,22 @@ migrations clean. `schema-qdeck-canvas` 39/39 PASS, `schema-deck-stars`
 37/37 PASS, `schema-grant-hygiene` 5/5 PASS, `rls-probe` fully green,
 `type-check` clean.
 
-Hosted (17.6, project rtqgisbotvxidvzphyhn): 0013 through 0017 applied
+Hosted (17.6, project rtqgisbotvxidvzphyhn): 0013 through 0018 applied
 2026-07-12, one migration per `apply_migration` call, in order. Applying
 0017 was initially blocked by the Claude Code auto-mode permission
 classifier (it could not itself confirm the cross-org bypass test
 precondition from the transcript); Mo re-authorized explicitly and it
-applied clean on retry. All five confirmed live via `list_migrations`.
+applied clean on retry. 0018 applied clean on the first attempt. All six
+confirmed live via `list_migrations`.
+
+0018 verified directly against hosted via `aclexplode` on
+`pg_proc.proacl` (not `information_schema`, per Mo's explicit
+instruction): `is_org_member(p_org uuid)`, `clone_qstack(p_source uuid,
+p_org uuid)`, `accept_share_invite(p_token text)`, `create_org(p_name
+text)`, and `set_stack_deck(p_stack uuid, p_deck uuid)` each show
+EXECUTE granted to exactly `{authenticated, postgres, service_role}`;
+`PUBLIC` absent from all five. Matches the local suite's result
+exactly.
 
 Post-apply verification against hosted directly (not inferred from the
 local run):
@@ -125,7 +135,7 @@ local run):
 | D-ST-7 | Cross-org UPDATE/DELETE blocking is asserted as zero-rows-plus-unchanged-content, not as a thrown error | expectReject on RLS-filtered writes; Postgres filters invisible rows silently, it does not throw. Two checks misreported failure until a fresh Test Author fixed the assertion style |
 | D-ST-8 | Deck assignment currently restricted to stack owner or org admin only, an accident of column placement (deck_id sits on the qstack row and inherits qstacks_update), not a deliberate decision. Correct model is any org member, same gesture class as Kanban placement; the design doc's deck page assumes assembly from stacks the caller does not own. | Fix is a narrow security-definer function set_stack_deck(p_stack, p_deck) per the 0010_definer_functions.sql precedent, not widening qstacks_update. Built in 0017, red-first tested. |
 | D-ST-9 | Deck-owned stars share the stars table via XOR subject (nullable qstack_id/deck_id, exactly one set), scarcity per subject via partial unique indexes, cached qdecks.star_count, seal parity at 25+ | A separate deck_stars table (two tables for one concept fragments the seal rule and the scarcity story); a status field on qdecks (rejected: decks carry the seal, never the fleece edge, per design decisions v1.0) |
-| D-ST-10 | The 0011 grant-hygiene pattern (revoke EXECUTE from anon) does not close PUBLIC's default EXECUTE grant; every definer function on hosted, including set_stack_deck, remains PUBLIC-executable. Fixed in 0018 (revoke ... from public on all five signatures, confirmed against pg_proc directly, no overloads); local verified green, held for Mo's go-ahead before hosted. | Leaving it unfixed (original call, before Mo asked for the fix); folding it into 0017 instead of its own migration (mixes an unrelated systemic fix into a feature migration) |
+| D-ST-10 | The 0011 grant-hygiene pattern (revoke EXECUTE from anon) does not close PUBLIC's default EXECUTE grant; every definer function on hosted, including set_stack_deck, remains PUBLIC-executable. Fixed in 0018, applied to hosted 2026-07-12 and verified live via aclexplode on pg_proc.proacl: all five functions show EXECUTE granted to exactly {authenticated, postgres, service_role}, PUBLIC absent. | Leaving it unfixed (original call, before Mo asked for the fix); folding it into 0017 instead of its own migration (mixes an unrelated systemic fix into a feature migration) |
 
 ## Watched items
 
