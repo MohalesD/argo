@@ -13,3 +13,4 @@
 | 2026-07-12 | deck-stars-set-stack-deck | [2026-07-12-deck-stars-set-stack-deck.md](2026-07-12-deck-stars-set-stack-deck.md) | PASS |
 | 2026-07-12 | hosted-apply-0013-0017 | [2026-07-12-hosted-apply-0013-0017.md](2026-07-12-hosted-apply-0013-0017.md) | PASS |
 | 2026-07-12 | revoke-public-execute | [2026-07-12-revoke-public-execute.md](2026-07-12-revoke-public-execute.md) | PASS |
+| 2026-07-12 | qstackcard-stage-deck-wiring | [2026-07-12-qstackcard-stage-deck-wiring.md](2026-07-12-qstackcard-stage-deck-wiring.md) | PASS |

@@ -14,6 +14,42 @@ export interface QStackRow {
   owner_id: string;
   org_id: string;
   created_at: string;
+  stage: string;
+  deck_id: string | null;
+}
+
+// Stage is org-defined free text (migration 0013), never a fixed
+// pipeline baked into schema, so this pill takes one consistent
+// treatment for any value rather than a color per known stage name.
+function StagePill({ stage }: { stage: string }) {
+  if (!stage) return null;
+  return (
+    <span
+      data-testid="qstack-stage"
+      className="inline-flex items-center gap-1.5 rounded-full border border-line bg-cream px-2 py-0.5 text-xs font-medium text-ink-soft"
+    >
+      <span className="h-1.5 w-1.5 rounded-full bg-ink-soft" />
+      {stage}
+    </span>
+  );
+}
+
+// Placeholder-scale treatment only: whether a decked stack should render
+// as a standalone card with a badge at all, versus being absorbed into
+// its QDeck's own aggregate card per the locked deck-page direction
+// (docs/argo-qstack-design-decisions-v1_0-2026-07-12.md, "A QDeck opens
+// its own page"), is an open question for Mo, not decided here. Forest
+// is reserved for the "Screened" compliance badge (PRD D14), so this
+// intentionally does not reuse that color.
+function DeckBadge() {
+  return (
+    <span
+      data-testid="qstack-deck-badge"
+      className="inline-flex items-center rounded-full border border-line bg-cream px-2 py-0.5 text-xs font-medium text-ink-soft"
+    >
+      In a QDeck
+    </span>
+  );
 }
 
 // One QStack rendered as a list row or a card stack. Both variants keep
@@ -44,9 +80,11 @@ export default function QStackCard({
             </span>
           ))}
         </span>
+        <StagePill stage={qstack.stage} />
         {qstack.forked_from_id ? (
           <span className="text-xs text-forest">forked</span>
         ) : null}
+        {qstack.deck_id ? <DeckBadge /> : null}
         <span className="ml-auto flex items-center gap-3 text-sm text-ink-soft">
           <span className="rounded-full border border-line px-2 py-0.5 text-xs">
             {qstack.visibility}
@@ -76,7 +114,7 @@ export default function QStackCard({
             <span className="text-gold">&#9733;</span> {qstack.star_count}
           </span>
         </div>
-        <div className="mt-3 flex flex-wrap gap-2 text-xs text-ink-soft">
+        <div className="mt-3 flex flex-wrap items-center gap-2 text-xs text-ink-soft">
           {meta.map((m) => (
             <span key={m} className="rounded-full bg-cream px-2 py-0.5">
               {m}
@@ -84,6 +122,8 @@ export default function QStackCard({
           ))}
           <span className="rounded-full border border-line px-2 py-0.5">{qstack.visibility}</span>
           {qstack.forked_from_id ? <span className="text-forest">forked</span> : null}
+          <StagePill stage={qstack.stage} />
+          {qstack.deck_id ? <DeckBadge /> : null}
         </div>
       </Link>
     </div>

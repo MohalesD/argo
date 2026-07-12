@@ -76,6 +76,17 @@ Agreed, not yet built, not yet scheduled as a theme.
    LinkedIn sharing.
 8. A polish pass on roughly 19 small items captured across the Pass A, B,
    and C direction notes footers. Sonnet work, not Fable work.
+9. QDeck aggregate-card rendering in the real app. QStackCard currently
+   shows a decked stack as a standalone loose card with a generic "In a
+   QDeck" badge (wired 2026-07-12). The approved prototype instead
+   absorbs a decked stack into its QDeck's own aggregate card (ghost
+   layers, deck glyph, no standalone rendering outside the deck page).
+   Not a stated rule in the decisions doc, an inference from the
+   prototype's data model, so the loose-card-badge version ships as an
+   interim state. Needs its own dedicated pass: a real QDeck card
+   component, filtering decked stacks out of top-level List/Stack/Board
+   views, and the deck page itself, none of which exist in the real app
+   yet.
 
 ## Icebox
 
@@ -172,8 +183,15 @@ types, schema only. No UI components, nothing under `prototypes/`.
       CHECKLIST line
 - [x] Draft surface contract v1.1 amendment (docs only, for UI track):
       `docs/argo-goal2-surface-contract-v1_1-2026-07-12.md`
-- [ ] Flag to UI track: `QStackRow` in QStackCard.tsx needs `stage` and
-      `deck_id` after migrations land (flag once hosted migration is in)
+- [x] Flag to UI track: `QStackRow` in QStackCard.tsx needs `stage` and
+      `deck_id` after migrations land (flag once hosted migration is in).
+      Wired 2026-07-12: stage pill (neutral dot+pill, stage is free text)
+      and a deck-membership badge on both card variants. Local gate green
+      (type-check, rls-probe, schema-qdeck-canvas, allowlist, compliance,
+      consent, brief; retrieval/anon suites pre-existing/unrelated
+      failures, not touched by this change). See
+      `docs/architecture/watch-items.md` for the resolved entry and the
+      open aggregation question logged below.
 
 ## Review
 
