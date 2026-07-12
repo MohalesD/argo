@@ -31,14 +31,27 @@ page-local is intentional for now.**
 ## QStackRow does not yet read stage or deck_id
 
 **Date:** 2026-07-12
-**Status:** WATCH
+**Status:** RESOLVED (with a residual open question, see below)
 **Source:** Schema/backend track (migrations 0013-0017, hosted-verified)
 
-QStackRow in components/QStackCard.tsx does not yet read stage or deck_id,
-both now live on hosted as of migration 0013-0017. The visual track that
-would normally consume this closed before schema landed. Whoever picks up
-QStack UI work next needs to wire these two fields before Canvas or the
-deck page can render real stage pills or deck membership from live data.
+QStackRow in src/components/library/QStackCard.tsx now declares `stage`
+and `deck_id`, and both card variants render a stage pill (neutral
+dot+pill treatment, since stage is org-defined free text with no fixed
+vocabulary per migration 0013) and a deck-membership badge when
+`deck_id` is set. No query change was needed; both callers already
+`select('*')` on qstacks.
+
+Residual open question, not resolved by this pass: the deck-membership
+badge renders the stack as a standalone loose card, which has no
+precedent in the approved prototype
+(`prototypes/qstack-library/06-fleece-ledger-deckpage.html`) or in
+`docs/argo-qstack-design-decisions-v1_0-2026-07-12.md`. The prototype's
+actual data model absorbs a decked stack into its QDeck's own aggregate
+card instead. The decisions doc does not state this as a rule in its own
+prose (checked directly, 2026-07-12); it is an inference from the
+prototype's implementation. Shipped as a pragmatic interim state per
+Mo's call. Tracked as a backlog item in `tasks/todo.md` (QDeck
+aggregate-card rendering) for a dedicated future pass.
 
 ## Interview surface accessibility comes from native elements, not from custom handlers
 
