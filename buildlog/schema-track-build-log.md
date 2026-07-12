@@ -44,6 +44,7 @@ Mo's go-ahead per plan.
 | D-ST-5 | Same-org deck membership enforced by composite FK, binding every caller including service role | Enforcement by trigger or application code |
 | D-ST-6 | Position rows are durable: deck membership never deletes or alters them, so a loose stack reappears at its remembered spot | Deleting positions on deck join, which would strand returning stacks at the origin |
 | D-ST-7 | Cross-org UPDATE/DELETE blocking is asserted as zero-rows-plus-unchanged-content, not as a thrown error | expectReject on RLS-filtered writes; Postgres filters invisible rows silently, it does not throw. Two checks misreported failure until a fresh Test Author fixed the assertion style |
+| D-ST-8 | Deck assignment currently restricted to stack owner or org admin only, an accident of column placement (deck_id sits on the qstack row and inherits qstacks_update), not a deliberate decision. Correct model is any org member, same gesture class as Kanban placement; the design doc's deck page assumes assembly from stacks the caller does not own. | Fix is a narrow security-definer function set_stack_deck(p_stack, p_deck) per the 0010_definer_functions.sql precedent, not widening qstacks_update. Not yet built. |
 
 ## Watched items
 
