@@ -87,6 +87,35 @@ Agreed, not yet built, not yet scheduled as a theme.
    component, filtering decked stacks out of top-level List/Stack/Board
    views, and the deck page itself, none of which exist in the real app
    yet.
+10. Marketplace seller onboarding, locked direction (Plan Mode
+    2026-07-12). Listing creation ships; marketplace is not seed-only.
+    Three seller paths in priority order: (1) invite-only first cohort
+    of 10 to 30, hand-picked by Mo, deliberately mixing brand-domain
+    names, high-influence independents, and methodology-strong
+    low-profile practitioners; (2) application path reviewed against
+    LinkedIn profile plus 2 to 3 of the applicant's own QStacks; (3)
+    future seal-gated path at 25 stars. Domain verification (e.g. a
+    true @netflix.com address) is an identity-automation tier inside
+    paths 1 and 2, not its own path; it clears identity, never quality.
+    Badge semantics, LOCKED: user-authored listings carry a
+    seller-identity mark meaning "this person is a vetted Argo seller,"
+    never a content-verification claim; the mark gets its own color;
+    forest green stays exclusive to the Screened badge per D14; per the
+    gold-never-carries-meaning-alone rule, any gold mark needs an
+    ink-legible twin. Schema requirement: build the seller mark as a
+    tiered field, not a boolean, so future levels (e.g. Top Contributor,
+    gray vs gold) are data changes, not migrations. OPEN QUESTION,
+    capture do not solve: before the seal becomes a commercial
+    credential, decide how stars display across contexts; 80 stars
+    inside a 5,000-person org are legitimate internal recognition but
+    would mislead a marketplace buyer about external validation;
+    candidate shapes are cross-org-only counts on marketplace surfaces,
+    dual internal/external counts, or weighting; needs its own design
+    pass. Visual design of the seller mark (checkmark, shield, scalloped
+    certificate, circled avatar, trophy) is a future Phase A HTML
+    prototype pass per html-prototype-pass-playbook-v1_0; not
+    prose-designed here. Seller onboarding schema and flows go to a
+    future Opus Plan Mode session.
 
 ## Icebox
 
