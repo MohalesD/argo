@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Argo &#183; QStack Library &#183; Three Directions</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Ccircle cx='8' cy='8' r='6' fill='%23e3a81c'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --gold: #e3a81c; --gold-hover: #c9971a; --gold-soft: #f7e8c3;
+  --cream: #fbf6e9; --ink: #2b2a26; --ink-soft: #55524a;
+  --forest: #2e4a3a; --line: #e9e2d0;
+  --shadow-card: 0 1px 2px rgb(43 42 38 / 0.06), 0 4px 16px rgb(43 42 38 / 0.07);
+  --shadow-lift: 0 2px 4px rgb(43 42 38 / 0.08), 0 12px 32px rgb(43 42 38 / 0.12);
+}
+* { box-sizing: border-box; margin: 0; }
+html { background: var(--cream); color: var(--ink); font-family: 'Inter', system-ui, sans-serif; }
+body { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 48px 24px; }
+:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; border-radius: 4px; }
+::selection { background: var(--gold-soft); }
+main { max-width: 880px; width: 100%; }
+h1 { font-family: 'Source Serif 4', Georgia, serif; font-size: 40px; font-weight: 600; line-height: 1.15; }
+.eyebrow { font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-soft); margin-bottom: 10px; }
+.standfirst { color: var(--ink-soft); margin-top: 10px; max-width: 56ch; line-height: 1.55; }
+.dirs { margin-top: 36px; display: grid; gap: 16px; }
+a.dir { display: flex; align-items: baseline; gap: 18px; text-decoration: none; color: inherit;
+  background: #ffffff; border: 1px solid var(--line); border-radius: 10px; padding: 22px 26px;
+  box-shadow: var(--shadow-card); transition: box-shadow 140ms cubic-bezier(0.4, 0, 0.2, 1), border-color 140ms; }
+a.dir:hover, a.dir:focus-visible { box-shadow: var(--shadow-lift); border-color: var(--gold); }
+.num { font-family: 'Source Serif 4', Georgia, serif; font-size: 26px; font-weight: 600; color: var(--gold-hover); }
+.name { font-family: 'Source Serif 4', Georgia, serif; font-size: 21px; font-weight: 600; }
+.desc { color: var(--ink-soft); font-size: 14px; line-height: 1.5; margin-top: 4px; }
+.hint { margin-top: 28px; font-size: 12.5px; color: var(--ink-soft); }
+</style>
+</head>
+<body>
+<main>
+  <p class="eyebrow">Argo &#183; design pass &#183; July 11, 2026</p>
+  <h1>The QStack library, three ways</h1>
+  <p class="standfirst">Same ten stacks, same palette, same interaction grammar in every file: star in place, move with a card-local undo, drag the board, arrange the canvas, fan a stack open. What changes is the character. Pick the one worth building.</p>
+  <div class="dirs">
+    <a class="dir" href="06-fleece-ledger-deckpage.html" style="border-color: var(--gold);">
+      <span class="num">06</span>
+      <span>
+        <span class="name">The Fleece Ledger, Pass C</span>
+        <span class="desc" style="display:block">Navigation and physical reveal split apart: a QDeck opens its own page to manage (reorder, remove, add a stack), while the canvas gets a hover-and-Enter peek that fans two member cards into a real arc without ever leaving the desk. The canvas itself is now genuinely large and scrollable, no more clipped 900px box. Start here.</span>
+      </span>
+    </a>
+    <a class="dir" href="05-fleece-ledger-decks.html" style="opacity: 0.75;">
+      <span class="num">05</span>
+      <span>
+        <span class="name">The Fleece Ledger, Pass B</span>
+        <span class="desc" style="display:block">Decks arrive: QDecks as a real object across List, Stack, and Canvas, unfurl with real spread choreography, drag one stack onto another to combine with a required confirm step, pinning, alignment hairlines, and a canvas that grows instead of clipping.</span>
+      </span>
+    </a>
+    <a class="dir" href="04-fleece-ledger-card.html" style="opacity: 0.6;">
+      <span class="num">04</span>
+      <span>
+        <span class="name">The Fleece Ledger, Pass A</span>
+        <span class="desc" style="display:block">The chosen direction, card rebuilt: ticket anatomy, stage pills, split seal and edge semantics, share, arrange, density, and the preview that never clips. Start here.</span>
+      </span>
+    </a>
+    <a class="dir" href="01-chart-room.html">
+      <span class="num">01</span>
+      <span>
+        <span class="name">The Chart Room</span>
+        <span class="desc" style="display:block">The library as a navigator's table. Coordinate ticks, seals on accomplished stacks, fork lineage drawn as dashed routes, a quiet compass rose.</span>
+      </span>
+    </a>
+    <a class="dir" href="02-fleece-ledger.html">
+      <span class="num">02</span>
+      <span>
+        <span class="name">The Fleece Ledger</span>
+        <span class="desc" style="display:block">The library as a collection of earned artifacts. Letterpress cards, crest watermarks, a gold foil edge that stacks earn, a shine that plays when it is deserved.</span>
+      </span>
+    </a>
+    <a class="dir" href="03-modern-voyage.html">
+      <span class="num">03</span>
+      <span>
+        <span class="name">The Modern Voyage</span>
+        <span class="desc" style="display:block">The library as an editorial front page. Big serif type, ticket cards with status spines, a magnetic canvas, motion only where your hands are.</span>
+      </span>
+    </a>
+  </div>
+  <p class="hint">Each file stands alone. In any of them: S stars, M moves, Enter fans a stack open on the canvas, arrows nudge, Esc closes. Canvas arrangements persist per file.</p>
+</main>
+</body>
+</html>

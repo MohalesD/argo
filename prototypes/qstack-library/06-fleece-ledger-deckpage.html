@@ -1,0 +1,3008 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Argo &#183; Your QStacks &#183; The Fleece Ledger, Pass C</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Ccircle cx='8' cy='8' r='6' fill='%23e3a81c'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&display=swap" rel="stylesheet">
+<style>
+/* Pass A: The Fleece Ledger card, rebuilt. Letterpress stationery plus ticket anatomy. */
+
+:root {
+  --gold: #e3a81c;
+  --gold-hover: #c9971a;
+  --gold-soft: #f7e8c3;
+  --cream: #fbf6e9;
+  --ink: #2b2a26;
+  --ink-soft: #55524a;
+  --forest: #2e4a3a;
+  --forest-soft: #e6efe9;
+  --flag: #b3402a;
+  --flag-soft: #f7e5e0;
+  --line: #e9e2d0;
+  --shadow-card: 0 1px 2px rgb(43 42 38 / 0.06), 0 4px 16px rgb(43 42 38 / 0.07);
+  --shadow-lift: 0 2px 4px rgb(43 42 38 / 0.08), 0 12px 32px rgb(43 42 38 / 0.12);
+  --font-display: 'Source Serif 4', Georgia, serif;
+  --font-body: 'Inter', system-ui, sans-serif;
+}
+html { background: var(--cream); color: var(--ink); font-family: var(--font-body); }
+h1, h2, h3 { font-family: var(--font-display); }
+:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; border-radius: 4px; }
+::selection { background: var(--gold-soft); }
+
+/* Derived tones, token family only */
+:root {
+  --press: color-mix(in srgb, var(--line) 66%, var(--ink) 34%);
+  --ease: cubic-bezier(0.4, 0, 0.2, 1);
+  --foil: linear-gradient(155deg, var(--gold-hover) 0%, var(--gold-hover) 40%, var(--gold) 50%, var(--gold-hover) 60%, var(--gold-hover) 100%);
+  --foil-v: linear-gradient(to bottom, var(--gold-hover), var(--gold) 50%, var(--gold-hover));
+  --board-bg: color-mix(in srgb, var(--cream) 55%, #ffffff 45%);
+}
+
+* { box-sizing: border-box; }
+body { margin: 0; font-size: 14px; line-height: 1.5; -webkit-font-smoothing: antialiased; }
+.page { max-width: 1220px; margin: 0 auto; padding: 26px 40px 90px; }
+button { font-family: var(--font-body); }
+
+.visually-hidden {
+  position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0;
+  overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+}
+
+/* Masthead */
+.masthead-top { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 4px 0 14px; }
+.wordmark { display: flex; align-items: center; gap: 10px; color: var(--ink); }
+.wordmark svg { width: 27px; height: 27px; display: block; }
+.wordmark .name { font-family: var(--font-display); font-weight: 700; font-size: 21px; letter-spacing: 0.05em; }
+.btn-gold {
+  display: inline-block; background: var(--gold); color: var(--ink); font-weight: 600;
+  font-size: 13.5px; padding: 9px 16px; border-radius: 8px; text-decoration: none;
+  border: 1px solid color-mix(in srgb, var(--gold) 86%, var(--ink) 14%);
+  box-shadow: 0 1px 0 rgb(255 255 255 / 0.55) inset;
+}
+.btn-gold:hover { background: var(--gold-hover); }
+.double-rule { height: 5px; border-top: 2px solid var(--ink); border-bottom: 1px solid var(--ink-soft); }
+.masthead-bottom { display: flex; align-items: flex-end; justify-content: space-between; gap: 18px; flex-wrap: wrap; padding: 20px 0 6px; }
+.kicker { margin: 0 0 6px; font-size: 12px; letter-spacing: 0.24em; text-transform: uppercase; color: var(--ink-soft); }
+h1 { margin: 0; font-size: 33px; font-weight: 700; letter-spacing: -0.01em; line-height: 1.1; }
+.lede { margin: 7px 0 0; font-size: 13.5px; color: var(--ink-soft); }
+
+/* Toolbar: view toggle plus density control */
+.toolbar { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.views { display: flex; gap: 2px; padding: 3px; background: #ffffff; border: 1px solid var(--line); border-radius: 10px; }
+.views button {
+  border: 0; background: transparent; padding: 7px 15px; font-size: 13px; font-weight: 500;
+  color: var(--ink-soft); border-radius: 7px; cursor: pointer;
+}
+.views button:hover { color: var(--ink); background: var(--cream); }
+.views button[aria-pressed="true"] { background: var(--gold); color: var(--ink); font-weight: 600; }
+.density button { padding: 7px 11px; font-size: 12.5px; }
+
+/* Keyboard hint bar */
+.hints { margin: 16px 0 0; font-size: 12px; color: var(--ink-soft); display: flex; flex-wrap: wrap; gap: 5px 7px; align-items: center; }
+.hints kbd {
+  font-family: var(--font-body); font-size: 11px; color: var(--ink); background: #ffffff;
+  border: 1px solid var(--line); border-radius: 4px; padding: 1px 6px; box-shadow: 0 1px 0 var(--line);
+}
+.hints .sep { color: var(--line); }
+
+#viewRoot { margin-top: 22px; }
+
+/* Card, shared ticket anatomy: title zone above, metadata stub below */
+.card {
+  position: relative; background: #ffffff; border: 1px solid var(--line);
+  border-radius: 6px; box-shadow: var(--shadow-card);
+}
+.card .title { margin: 0; font-weight: 600; color: var(--ink); line-height: 1.25; min-width: 0; }
+.zone-title {
+  position: relative; z-index: 3; display: flex; align-items: flex-start;
+  justify-content: space-between; gap: 10px;
+}
+.zone-stub {
+  position: relative; z-index: 2; display: flex; flex-wrap: wrap; align-items: flex-end;
+  justify-content: space-between; gap: 8px 10px; border-top: 1px dashed var(--line);
+}
+/* The notch pair: circular cutouts colored to the surface behind the card. Board and canvas only. */
+.card-board .zone-stub::before, .card-board .zone-stub::after,
+.card-canvas .zone-stub::before, .card-canvas .zone-stub::after {
+  content: ""; position: absolute; top: 0; width: 14px; height: 14px;
+  border: 1px solid var(--line); border-radius: 50%; transform: translateY(-50%); z-index: 3;
+}
+.card-board .zone-stub::before, .card-canvas .zone-stub::before { left: -8px; }
+.card-board .zone-stub::after, .card-canvas .zone-stub::after { right: -8px; }
+.card-board .zone-stub::before, .card-board .zone-stub::after { background: var(--board-bg); }
+.card-canvas .zone-stub::before, .card-canvas .zone-stub::after { background: #ffffff; }
+
+/* Star cluster: ink count carries the number, gold reinforces */
+.star-cluster { display: flex; align-items: center; gap: 7px; flex: none; }
+.star-btn {
+  position: relative; display: flex; align-items: center; gap: 6px; flex: none;
+  background: none; border: 0; padding: 3px 4px; cursor: pointer; border-radius: 6px; color: var(--ink);
+}
+.star-btn .glyph { color: var(--gold); font-size: 15px; line-height: 1; }
+.star-btn .count { font-weight: 600; font-size: 13px; color: var(--ink); font-variant-numeric: lining-nums tabular-nums; }
+.star-btn:hover .glyph { color: var(--gold-hover); }
+.star-btn::after {
+  content: ""; position: absolute; top: 1px; left: 2px; width: 20px; height: 20px;
+  border-radius: 50%; border: 2px solid var(--gold); opacity: 0; transform: scale(0.4); pointer-events: none;
+}
+.star-btn.pulsing .glyph { animation: star-pop 0.45s var(--ease); }
+.star-btn.pulsing::after { animation: star-ring 0.6s var(--ease); }
+@keyframes star-pop { 0% { transform: scale(1); } 40% { transform: scale(1.3); } 100% { transform: scale(1); } }
+@keyframes star-ring {
+  0% { opacity: 0.85; transform: scale(0.4); }
+  100% { opacity: 0; transform: scale(2); }
+}
+
+/* Move-settle glow: a brief gold ring at the card's edge, move and reorder confirmations only */
+.card-move-glow {
+  position: absolute; inset: -3px; z-index: 55; pointer-events: none;
+  border-radius: inherit; border: 2px solid var(--gold); opacity: 0; transform: scale(0.97);
+}
+.card-move-glow.pulsing { animation: move-ring 0.6s var(--ease); }
+@keyframes move-ring {
+  0% { opacity: 0.85; transform: scale(0.97); }
+  100% { opacity: 0; transform: scale(1.05); }
+}
+
+/* The seal: durable achievement at 25 stars, never status. Tooltip on hover and focus. */
+.seal { position: relative; display: inline-block; flex: none; line-height: 0; border-radius: 50%; cursor: default; }
+.seal.seal-off { display: none; }
+.seal::after {
+  content: "Earned at 25 stars. It stays earned.";
+  position: absolute; top: calc(100% + 7px); right: -4px; width: 168px;
+  background: #ffffff; color: var(--ink); border: 1px solid var(--line); border-radius: 6px;
+  box-shadow: var(--shadow-lift); padding: 6px 9px; font-family: var(--font-body);
+  font-size: 11px; font-weight: 500; line-height: 1.45; text-align: left; white-space: normal;
+  opacity: 0; visibility: hidden; transition: opacity 0.15s var(--ease); pointer-events: none; z-index: 90;
+}
+.seal:hover::after, .seal:focus::after { opacity: 1; visibility: visible; }
+
+/* Stage pill: leading colored dot, tinted ground, ink text. No red, no traffic lights. */
+.stage-pill {
+  display: inline-flex; align-items: center; gap: 5px; flex: none;
+  font-size: 11px; font-weight: 600; color: var(--ink); border-radius: 999px;
+  padding: 2.5px 9px; white-space: nowrap; border: 1px solid transparent;
+}
+.stage-pill .dot { width: 6px; height: 6px; border-radius: 50%; flex: none; }
+.stage-phone { background: #ffffff; border-color: var(--line); }
+.stage-phone .dot { background: var(--ink-soft); }
+.stage-tech { background: color-mix(in srgb, var(--ink-soft) 10%, #ffffff); }
+.stage-tech .dot { background: var(--ink-soft); }
+.stage-onsite { background: var(--gold-soft); }
+.stage-onsite .dot { background: var(--gold-hover); }
+.stage-takehome { background: #ffffff; border: 1px dashed var(--line); }
+.stage-takehome .dot { width: 8px; height: 8px; background: transparent; border: 2px solid var(--ink-soft); }
+.stage-final { background: var(--forest-soft); }
+.stage-final .dot { background: var(--forest); }
+
+/* Meta chips, tidy pill treatment */
+.chips { display: flex; flex-wrap: wrap; gap: 5px; align-items: center; min-width: 0; }
+.chip {
+  font-size: 10.5px; font-weight: 500; color: var(--ink); background: #ffffff;
+  border: 1px solid var(--line); border-radius: 999px; padding: 2.5px 8px; white-space: nowrap;
+}
+.chip.vis { border-style: dashed; }
+.chip.screened { color: var(--forest); background: var(--forest-soft); border-color: color-mix(in srgb, var(--forest) 22%, var(--forest-soft)); font-weight: 600; }
+.chip.forked { color: var(--forest); border: 0; background: none; padding-left: 0; font-weight: 600; }
+.chip.qcount { background: var(--cream); }
+.chip.flag { background: var(--flag-soft); border-color: color-mix(in srgb, var(--flag) 24%, var(--flag-soft)); color: var(--ink); font-weight: 600; }
+
+/* Stub action corner: share plus Move-to, both pressable and bordered */
+.stub-actions { display: flex; align-items: center; gap: 6px; flex: none; margin-left: auto; }
+.status-btn {
+  flex: none; display: inline-flex; align-items: center; gap: 6px; cursor: pointer;
+  border: 1px solid var(--line); background: #ffffff; color: var(--ink-soft);
+  border-radius: 6px; padding: 4px 9px; font-size: 12px; font-weight: 500;
+  box-shadow: 0 1px 0 var(--line);
+}
+.status-btn:hover { border-color: var(--ink-soft); color: var(--ink); }
+.status-btn:active { transform: translateY(1px); box-shadow: none; }
+.status-btn .caret { font-size: 11px; line-height: 1; }
+.share-btn {
+  flex: none; display: inline-flex; align-items: center; justify-content: center;
+  width: 26px; height: 26px; border: 1px solid var(--line); background: #ffffff;
+  color: var(--ink-soft); border-radius: 6px; cursor: pointer; box-shadow: 0 1px 0 var(--line);
+}
+.share-btn:hover { border-color: var(--ink-soft); color: var(--ink); }
+.share-btn:active { transform: translateY(1px); box-shadow: none; }
+
+/* Off the board: the action cluster steps off the card's corner together, deliberately */
+.card.offb .zone-stub { overflow: visible; }
+.card.offb .stub-actions {
+  position: relative; z-index: 4; transform: translate(3px, 4px);
+}
+.card.offb .status-btn {
+  background: #ffffff; box-shadow: var(--shadow-card);
+}
+
+/* Arrange caret, immediately after the title text */
+.arrange-btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 20px; height: 20px; margin-left: 6px; vertical-align: 2px;
+  border: 1px solid var(--line); background: #ffffff; color: var(--ink-soft);
+  border-radius: 5px; cursor: pointer; font-size: 11px; line-height: 1; box-shadow: 0 1px 0 var(--line);
+}
+.arrange-btn:hover { border-color: var(--ink-soft); color: var(--ink); }
+.arrange-btn:active { transform: translateY(1px); box-shadow: none; }
+
+/* Card-local menus: Move-to and Arrange share one family */
+.move-menu {
+  position: absolute; right: 8px; bottom: 42px; z-index: 60; min-width: 172px;
+  background: #ffffff; border: 1px solid var(--line); border-radius: 8px;
+  box-shadow: var(--shadow-lift); padding: 6px;
+}
+.move-menu.arrange-menu { right: auto; bottom: auto; left: 12px; top: 38px; }
+.menu-label { font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-soft); padding: 3px 9px 5px; }
+.move-opt {
+  display: flex; width: 100%; align-items: center; justify-content: space-between; gap: 10px;
+  border: 0; background: none; border-radius: 6px; padding: 7px 9px; cursor: pointer;
+  font-size: 12.5px; color: var(--ink); text-align: left;
+}
+.move-opt:hover, .move-opt:focus-visible { background: var(--cream); }
+.move-opt .opt-now { font-size: 10.5px; color: var(--forest); font-weight: 600; }
+.card.menu-open { z-index: 40; }
+
+/* One feedback pattern: a forest pill straddling the card's bottom edge */
+.card-feedback {
+  position: absolute; left: 50%; bottom: -13px; transform: translateX(-50%);
+  display: flex; align-items: center; gap: 8px; z-index: 65;
+  background: var(--forest-soft); border: 1px solid color-mix(in srgb, var(--forest) 30%, var(--forest-soft));
+  border-radius: 999px; box-shadow: var(--shadow-card); padding: 5px 12px;
+  font-size: 12px; font-weight: 500; color: var(--forest); white-space: nowrap;
+  animation: pill-in 150ms var(--ease) both;
+}
+.card-feedback.leaving { animation: pill-out 200ms var(--ease) both; pointer-events: none; }
+.card-feedback button {
+  border: 0; background: none; cursor: pointer; padding: 0;
+  font-size: 12px; font-weight: 600; color: var(--forest);
+  text-decoration: underline; text-underline-offset: 2px;
+}
+@keyframes pill-in {
+  from { opacity: 0; transform: translateX(-50%) translateY(4px); }
+  to { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+@keyframes pill-out {
+  from { opacity: 1; transform: translateX(-50%) translateY(0); }
+  to { opacity: 0; transform: translateX(-50%) translateY(6px); }
+}
+
+/* List view: the register sheet */
+.sheet { background: #ffffff; border: 1px solid var(--line); border-radius: 8px; box-shadow: var(--shadow-card); }
+.card-list {
+  border: 0; border-radius: 0; box-shadow: none;
+  border-bottom: 1px solid var(--line); padding: 0;
+}
+.sheet .card-list:first-child { border-top-left-radius: 8px; border-top-right-radius: 8px; }
+.sheet .card-list:last-child { border-bottom: 0; border-bottom-left-radius: 8px; border-bottom-right-radius: 8px; }
+.card-list .title { font-size: 16.5px; }
+.card-list .zone-title { padding: 15px 20px 9px; }
+.card-list .zone-stub { padding: 10px 20px 13px; }
+.card-list.edge::before {
+  content: ""; position: absolute; left: -1px; top: -1px; bottom: -1px; width: 2px;
+  background: var(--foil-v); z-index: 4;
+}
+.sheet .card-list.edge:first-child::before { border-top-left-radius: 8px; }
+.sheet .card-list.edge:last-child::before { border-bottom-left-radius: 8px; }
+
+/* Stack view: the gallery of letterpress tickets */
+.shelf { margin-top: 30px; }
+.shelf:first-child { margin-top: 6px; }
+.shelf-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin: 0 2px 16px; }
+.shelf-name { margin: 0; font-size: 15.5px; font-weight: 600; letter-spacing: 0.01em; }
+.shelf-count { font-size: 12px; color: var(--ink-soft); letter-spacing: 0.04em; }
+.shelf-row { display: flex; flex-wrap: wrap; gap: 24px; padding-bottom: 34px; border-bottom: 1px solid var(--line); }
+
+.card-stack {
+  width: 238px; aspect-ratio: 3 / 4; padding: 0; border-radius: 4px;
+  display: flex; flex-direction: column;
+  transition: box-shadow 0.25s var(--ease), transform 0.25s var(--ease);
+}
+.card-stack::before {
+  /* Letterpress frame: dark hairline pressed in, white highlight below it */
+  content: ""; position: absolute; inset: 8px; z-index: 1; pointer-events: none;
+  border: 1px solid var(--press); border-radius: 2px;
+  box-shadow: 0 1px 0 #ffffff, inset 0 1px 2px rgb(43 42 38 / 0.10);
+}
+.card-stack.edge {
+  border: 2px solid transparent;
+  background: linear-gradient(#ffffff, #ffffff) padding-box, var(--foil) border-box;
+}
+.card-stack.edge::before { inset: 7px; }
+.card-stack:hover { box-shadow: var(--shadow-lift); }
+.card-stack .title { font-size: 17.5px; }
+.card-stack .zone-title { padding: 16px 16px 0; }
+.card-mid { flex: 1; min-height: 0; }
+.card-stack .zone-stub { padding: 12px 16px 15px; }
+.card-stack .chips { max-width: 72%; }
+
+.card-stack .star-cluster { flex-direction: column; align-items: flex-end; gap: 4px; }
+.card-stack .star-big { flex-direction: column; align-items: flex-end; gap: 2px; padding: 2px 3px; }
+.card-stack .star-big .glyph { font-size: 14px; }
+.card-stack .star-big .count {
+  font-family: var(--font-display); font-weight: 600; font-size: 40px; line-height: 0.95;
+  letter-spacing: -0.02em; color: var(--ink);
+}
+.card-stack .star-big::after { top: -3px; left: auto; right: -3px; width: 24px; height: 24px; }
+.card-stack .star-big.pulsing::after { animation: star-ring 0.75s var(--ease); box-shadow: 0 0 0 5px rgb(227 168 28 / 0.14); }
+
+.set-mark {
+  position: absolute; right: 12px; top: 50%; transform: translateY(-50%); z-index: 1;
+  writing-mode: vertical-rl; font-size: 9px; letter-spacing: 0.2em; color: var(--ink-soft);
+  text-transform: uppercase; pointer-events: none; user-select: none;
+}
+.watermark {
+  position: absolute; inset: 0; z-index: 0; display: flex; align-items: center; justify-content: center;
+  color: var(--ink); opacity: 0.05; pointer-events: none;
+}
+.watermark svg { width: 148px; height: 148px; transform: translateY(10px); }
+
+/* The shine: single gold hue, event-triggered, in-rotation cards only */
+.shine {
+  position: absolute; inset: 0; z-index: 3; border-radius: inherit; overflow: hidden;
+  pointer-events: none; opacity: 0; transition: opacity 0.3s var(--ease); mix-blend-mode: multiply;
+}
+.shine.on { opacity: 1; }
+.shine-band {
+  position: absolute; top: -45%; height: 190%; width: 46%;
+  left: calc(var(--px, -60) * 1% - 23%);
+  transform: rotate(16deg);
+  background: linear-gradient(90deg, rgb(227 168 28 / 0), rgb(227 168 28 / 0.32) 50%, rgb(227 168 28 / 0));
+}
+
+/* Board view */
+.board { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; align-items: start; }
+.board-col {
+  background: var(--board-bg);
+  border: 1px solid var(--line); border-radius: 10px; padding: 12px; min-height: 440px;
+  transition: border-color 0.15s var(--ease), background-color 0.15s var(--ease);
+}
+.board-col.drop-hint { border-color: var(--gold); background: color-mix(in srgb, var(--gold-soft) 45%, #ffffff); }
+.col-head { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; margin: 2px 4px 12px; }
+.col-name { margin: 0; font-size: 14.5px; font-weight: 600; }
+.col-count { font-size: 12px; color: var(--ink-soft); }
+.col-body { display: flex; flex-direction: column; gap: 10px; min-height: 360px; }
+.col-empty { margin: 4px 6px; font-size: 12.5px; line-height: 1.55; color: var(--ink-soft); }
+.card-board { padding: 0; touch-action: none; cursor: grab; user-select: none; }
+.card-board .title { font-size: 15px; }
+.card-board .zone-title { padding: 11px 13px 8px; }
+.card-board .zone-stub { padding: 9px 13px 11px; }
+.card-board.edge, .card-canvas.edge { border-color: var(--gold-hover); }
+.card.dragging { cursor: grabbing; box-shadow: var(--shadow-lift); z-index: 70; opacity: 0.96; }
+
+/* Canvas view: the display case. Density does not apply here (Pass B).
+   Pass C: a real canvas. The viewport is the visible, scrollable window; the canvas
+   itself is a large fixed content area with no overflow:hidden anywhere in the chain,
+   so nothing painted by a card, ever, is clipped, only ever scrolled to. */
+.canvas-note { margin: 2px 0 12px; font-size: 12.5px; color: var(--ink-soft); }
+.canvas-viewport {
+  position: relative; overflow: auto; border: 1px solid var(--line);
+  border-radius: 8px; box-shadow: var(--shadow-card);
+  height: calc(100vh - 340px); min-height: 480px;
+}
+/* Pass C2: Canvas is deliberately the one wide view; every other view (List, Stack,
+   Board, the deck page) keeps the page's centered 1220px treatment, unchanged. Break
+   the viewport out to nearly the full browser width, with a small consistent margin
+   from the edges rather than the page's own gutter. */
+#viewRoot[data-view="canvas"] .canvas-viewport {
+  width: calc(100vw - 48px);
+  max-width: none;
+  margin-left: calc(50% - 50vw + 24px);
+}
+/* Pass C2: sized to the default arrangement with modest breathing room, not the
+   oversized 2400 by 1700 Pass C shipped. Width fills the (now wider) viewport by
+   default, floored so the four-column default layout always has room, a real
+   reduction from 2400 down to whatever the viewport now provides. Height stays
+   paired with the row spacing in defaultPos: with real card heights running up to
+   roughly 240px in this dataset and the three-band scheme fixed at equal thirds,
+   1550 is the shortest height that lets a two-row zone clear both its own first
+   row and the next zone's first row without any card covering another; going
+   shorter reintroduces the exact overlap this pass exists to fix. Horizontal
+   scroll stays available as headroom for a user who deliberately spreads things
+   out; it is not forced by the default layout on a normal window, vertical
+   scroll past the visible viewport height was already normal before this pass
+   and stays normal now. */
+.canvas { position: relative; width: 100%; min-width: 1150px; height: 1550px; background: #ffffff; }
+/* Pass C2: the zone bands from Pass B are restored, full-width rows with an
+   alternating tint on the middle band, giving the canvas visible structure. They
+   remain purely a background cue, pointer-events: none, exerting no layout
+   constraint on where a card can actually be dragged. */
+.zone { position: absolute; left: 0; right: 0; height: 33.333%; pointer-events: none; }
+.zone-1 { top: 0; }
+.zone-2 { top: 33.333%; background: color-mix(in srgb, var(--cream) 42%, #ffffff); }
+.zone-3 { top: 66.666%; }
+.zone-1, .zone-2 { border-bottom: 1px solid var(--line); }
+.zone-label { position: absolute; top: 12px; left: 18px; display: flex; align-items: baseline; gap: 10px; }
+.zone-name { font-size: 12px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--ink-soft); font-weight: 500; }
+.zone-count { font-size: 12px; color: var(--ink-soft); }
+.card-canvas { position: absolute; width: 218px; padding: 0; touch-action: none; cursor: grab; user-select: none; }
+.card-canvas .title { font-size: 15px; }
+.card-canvas .zone-title { padding: 11px 13px 8px; }
+.card-canvas .zone-stub { padding: 9px 13px 11px; }
+.title-btn { background: none; border: 0; padding: 0; margin: 0; cursor: pointer; text-align: left; font: inherit; color: inherit; border-radius: 4px; }
+
+/* Fan-out preview: scattered metadata slips, then a straight See-all footer */
+.fanout { position: absolute; top: calc(100% + 10px); left: 6px; width: 104%; z-index: 46; display: flex; flex-direction: column; gap: 6px; }
+.fan-row {
+  background: #ffffff; border: 1px solid var(--line); border-radius: 4px; padding: 7px 11px;
+  font-size: 12px; color: var(--ink); box-shadow: var(--shadow-card); transform-origin: 14px 50%;
+  animation: fan-in 0.3s var(--ease) both; animation-delay: calc(var(--fi) * 40ms);
+}
+.fanout:not(.fan-flat) .fan-row:nth-child(1) { transform: rotate(-1.6deg); }
+.fanout:not(.fan-flat) .fan-row:nth-child(2) { transform: rotate(0.5deg); }
+.fanout:not(.fan-flat) .fan-row:nth-child(3) { transform: rotate(1.8deg); }
+.fan-row .qn { font-family: var(--font-display); font-weight: 600; margin-right: 2px; }
+.fan-more {
+  background: #ffffff; border: 1px solid var(--line); border-radius: 4px; padding: 7px 11px;
+  font-size: 12px; font-weight: 600; color: var(--ink); text-align: left; cursor: pointer;
+  box-shadow: var(--shadow-card);
+  animation: fan-in 0.3s var(--ease) both; animation-delay: calc(var(--fi) * 40ms);
+}
+.fan-more:hover { border-color: var(--ink-soft); }
+@keyframes fan-in { from { opacity: 0; translate: 0 -5px; } to { opacity: 1; translate: 0 0; } }
+
+/* Density: Comfortable is the base. Compact and Dense tighten gallery, list, board. */
+#viewRoot[data-density="compact"] .shelf-row { gap: 18px; padding-bottom: 26px; }
+#viewRoot[data-density="compact"] .card-stack { width: 200px; }
+#viewRoot[data-density="compact"] .card-stack .zone-title { padding: 12px 12px 0; }
+#viewRoot[data-density="compact"] .card-stack .zone-stub { padding: 10px 12px 12px; }
+#viewRoot[data-density="compact"] .card-stack .title { font-size: 15px; }
+#viewRoot[data-density="compact"] .card-stack .star-big .count { font-size: 30px; }
+#viewRoot[data-density="compact"] .card-stack .watermark { opacity: 0.03; }
+#viewRoot[data-density="compact"] .card-list .zone-title { padding: 11px 16px 6px; }
+#viewRoot[data-density="compact"] .card-list .zone-stub { padding: 8px 16px 10px; }
+#viewRoot[data-density="compact"] .card-board .zone-title { padding: 9px 11px 6px; }
+#viewRoot[data-density="compact"] .card-board .zone-stub { padding: 7px 11px 9px; }
+#viewRoot[data-density="compact"] .board-col { padding: 9px; }
+
+#viewRoot[data-density="dense"] .shelf { margin-top: 20px; }
+#viewRoot[data-density="dense"] .shelf-row { gap: 12px; padding-bottom: 20px; }
+#viewRoot[data-density="dense"] .card-stack { width: 164px; }
+#viewRoot[data-density="dense"] .card-stack .zone-title { padding: 10px 10px 0; }
+#viewRoot[data-density="dense"] .card-stack .zone-stub { padding: 8px 10px 10px; }
+#viewRoot[data-density="dense"] .card-stack .title { font-size: 12px; }
+#viewRoot[data-density="dense"] .card-stack .star-big .glyph { font-size: 11px; }
+#viewRoot[data-density="dense"] .card-stack .star-big .count { font-size: 22px; }
+#viewRoot[data-density="dense"] .card-stack .watermark,
+#viewRoot[data-density="dense"] .card-stack .set-mark { display: none; }
+#viewRoot[data-density="dense"] .card-stack .chip { display: none; }
+#viewRoot[data-density="dense"] .card-stack .chip.qcount,
+#viewRoot[data-density="dense"] .card-stack .chip.screened { display: inline-block; font-size: 11px; }
+#viewRoot[data-density="dense"] .card-stack .status-btn { font-size: 11px; padding: 3px 7px; }
+#viewRoot[data-density="dense"] .card-stack .share-btn { width: 23px; height: 23px; }
+#viewRoot[data-density="dense"] .card-list .title { font-size: 14px; }
+#viewRoot[data-density="dense"] .card-list .zone-title { padding: 8px 14px 4px; }
+#viewRoot[data-density="dense"] .card-list .zone-stub { padding: 6px 14px 8px; }
+#viewRoot[data-density="dense"] .card-board .zone-title { padding: 7px 9px 5px; }
+#viewRoot[data-density="dense"] .card-board .zone-stub { padding: 6px 9px 8px; }
+#viewRoot[data-density="dense"] .board-col { padding: 7px; }
+#viewRoot[data-density="dense"] .col-body { gap: 7px; }
+
+/* Page-load stagger reveal */
+.reveal { animation: rise 0.5s var(--ease); animation-delay: calc(var(--i) * 40ms); animation-fill-mode: backwards; }
+@keyframes rise { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+
+/* Direction notes footer */
+.notes { margin-top: 56px; border-top: 1px solid var(--line); padding-top: 18px; max-width: 780px; }
+.notes summary { cursor: pointer; font-family: var(--font-display); font-weight: 600; font-size: 15px; color: var(--ink); }
+.notes summary:hover { color: var(--ink-soft); }
+.notes ol { margin: 12px 0 4px; padding-left: 22px; font-size: 13px; color: var(--ink-soft); line-height: 1.65; }
+.notes li { margin-bottom: 9px; }
+.notes strong { color: var(--ink); font-weight: 600; }
+
+/* Pass B: QDeck rendering. Two ghost layers behind an explicit face panel, since a
+   stacking context's own background always paints beneath its children, negative
+   z-index included; an explicit face element is the only reliable way to keep
+   ghosts genuinely behind it. */
+.card-deck { isolation: isolate; }
+.card-stack.card-deck, .card-canvas.card-deck {
+  background: transparent; border: 0; box-shadow: none;
+  /* Pass C: one ambient shadow beneath the whole layered cluster, cheaper and more
+     cohesive than the per-layer box-shadows fighting each other underneath it. */
+  filter: drop-shadow(0 7px 15px rgb(43 42 38 / 0.16));
+}
+.card-stack.card-deck::before { content: none; }
+.deck-layer {
+  position: absolute; inset: 0; z-index: 0; pointer-events: none;
+  background: var(--cream); border: 1px solid var(--line); border-radius: inherit;
+  box-shadow: var(--shadow-card);
+  transition: transform 0.38s var(--ease), opacity 0.38s var(--ease);
+}
+/* Pass C: resting offset and rotation strengthened past Pass B's subtle depth cue,
+   so a QDeck reads as a container at a glance, per direction 4. */
+.card-stack .deck-layer:nth-of-type(1) { transform: translate(8px, 9px) rotate(2.2deg); }
+.card-stack .deck-layer:nth-of-type(2) { transform: translate(14px, 17px) rotate(3.6deg); }
+.card-canvas .deck-layer:nth-of-type(1) { transform: translate(6px, 7px) rotate(1.8deg); }
+.card-canvas .deck-layer:nth-of-type(2) { transform: translate(11px, 14px) rotate(3deg); }
+/* Pass C: the canvas peek, a hover and focus gesture only, never a navigation. The two
+   ghost layers fan into a genuine arc, rotating outward in opposite directions, each
+   revealing a representative member stage near its exposed edge. The face keeps
+   showing the deck's own identity throughout; see setDeckPeek. */
+.card-canvas.card-deck.peeking .deck-layer:nth-of-type(1) { transform: translate(-24px, 10px) rotate(-14deg); }
+.card-canvas.card-deck.peeking .deck-layer:nth-of-type(2) { transform: translate(26px, 12px) rotate(16deg); }
+.deck-peek-label {
+  position: absolute; bottom: 10px; z-index: 2; opacity: 0; transform: translateY(3px);
+  transition: opacity 0.3s var(--ease), transform 0.3s var(--ease); pointer-events: none;
+}
+.card-canvas .deck-layer:nth-of-type(1) .deck-peek-label { left: 12px; }
+.card-canvas .deck-layer:nth-of-type(2) .deck-peek-label { right: 12px; }
+.deck-peek-label .stage-pill { font-size: 10px; padding: 2px 7px; box-shadow: var(--shadow-card); }
+.card-canvas.card-deck.peeking .deck-peek-label { opacity: 1; transform: translateY(0); }
+.deck-face {
+  position: relative; z-index: 1; border-radius: inherit;
+}
+.card-stack .deck-face {
+  flex: 1; display: flex; flex-direction: column; justify-content: space-between;
+  background: #ffffff; border: 1px solid var(--line); box-shadow: var(--shadow-card);
+}
+.card-canvas .deck-face {
+  background: #ffffff; border: 1px solid var(--line); box-shadow: var(--shadow-card);
+}
+/* Pass C: real presence for the deck glyph everywhere it renders, a light ink-tinted
+   disc behind it rather than a bare line icon easy to miss at a glance (direction 4). */
+.zone-title .deck-glyph {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 21px; height: 21px; border-radius: 50%; flex: none;
+  background: color-mix(in srgb, var(--ink) 9%, var(--cream) 91%);
+  color: var(--ink-soft); margin-right: 7px; vertical-align: -5px;
+}
+
+/* Pass C: the QDeck page. A back link, a real h1 identity block, a stage pipeline,
+   an Add-a-stack control, then every member as a full card. headWrap is the one
+   position: relative anchor for every feedback pill this page shows, since there is
+   no longer a single card element representing "the deck" here. */
+.deckpage-back {
+  display: inline-flex; align-items: center; gap: 5px; margin: 0 0 16px;
+  font-size: 12.5px; font-weight: 500; color: var(--ink-soft); text-decoration: none;
+  background: none; border: 0; padding: 2px 0; cursor: pointer; font-family: var(--font-body);
+}
+.deckpage-back:hover { color: var(--ink); text-decoration: underline; text-underline-offset: 2px; }
+.deckpage-head { position: relative; margin: 0 0 26px; }
+.deckpage-identity { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+.deckpage-glyph {
+  display: inline-flex; align-items: center; justify-content: center; flex: none;
+  width: 40px; height: 40px; border-radius: 50%;
+  background: color-mix(in srgb, var(--ink) 9%, var(--cream) 91%); color: var(--ink-soft);
+}
+.deckpage-glyph svg { width: 21px; height: 21px; }
+.deckpage-identity h1 { margin: 0; font-size: 27px; font-weight: 700; letter-spacing: -0.01em; line-height: 1.15; }
+.deckpage-pipeline {
+  display: flex; align-items: center; flex-wrap: wrap; gap: 7px;
+  margin: 18px 0 20px; padding: 14px 16px; background: #ffffff;
+  border: 1px solid var(--line); border-radius: 8px;
+}
+.pipeline-arrow { color: var(--ink-soft); font-size: 13px; flex: none; }
+.deckpage-add { position: relative; display: inline-block; }
+.add-stack-btn {
+  display: inline-flex; align-items: center; gap: 6px; cursor: pointer;
+  border: 1px solid var(--line); background: #ffffff; color: var(--ink);
+  border-radius: 7px; padding: 8px 14px; font-size: 12.5px; font-weight: 600;
+  box-shadow: 0 1px 0 var(--line);
+}
+.add-stack-btn:hover { border-color: var(--ink-soft); }
+.add-stack-btn:active { transform: translateY(1px); box-shadow: none; }
+.move-menu.add-stack-menu { left: 0; top: calc(100% + 8px); right: auto; bottom: auto; max-width: 260px; }
+.deckpage-members { margin-top: 22px; }
+
+/* Pass C: List view's collapsible chevron, separate from the title (which navigates).
+   Collapsed by default, this is the density answer at volume: five recruiters and
+   twenty open roles never all land on screen unasked. */
+.chevron-btn {
+  display: inline-flex; align-items: center; justify-content: center; flex: none;
+  width: 18px; height: 18px; margin-right: 4px; border: 0; background: none;
+  color: var(--ink-soft); cursor: pointer; border-radius: 4px; font-size: 10px; padding: 0;
+}
+.chevron-btn:hover { color: var(--ink); }
+.card-list.deck-member-indent { margin-left: 26px; border-left: 2px solid var(--line); }
+
+/* Pass C: a deck row in List reads as a different kind of object, not just decorative,
+   the structural difference (it holds things) now looks and behaves like one too. */
+.card-list.card-deck { background: var(--board-bg); }
+
+/* Alignment hairlines, functional feedback during a canvas drag, not decorative */
+.guide-v, .guide-h { position: absolute; display: none; background: color-mix(in srgb, var(--ink-soft) 35%, transparent); pointer-events: none; z-index: 20; }
+.guide-v { top: 0; bottom: 0; width: 1px; }
+.guide-h { left: 0; right: 0; height: 1px; }
+
+/* Pinning: a utility toggle, ink-only, no gold. Pass C strengthens the two states into
+   a genuine silhouette change (an outlined ring versus a solid filled disc), not a
+   thin color swap, plus a hover and focus tooltip using the seal's own technique. */
+.pin-btn {
+  position: absolute; top: -11px; left: -11px; z-index: 30;
+  width: 23px; height: 23px; display: inline-flex; align-items: center; justify-content: center;
+  background: #ffffff; border: 1.5px solid var(--ink-soft); border-radius: 50%; color: var(--ink-soft);
+  cursor: pointer; box-shadow: var(--shadow-card);
+}
+.pin-btn:hover { border-color: var(--ink); color: var(--ink); }
+.pin-btn[aria-pressed="true"] { background: var(--ink); border-color: var(--ink); color: var(--cream); }
+.pin-btn[aria-pressed="true"]:hover { background: color-mix(in srgb, var(--ink) 84%, #ffffff 16%); }
+.pin-btn::after {
+  content: "Pin this card in place."; position: absolute; top: calc(100% + 7px); left: -4px; width: 148px;
+  background: #ffffff; color: var(--ink); border: 1px solid var(--line); border-radius: 6px;
+  box-shadow: var(--shadow-lift); padding: 6px 9px; font-family: var(--font-body);
+  font-size: 11px; font-weight: 500; line-height: 1.45; text-align: left; white-space: normal;
+  opacity: 0; visibility: hidden; transition: opacity 0.15s var(--ease); pointer-events: none; z-index: 90;
+}
+.pin-btn[aria-pressed="true"]::after { content: "Unpin this card."; }
+.pin-btn:hover::after, .pin-btn:focus-visible::after { opacity: 1; visibility: visible; }
+.card.pinned { cursor: default; }
+.card.pinned .zone-title, .card.pinned .zone-stub { cursor: default; }
+
+/* Combine confirmation: distinct from a menu, one line plus two buttons */
+.combine-pop {
+  position: absolute; top: calc(100% + 10px); left: 6px; z-index: 62; min-width: 236px; max-width: 280px;
+  background: #ffffff; border: 1px solid var(--line); border-radius: 8px;
+  box-shadow: var(--shadow-lift); padding: 12px;
+}
+.combine-pop p { margin: 0 0 10px; font-size: 12.5px; color: var(--ink); line-height: 1.5; }
+.combine-pop .combine-actions { display: flex; gap: 8px; }
+.combine-pop .btn-combine-confirm, .combine-pop .btn-combine-cancel {
+  flex: 1; text-align: center; font-size: 12.5px; font-weight: 600; border-radius: 6px;
+  padding: 7px 10px; cursor: pointer;
+}
+.combine-pop .btn-combine-confirm {
+  border: 1px solid color-mix(in srgb, var(--gold) 86%, var(--ink) 14%); background: var(--gold); color: var(--ink);
+}
+.combine-pop .btn-combine-confirm:hover { background: var(--gold-hover); }
+.combine-pop .btn-combine-cancel { border: 1px solid var(--line); background: #ffffff; color: var(--ink-soft); }
+.combine-pop .btn-combine-cancel:hover { border-color: var(--ink-soft); color: var(--ink); }
+.card-canvas.combine-target { outline: 2px solid var(--gold); outline-offset: 2px; border-radius: 6px; }
+.card-canvas.combine-armed { z-index: 78; }
+
+@media (prefers-reduced-motion: reduce) {
+  .deck-layer { transition: none; }
+  .deck-peek-label { transition: none; }
+}
+
+@media (max-width: 980px) {
+  .board { grid-template-columns: repeat(2, 1fr); }
+  .page { padding: 22px 22px 70px; }
+}
+@media (max-width: 620px) {
+  .board { grid-template-columns: 1fr; }
+  .masthead-bottom { align-items: flex-start; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal, .fan-row, .fan-more, .star-btn.pulsing .glyph, .card-feedback, .card-feedback.leaving { animation: none; }
+  .star-btn.pulsing::after { animation: none; opacity: 0; }
+  .card-move-glow.pulsing { animation: none; opacity: 0; }
+  .card-stack, .board-col, .shine, .seal::after { transition: none; }
+  .shine { display: none; }
+  .card-stack:hover { transform: none; box-shadow: var(--shadow-card); }
+}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <defs>
+    <symbol id="crest" viewBox="0 0 64 64">
+      <g fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M26 20 C22 12 11 12 9 19 C7 26 13 32 19 30 C23 29 24 25 22 23"/>
+        <path d="M38 20 C42 12 53 12 55 19 C57 26 51 32 45 30 C41 29 40 25 42 23"/>
+        <path d="M26 20 C28 16 30 15 32 15 C34 15 36 16 38 20 C40 24 41 28 41 32 C41 40 37 46 32 49 C27 46 23 40 23 32 C23 28 24 24 26 20 Z"/>
+        <path d="M27 26 C30 24 34 24 37 26"/>
+        <path d="M29 42 C31 43.5 33 43.5 35 42"/>
+        <path d="M23 55 C25 53 28 53 30 55 M34 55 C36 53 39 53 41 55"/>
+      </g>
+    </symbol>
+  </defs>
+</svg>
+
+<div class="page">
+  <header>
+    <div class="masthead-top">
+      <div class="wordmark">
+        <svg viewBox="0 0 64 64" aria-hidden="true"><use href="#crest"></use></svg>
+        <span class="name">Argo</span>
+      </div>
+      <a class="btn-gold" href="#" id="newStack" role="button">New QStack</a>
+    </div>
+    <div class="double-rule" role="presentation"></div>
+    <div class="masthead-bottom">
+      <div>
+        <p class="kicker">The Fleece Ledger &#183; Pass C</p>
+        <h1>Your QStacks</h1>
+        <p class="lede">Every stack your team runs, and every QDeck it belongs to, entered in one register.</p>
+      </div>
+      <div class="toolbar">
+        <div class="views" role="group" aria-label="Change view">
+          <button type="button" data-view="list" aria-pressed="false">List</button>
+          <button type="button" data-view="stack" aria-pressed="true">Stack</button>
+          <button type="button" data-view="board" aria-pressed="false">Board</button>
+          <button type="button" data-view="canvas" aria-pressed="false">Canvas</button>
+        </div>
+        <div class="views density" role="group" aria-label="Density">
+          <button type="button" data-density="comfortable" aria-pressed="true">Comfortable</button>
+          <button type="button" data-density="compact" aria-pressed="false">Compact</button>
+          <button type="button" data-density="dense" aria-pressed="false">Dense</button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main id="viewRoot" data-view="stack" data-density="comfortable"></main>
+
+  <p class="hints" id="hints"></p>
+
+  <div class="visually-hidden" aria-live="polite" id="live"></div>
+
+  <details class="notes">
+    <summary>Direction notes, Pass A</summary>
+    <ol>
+      <li><strong>Ticket anatomy fused in.</strong> Every card now splits into a title zone and a metadata stub, divided by a hairline dashed rule and a notch pair colored to the surface behind the card in each view. The standing anatomy contract holds: title top-left, star cluster top-right, metadata bottom-left, status and move bottom-right. Serves locality-first, every control beside the object it affects.</li>
+      <li><strong>Seal and edge split, the central fix.</strong> The fleece foil edge now means exactly in rotation: reversible status, applied and removed live on move, and the earned shine rides with it. The gold seal means exactly 25 stars: a durable achievement that never depends on status, updating live when starring crosses 25. All four combinations exist in the dataset: s1 and s4 carry both, s3 edge only, s9 seal only after its move to ready, the rest neither. Serves two-states-not-tiers with each state carrying one exact meaning.</li>
+      <li><strong>Gold reinforces, ink carries.</strong> The star count is an ink numeral, the status is a word inside the Move-to button, the seal duplicates the ink count through its tooltip and aria-label, the fleece edge duplicates the words in rotation in the Move-to button. Gold never carries a state alone, per the contrast floor.</li>
+      <li><strong>Stage pill.</strong> Five stages rendered as differentiated pills, dot plus tinted ground plus ink text, all token-derived: phone screen, technical screen, onsite, take-home, final. No red in the stage set, no traffic-light triad. Serves legibility at a glance without a color code to memorize.</li>
+      <li><strong>Share affordance.</strong> A small pressable icon button in the stub's action corner copies a share link and confirms with the card-local pill, announced politely. Serves locality: the confirmation lands where the action happened.</li>
+      <li><strong>Arrange dropdown.</strong> A caret after the title opens a four-item menu: Move up, Move down, Move to front, Move to back. It reorders within the shelf or list in stack, list, and board views and adjusts layering on the canvas, with focus preserved and undo in the pill. Keyboard parity via the same menu grammar as Move-to.</li>
+      <li><strong>Density control.</strong> Comfortable, Compact, Dense, persisted to argo-proto-04-density-v1. Dense keeps every ink text at 11px or larger, hides the watermark and set mark, collapses chips to stage, count, and Screened, and fits five to six readable gallery columns in a 1280px window. Canvas ignores density until Pass B.</li>
+      <li><strong>Fuller preview, no clipping.</strong> The fan keeps its three scattered rows and adds a straight See all N questions footer that expands to every row, metadata only, never question text. When a fan would clip at the canvas boundary, the canvas grows temporarily and restores on close.</li>
+      <li><strong>One feedback pattern.</strong> Every confirmation is the same forest pill straddling the card's bottom edge, message and undo never separated, auto-dismiss at five seconds. Off-board cards offset their Move-to button by nine pixels past the corner, an intentional signal that the card is literally off the board.</li>
+      <li><strong>Flag tokens wired.</strong> The flagged chip on s7 uses the flag tokens for their real product meaning, a compliance flag count visible only to the author, ink text on flag-soft. The only red in the file. Dataset deltas this pass: s9 moved to ready, and stage and flagged fields added to every stack. The shine remains single-hue gold, not holographic rainbow, per the standing ban.</li>
+    </ol>
+  </details>
+
+  <details class="notes">
+    <summary>Direction notes, Pass B</summary>
+    <ol>
+      <li><strong>QDeck, a first-class object.</strong> A QDeck bundles every stage stack for one role into one visible unit: a data layer (stackDeckId, isLoose, libraryItems, addStackToDeck, createDeckFromStacks, removeStackFromDeck), a card (buildDeckCard, ghost layers, an explicit face panel), an unfurl interaction, and drag-to-combine on canvas. Fifteen new QStacks arrive pre-decked into five QDecks, s1 through s10 stay loose, so the library reads as fifteen top-level items with twenty-five stacks worth of stage detail one unfurl away, the concrete demonstration of legible at volume.</li>
+      <li><strong>Decks excluded from Board, deliberately.</strong> A QDeck spans every stage of a role, which means it spans every status a stage can be in, and the board is a single-status-per-card Kanban of individual stage-work. Inventing a status rollup for a deck, picking which member status wins, would be exactly the kind of deck-intelligence judgment this pass is scoped to avoid. Board renders loose stacks only; a decked stack never appears there, not even on its own.</li>
+      <li><strong>The seal rides with stars, the fleece edge does not.</strong> The seal means twenty-five stars, an achievement, and a deck has its own independent star count, so it qualifies on the same terms a stack does. The fleece edge means in rotation, a single status value, and a deck has no single status to carry it. Giving a deck the edge would either force a false status onto it or quietly redefine what the edge means; neither is on the table this pass, so decks get the seal and never the edge, and never the earned shine that rides with the edge.</li>
+      <li><strong>Unfurled member rows are informational only.</strong> Title, stage pill, status word, star count, nothing clickable, no question text (there is none at stack level to begin with, so this is not a compliance boundary, just a scope one). Moving or reordering a stack inside its deck, or dragging one out through the unfurl panel, is real product judgment about how a team wants its loop assembled; the data layer already supports a stack leaving a deck cleanly (removeStackFromDeck), but no control exposes it this pass, so it stays a read surface until that judgment is made deliberately.</li>
+      <li><strong>Deck formation and the D key are canvas only.</strong> Drag-to-combine needs two things List and Stack gallery do not have: freeform position to detect a real overlap, and a spatial "drop" gesture the confirm popover can anchor to. Building a parallel combine affordance for a flat register or a grid would be a different interaction, not a port of this one; Canvas is where two items can physically meet, so that is where combining lives, keyboard included.</li>
+      <li><strong>Copy-versus-move exists at the data layer, only move ships in this pass's UI.</strong> addStackToDeck's rule, already decked means copy with a new synthetic id, loose means a plain move, is correct today even though every path this pass builds (drag onto a target, the D key menu) always starts from a loose stack, so only the move branch ever runs. The copy branch is there for a future pass that lets a stack be dragged out of one deck into another; leaving it unbuilt now, with the rule already correct in the data layer, means that future pass changes a UI surface, not the model underneath it.</li>
+      <li><strong>Alignment hairlines, ported without the grid.</strong> Direction 03's guide-line detection is reused verbatim: two thin lines, six-pixel edge tolerance, shown during a canvas drag and hidden on release. Its snap-to-grid was deliberately left behind; the guides are a visual aid only, they never round or lock the committed drop position, freeform placement on canvas stays exactly as free as Pass A left it.</li>
+      <li><strong>Pinning is a utility, not an accomplishment.</strong> The pin toggle uses ink only, a genuine silhouette change between its two states, never gold, matching the file's own rule that gold is reserved for actions, stars, and accomplishment. A pinned card cannot be dragged or arrow-nudged, but it stays a fully valid target for something else being dragged onto it, since only its own movement is meant to freeze.</li>
+      <li><strong>The position constraint, restated.</strong> Canvas x and y remain spatial memory only, never a ranking, ordering, or scoring signal, enforced in this prototype by the fact that no sorting or arrangement logic anywhere in the file reads state.positions. When this becomes real, positions belong in their own table, readable only by the canvas renderer, and no assessment or ranking code path may ever read them, now or later.</li>
+    </ol>
+  </details>
+
+  <details class="notes">
+    <summary>Direction notes, Pass C</summary>
+    <ol>
+      <li><strong>One job split into two surfaces.</strong> Pass B's deck unfurl tried to both reveal a QDeck's contents and let a person manage them from the same small panel. This pass splits that in two. The QDeck page is where a person sees everything and manages it, every member as a full card, add, reorder, and remove all live there. The canvas peek is where a person gets a satisfying physical glimpse, two ghost layers fanning open under a hover or a focused Enter, showing at most two representative member stages. The peek never navigates and needs no click; the page is reached only by a deliberate title click, in List, Stack, and Canvas alike. Neither surface tries to do the other's job, which is what made Pass B's single panel feel like it was straining at two different tasks.</li>
+      <li><strong>Reorder and remove scoped by the stack's own membership, not by the screen showing it.</strong> A decked stack's Arrange menu gains a fifth option, Remove from deck, and its up, down, front, back options reorder within its own deck's stack_ids array, whenever that stack is not loose, regardless of whether it is currently rendered on the QDeck page or as an indented row under an expanded List entry. Scoping this by state.view instead would have meant writing and maintaining the same reorder and remove logic twice, once per screen, with two chances to drift out of sync. Scoping it by the stack's own data (itemType and isLoose) instead means the QDeck page and the expanded List row get this capability automatically, for free, from the same buildCard call each already makes. The one place this scoping mattered for correctness rather than just economy: deleting the last member of a deck navigates back only when the deletion happened on that deck's own page, since only there is there a page to leave; the same deletion via an expanded List row just collapses the row to nothing, because the person removing it was never "on" a deck page to begin with.</li>
+      <li><strong>The canvas rework: nothing may clip, which meant removing, not patching.</strong> Pass B's dynamic canvas resize (growCanvasForPanel, restoreCanvasHeight) existed to work around a fixed-height, overflow-hidden canvas. Pass C removes both the workaround and the constraint that required it: the canvas is now a large, fixed content area (2400 by 1700) inside a viewport with overflow auto and no overflow hidden anywhere in that chain. Because a non-clipping ancestor's scrollable area grows to include anything a descendant paints outside the nominal box, a fan-out preview or a peeking QDeck near the canvas edge is never cut off, it is, at worst, one scroll away. That is a structural guarantee, not a value tuned to fit today's dataset, which is why patching the old resize function instead of removing it would have been the wrong fix.</li>
+      <li><strong>The drag dead-space bug, diagnosed rather than guessed.</strong> The reported symptom traced to one line: the pointerdown delegation's exclusion selector caught any button, and a QDeck's title is a real button in every view, and a stack's title is a real button on canvas. That silently killed drag-start from the title text specifically, the one spot the fix's own test list says should remain draggable even though the title is also a control. Confirmed empirically with a real rendered canvas card before and after: title text now starts a drag exactly like the metadata stub and the empty middle space do, while a clean click with no movement still opens the QDeck page or the fan preview, because the card-level suppress-click window that already protects every other control from a stray post-drag click covers this one too, unchanged. A second, subtler bug turned up during that same check: pointer capture taken immediately on pointerdown was retargeting the synthesized click event to the card itself, which would have broken the title's own clean-click navigation the moment it became draggable; deferring capture until movement is confirmed fixed it without weakening the drag.</li>
+      <li><strong>The position constraint, restated once more.</strong> Canvas x and y remain spatial memory only, never a ranking, ordering, or scoring signal. This pass changes what the canvas looks like, a real scrollable content area instead of a fixed display case, and adds a hover gesture to it, but touches nothing about what a position means. No sorting, ranking, or assessment logic anywhere in this file reads state.positions, now, same as before this pass, same as it must stay after it.</li>
+    </ol>
+  </details>
+</div>
+
+<script>
+(function () {
+"use strict";
+
+/* SHARED DATASET, Pass A: stage and flagged added, s9 moved to ready */
+const STACKS = [
+  { id:"s1",  title:"Senior Backend Loop",         role_family:"engineering",        level:"senior", methodology:"structured", visibility:"org",     forked_from:null, stars:32, status:"in_rotation", stage:"onsite",           flagged:0, questions:9, rubrics:9, screened:true,  cats:["system design","debugging","collaboration"] },
+  { id:"s2",  title:"Platform Engineering Screen", role_family:"engineering",        level:"lead",   methodology:"behavioral", visibility:"private", forked_from:null, stars:7,  status:"ready",       stage:"technical screen", flagged:0, questions:6, rubrics:5, screened:true,  cats:["architecture","incident response","leadership"] },
+  { id:"s3",  title:"Junior Frontend Screen",      role_family:"engineering",        level:"junior", methodology:"structured", visibility:"public",  forked_from:"s1", stars:18, status:"in_rotation", stage:"phone screen",     flagged:0, questions:7, rubrics:7, screened:true,  cats:["fundamentals","css layout","communication"] },
+  { id:"s4",  title:"Product Sense Deep Dive",     role_family:"product_management", level:"senior", methodology:"case",       visibility:"public",  forked_from:null, stars:41, status:"in_rotation", stage:"onsite",           flagged:0, questions:8, rubrics:8, screened:true,  cats:["product sense","prioritization","metrics"] },
+  { id:"s5",  title:"APM First Round",             role_family:"product_management", level:"junior", methodology:"structured", visibility:"org",     forked_from:null, stars:5,  status:"drafting",    stage:"phone screen",     flagged:0, questions:5, rubrics:3, screened:false, cats:["analytical thinking","curiosity","communication"] },
+  { id:"s6",  title:"Enterprise AE Loop",          role_family:"sales",              level:"mid",    methodology:"behavioral", visibility:"org",     forked_from:null, stars:12, status:"ready",       stage:"final",            flagged:0, questions:8, rubrics:6, screened:true,  cats:["discovery","negotiation","territory planning"] },
+  { id:"s7",  title:"SDR Screen",                  role_family:"sales",              level:"junior", methodology:"structured", visibility:"private", forked_from:"s6", stars:2,  status:"drafting",    stage:"phone screen",     flagged:1, questions:5, rubrics:2, screened:false, cats:["outreach","resilience","coachability"] },
+  { id:"s8",  title:"People Ops Generalist Loop",  role_family:"people_ops",         level:"mid",    methodology:"behavioral", visibility:"org",     forked_from:null, stars:9,  status:"ready",       stage:"final",            flagged:0, questions:7, rubrics:7, screened:true,  cats:["employee relations","process design","judgment"] },
+  { id:"s9",  title:"Design Portfolio Review",     role_family:"design",             level:"senior", methodology:"portfolio",  visibility:"public",  forked_from:null, stars:27, status:"ready",       stage:"take-home",        flagged:0, questions:6, rubrics:6, screened:true,  cats:["craft","process","critique"] },
+  { id:"s10", title:"Brand Designer Screen",       role_family:"design",             level:"mid",    methodology:"structured", visibility:"private", forked_from:null, stars:0,  status:"off_board",   stage:"technical screen", flagged:0, questions:4, rubrics:1, screened:false, cats:["visual systems","typography","storytelling"] },
+  { id:"s11", title:"Staff Infrastructure Phone Screen",  role_family:"engineering",        level:"staff",  methodology:"structured", visibility:"org", forked_from:null, stars:3, status:"drafting",   stage:"phone screen",     flagged:0, questions:5, rubrics:2, screened:false, cats:["systems thinking","reliability","communication"] },
+  { id:"s12", title:"Staff Infrastructure Technical Screen", role_family:"engineering",     level:"staff",  methodology:"structured", visibility:"org", forked_from:null, stars:6, status:"ready",      stage:"technical screen", flagged:0, questions:7, rubrics:7, screened:true,  cats:["distributed systems","incident response","tradeoffs"] },
+  { id:"s13", title:"Staff Infrastructure Onsite",         role_family:"engineering",        level:"staff",  methodology:"structured", visibility:"org", forked_from:null, stars:8, status:"ready",      stage:"onsite",           flagged:0, questions:9, rubrics:8, screened:true,  cats:["architecture","scaling","mentorship"] },
+  { id:"s14", title:"Growth PM Phone Screen",              role_family:"product_management", level:"mid",    methodology:"structured", visibility:"org", forked_from:null, stars:9, status:"ready",      stage:"phone screen",     flagged:0, questions:5, rubrics:5, screened:true,  cats:["experimentation","metrics","curiosity"] },
+  { id:"s15", title:"Growth PM Technical Screen",          role_family:"product_management", level:"mid",    methodology:"case",       visibility:"org", forked_from:null, stars:7, status:"ready",      stage:"technical screen", flagged:0, questions:6, rubrics:6, screened:true,  cats:["analytics","sql","prioritization"] },
+  { id:"s16", title:"Growth PM Onsite",                    role_family:"product_management", level:"mid",    methodology:"case",       visibility:"org", forked_from:null, stars:13, status:"in_rotation", stage:"onsite",          flagged:0, questions:8, rubrics:8, screened:true,  cats:["strategy","stakeholder alignment","execution"] },
+  { id:"s17", title:"Named AE Phone Screen",                role_family:"sales",              level:"senior", methodology:"structured", visibility:"org", forked_from:null, stars:2, status:"drafting",   stage:"phone screen",     flagged:0, questions:5, rubrics:2, screened:false, cats:["prospecting","qualification","communication"] },
+  { id:"s18", title:"Named AE Technical Screen",            role_family:"sales",              level:"senior", methodology:"behavioral", visibility:"org", forked_from:null, stars:4, status:"ready",      stage:"technical screen", flagged:0, questions:6, rubrics:5, screened:true,  cats:["deal strategy","forecasting","objection handling"] },
+  { id:"s19", title:"Named AE Onsite",                      role_family:"sales",              level:"senior", methodology:"behavioral", visibility:"org", forked_from:null, stars:5, status:"ready",      stage:"onsite",           flagged:0, questions:7, rubrics:6, screened:true,  cats:["executive presence","negotiation","territory planning"] },
+  { id:"s20", title:"HRBP Phone Screen",                    role_family:"people_ops",         level:"mid",    methodology:"structured", visibility:"org", forked_from:null, stars:1, status:"drafting",   stage:"phone screen",     flagged:0, questions:4, rubrics:1, screened:false, cats:["employee relations","confidentiality","judgment"] },
+  { id:"s21", title:"HRBP Take Home",                       role_family:"people_ops",         level:"mid",    methodology:"structured", visibility:"org", forked_from:null, stars:2, status:"ready",      stage:"take-home",        flagged:0, questions:5, rubrics:5, screened:true,  cats:["policy design","case analysis","writing"] },
+  { id:"s22", title:"HRBP Onsite",                          role_family:"people_ops",         level:"mid",    methodology:"behavioral", visibility:"org", forked_from:null, stars:3, status:"ready",      stage:"onsite",           flagged:0, questions:6, rubrics:6, screened:true,  cats:["coaching","conflict resolution","business partnership"] },
+  { id:"s23", title:"Product Design Phone Screen",          role_family:"design",             level:"senior", methodology:"portfolio",  visibility:"org", forked_from:null, stars:5, status:"ready",      stage:"phone screen",     flagged:0, questions:5, rubrics:5, screened:true,  cats:["portfolio walkthrough","process","collaboration"] },
+  { id:"s24", title:"Product Design Take Home",             role_family:"design",             level:"senior", methodology:"portfolio",  visibility:"org", forked_from:null, stars:6, status:"ready",      stage:"take-home",        flagged:0, questions:5, rubrics:5, screened:true,  cats:["craft","systems thinking","rationale"] },
+  { id:"s25", title:"Product Design Onsite",                role_family:"design",             level:"senior", methodology:"portfolio",  visibility:"org", forked_from:null, stars:8, status:"in_rotation", stage:"onsite",          flagged:0, questions:7, rubrics:7, screened:true,  cats:["critique","whiteboarding","stakeholder communication"] }
+];
+const DECKS = [
+  { id:"d1", title:"Staff Infrastructure Loop", stars:14, stack_ids:["s11","s12","s13"] },
+  { id:"d2", title:"Growth PM Loop",             stars:29, stack_ids:["s14","s15","s16"] },
+  { id:"d3", title:"Named Account Executive Loop", stars:11, stack_ids:["s17","s18","s19"] },
+  { id:"d4", title:"HRBP Loop",                  stars:6,  stack_ids:["s20","s21","s22"] },
+  { id:"d5", title:"Product Design Loop",        stars:19, stack_ids:["s23","s24","s25"] }
+];
+const COLUMNS = [
+  { id:"drafting",    name:"Drafting" },
+  { id:"ready",       name:"Ready to run" },
+  { id:"in_rotation", name:"In rotation" },
+  { id:"off_board",   name:"Not on the board" }
+];
+const FLASH_MS = 1600;
+const UNDO_MS = 7000;
+
+var LS_KEY = "argo-proto-05-canvas-v1";
+var DENSITY_KEY = "argo-proto-05-density-v1";
+var PINNED_KEY = "argo-proto-05-pinned-v1";
+var DECKS_KEY = "argo-proto-05-decks-v1";
+var SVG_NS = "http://www.w3.org/2000/svg";
+var FAMILY_ORDER = ["engineering", "product_management", "sales", "people_ops", "design"];
+var FAMILY_NAMES = {
+  engineering: "Engineering",
+  product_management: "Product management",
+  sales: "Sales",
+  people_ops: "People ops",
+  design: "Design"
+};
+var ZONES = [
+  { name: "Engineering", families: ["engineering"] },
+  { name: "Product and Sales", families: ["product_management", "sales"] },
+  { name: "People and Design", families: ["people_ops", "design"] }
+];
+var STAGE_CLASSES = {
+  "phone screen": "stage-phone",
+  "technical screen": "stage-tech",
+  "onsite": "stage-onsite",
+  "take-home": "stage-takehome",
+  "final": "stage-final"
+};
+var HINTS = {
+  list: "<kbd>Tab</kbd> focuses a row <span class='sep'>&middot;</span> <kbd>S</kbd> stars it <span class='sep'>&middot;</span> <kbd>M</kbd> moves a stack <span class='sep'>&middot;</span> the chevron expands a QDeck in place, its title opens the QDeck page",
+  stack: "<kbd>Tab</kbd> focuses a card <span class='sep'>&middot;</span> <kbd>S</kbd> stars it <span class='sep'>&middot;</span> <kbd>M</kbd> moves a stack <span class='sep'>&middot;</span> a QDeck's title opens its own page",
+  board: "<kbd>Tab</kbd> focuses a card <span class='sep'>&middot;</span> <kbd>S</kbd> stars <span class='sep'>&middot;</span> <kbd>M</kbd> moves <span class='sep'>&middot;</span> drag a card between columns <span class='sep'>&middot;</span> loose stacks only, QDecks live in Stack and Canvas",
+  canvas: "<kbd>Tab</kbd> focuses a card <span class='sep'>&middot;</span> <kbd>Arrows</kbd> nudge, <kbd>Shift</kbd> for a longer step <span class='sep'>&middot;</span> <kbd>Enter</kbd> fans out a preview or peeks a QDeck, its title opens the QDeck page <span class='sep'>&middot;</span> <kbd>S</kbd> stars <span class='sep'>&middot;</span> <kbd>M</kbd> moves <span class='sep'>&middot;</span> <kbd>D</kbd> combines into a QDeck <span class='sep'>&middot;</span> pin to hold a card in place <span class='sep'>&middot;</span> <kbd>Esc</kbd> closes",
+  deck: "<kbd>Tab</kbd> focuses a control or a card <span class='sep'>&middot;</span> <kbd>S</kbd> stars <span class='sep'>&middot;</span> <kbd>M</kbd> moves a stack <span class='sep'>&middot;</span> Arrange reorders within this QDeck or removes a stack from it"
+};
+
+/* The seal: concentric rings around an eight-point star, gold tokens only */
+var SEAL_SVG =
+  '<svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true">' +
+  '<circle cx="12" cy="12" r="10.5" fill="var(--gold-hover)"/>' +
+  '<circle cx="12" cy="12" r="10" fill="none" stroke="var(--gold)" stroke-width="1"/>' +
+  '<circle cx="12" cy="12" r="7.6" fill="none" stroke="rgb(251 246 233 / 0.75)" stroke-width="0.8"/>' +
+  '<rect x="8.9" y="8.9" width="6.2" height="6.2" fill="var(--cream)"/>' +
+  '<rect x="8.9" y="8.9" width="6.2" height="6.2" fill="var(--cream)" transform="rotate(45 12 12)"/>' +
+  "</svg>";
+
+var SHARE_SVG =
+  '<svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
+  '<path d="M13 9v3.5a1 1 0 0 1-1 1H3.5a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1H7"/>' +
+  '<path d="M10.5 2.5h3v3"/>' +
+  '<path d="M13.5 2.5 8 8"/>' +
+  "</svg>";
+
+/* Pass B: the deck glyph, a small stack of cards */
+var DECK_SVG =
+  '<svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round" aria-hidden="true">' +
+  '<rect x="2.3" y="1.3" width="9" height="6.4" rx="1.1"/>' +
+  '<rect x="3.6" y="4.1" width="9" height="6.4" rx="1.1"/>' +
+  '<rect x="4.9" y="6.9" width="9" height="6.4" rx="1.1"/>' +
+  "</svg>";
+
+/* Pin, a utility toggle, ink only, never gold: a silhouette change carries the state, not a color */
+var PIN_OUTLINE_SVG = '<svg width="11" height="11" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 2v4.5M5 6.5h6l-1 4H6l-1-4Z"/><path d="M8 10.5v3.5"/></svg>';
+var PIN_FILLED_SVG = '<svg width="11" height="11" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 2c-1.7 0-3 1.3-3 3 0 1.1.5 2 1.3 2.6L5 10.5h6L9.7 7.6C10.5 7 11 6.1 11 5c0-1.7-1.3-3-3-3Z"/><rect x="7.3" y="10.5" width="1.4" height="3.5" rx="0.5"/></svg>';
+
+var viewRoot = document.getElementById("viewRoot");
+var hintsEl = document.getElementById("hints");
+var liveEl = document.getElementById("live");
+
+var state = {
+  view: "stack",
+  density: loadDensity(),
+  stacks: STACKS.map(function (s) { return Object.assign({}, s); }),
+  decks: loadDecks(),
+  pinned: loadPinned(),
+  positions: loadPositions(),
+  swept: {},
+  z: {},
+  cloneSeq: 0,
+  deckSeq: 0,
+  /* Pass C: the QDeck page. activeDeckId names the deck currently on its own page;
+     returnView is where "Back to library" lands, captured once per hop, not
+     overwritten on a hop that starts from the deck page itself (there is no in-page
+     path to another deck this pass, so that guard is defensive, not load-bearing). */
+  activeDeckId: null,
+  returnView: "stack",
+  /* Pass C: List's collapse state, presentation only, not persisted, resetting on
+     reload is fine since it changes nothing about the data underneath it. */
+  expandedDecks: {}
+};
+
+function reduced() {
+  try { return window.matchMedia("(prefers-reduced-motion: reduce)").matches; }
+  catch (err) { return false; }
+}
+function loadDecks() {
+  try {
+    var raw = localStorage.getItem(DECKS_KEY);
+    if (!raw) return DECKS.map(function (d) { return Object.assign({}, d, { stack_ids: d.stack_ids.slice() }); });
+    var parsed = JSON.parse(raw);
+    if (!Array.isArray(parsed)) throw new Error("bad shape");
+    return parsed.map(function (d) {
+      return {
+        id: String(d.id), title: String(d.title), stars: isFinite(d.stars) ? Number(d.stars) : 0,
+        stack_ids: Array.isArray(d.stack_ids) ? d.stack_ids.slice() : [],
+        _freshlyCreated: !!d._freshlyCreated
+      };
+    });
+  } catch (err) {
+    return DECKS.map(function (d) { return Object.assign({}, d, { stack_ids: d.stack_ids.slice() }); });
+  }
+}
+function saveDecks() {
+  try { localStorage.setItem(DECKS_KEY, JSON.stringify(state.decks)); }
+  catch (err) { /* storage unavailable, deck formation lives for this visit only */ }
+}
+function loadPinned() {
+  try {
+    var raw = localStorage.getItem(PINNED_KEY);
+    if (!raw) return [];
+    var parsed = JSON.parse(raw);
+    if (!Array.isArray(parsed)) return [];
+    return parsed.filter(function (id) { return typeof id === "string"; });
+  } catch (err) { return []; }
+}
+function savePinned() {
+  try { localStorage.setItem(PINNED_KEY, JSON.stringify(state.pinned)); }
+  catch (err) { /* storage unavailable, pins live for this visit only */ }
+}
+/* HARD CONSTRAINT: canvas x and y are spatial memory only, never a ranking, ordering,
+   or scoring signal. When this becomes real, positions live in their own table
+   (for example qstack_canvas_positions), readable only by the canvas renderer.
+   No sorting, ranking, or assessment logic may ever read these coordinates,
+   now or later. */
+function loadPositions() {
+  try {
+    var raw = localStorage.getItem(LS_KEY);
+    if (!raw) return {};
+    var parsed = JSON.parse(raw);
+    if (!parsed || typeof parsed !== "object") return {};
+    var clean = {};
+    Object.keys(parsed).forEach(function (k) {
+      var p = parsed[k];
+      if (p && isFinite(p.x) && isFinite(p.y) && p.x >= 0 && p.x <= 100 && p.y >= 0 && p.y <= 100) {
+        clean[k] = { x: Number(p.x), y: Number(p.y) };
+      }
+    });
+    return clean;
+  } catch (err) { return {}; }
+}
+function savePositions() {
+  try { localStorage.setItem(LS_KEY, JSON.stringify(state.positions)); }
+  catch (err) { /* storage unavailable, arrangement lives for this visit only */ }
+}
+function loadDensity() {
+  try {
+    var d = localStorage.getItem(DENSITY_KEY);
+    if (d === "comfortable" || d === "compact" || d === "dense") return d;
+  } catch (err) { /* storage unavailable */ }
+  return "comfortable";
+}
+function fmt(v) { return String(v).split("_").join(" "); }
+function pad2(n) { return String(n).length < 2 ? "0" + n : String(n); }
+function getStack(id) {
+  for (var i = 0; i < state.stacks.length; i++) { if (state.stacks[i].id === id) return state.stacks[i]; }
+  return null;
+}
+function getDeck(id) {
+  for (var i = 0; i < state.decks.length; i++) { if (state.decks[i].id === id) return state.decks[i]; }
+  return null;
+}
+/* getItem resolves either kind by id: decks and stacks share the click, star, arrange,
+   drag, and nudge handlers on canvas, so most interaction code should call this rather
+   than getStack directly. */
+function getItem(id) {
+  var d = getDeck(id);
+  if (d) return d;
+  return getStack(id);
+}
+function itemType(id) { return getDeck(id) ? "deck" : "stack"; }
+
+/* Deck membership: the data layer. A stack belongs to at most one deck, one to many,
+   never many to many. */
+function stackDeckId(stackId) {
+  for (var i = 0; i < state.decks.length; i++) {
+    if (state.decks[i].stack_ids.indexOf(stackId) > -1) return state.decks[i].id;
+  }
+  return null;
+}
+function isLoose(stackId) { return stackDeckId(stackId) === null; }
+
+/* The base collection for List, Stack gallery, and Canvas: every deck, plus every
+   loose stack. Board view does not use this, it filters state.stacks directly
+   by isLoose, see renderBoard. */
+function libraryItems() {
+  var items = state.decks.map(function (d) { return { type: "deck", data: d }; });
+  state.stacks.forEach(function (s) {
+    if (isLoose(s.id)) items.push({ type: "stack", data: s });
+  });
+  return items;
+}
+
+function nextCloneId(baseId) {
+  state.cloneSeq += 1;
+  return baseId + "-copy-" + state.cloneSeq;
+}
+function nextDeckId() {
+  state.deckSeq += 1;
+  var id = "dnew" + state.deckSeq;
+  while (getDeck(id)) { state.deckSeq += 1; id = "dnew" + state.deckSeq; }
+  return id;
+}
+
+/* Adding a stack to a deck: if the stack is already decked elsewhere, this is a COPY,
+   not a move, the clone gets a new id and joins the target deck while the original
+   deck keeps its member untouched. If the stack is loose, this is a plain MOVE. This
+   rule is architecturally required even though this pass's built UI only ever calls
+   addStackToDeck with a loose stack (drag-to-combine and the D key both start from a
+   loose stack, per spec section 8 and 12): the copy branch is here and correct, ready
+   for a future pass that lets a stack be dragged out of one deck into another. */
+function addStackToDeck(stackId, deckId) {
+  var deck = getDeck(deckId);
+  if (!deck) return null;
+  var currentDeck = stackDeckId(stackId);
+  var resultStack = getStack(stackId);
+  if (currentDeck !== null && currentDeck !== deckId) {
+    var original = getStack(stackId);
+    var clone = Object.assign({}, original, { id: nextCloneId(stackId), forked_from: null, flagged: 0 });
+    state.stacks.push(clone);
+    deck.stack_ids.push(clone.id);
+    resultStack = clone;
+  } else if (currentDeck === null) {
+    deck.stack_ids.push(stackId);
+  }
+  saveDecks();
+  return resultStack;
+}
+
+/* Forming a brand new deck from two loose stacks. Same role_family on both names the
+   deck after that family's loop; a mismatched pair still combines, judgment about
+   whether that combination makes sense is explicitly out of scope this pass. */
+function createDeckFromStacks(stackIdA, stackIdB) {
+  var a = getStack(stackIdA), b = getStack(stackIdB);
+  if (!a || !b) return null;
+  var title = (a.role_family === b.role_family && FAMILY_NAMES[a.role_family])
+    ? FAMILY_NAMES[a.role_family] + " Loop"
+    : "New QDeck";
+  var deck = { id: nextDeckId(), title: title, stars: 0, stack_ids: [], _freshlyCreated: true };
+  state.decks.push(deck);
+  if (isLoose(stackIdA)) deck.stack_ids.push(stackIdA); else addStackToDeck(stackIdA, deck.id);
+  if (isLoose(stackIdB)) deck.stack_ids.push(stackIdB); else addStackToDeck(stackIdB, deck.id);
+  saveDecks();
+  return deck;
+}
+
+/* Undo for a combine: splice the stack back out. A deck left with zero members by an
+   undo, and created fresh by this session's own combine action, is deleted entirely
+   so a canceled combination leaves no trace. */
+function removeStackFromDeck(stackId, deckId) {
+  var deck = getDeck(deckId);
+  if (!deck) return;
+  var idx = deck.stack_ids.indexOf(stackId);
+  if (idx > -1) deck.stack_ids.splice(idx, 1);
+  if (deck.stack_ids.length === 0 && deck._freshlyCreated) {
+    var di = state.decks.indexOf(deck);
+    if (di > -1) state.decks.splice(di, 1);
+  }
+  saveDecks();
+}
+
+function colName(id) {
+  for (var i = 0; i < COLUMNS.length; i++) { if (COLUMNS[i].id === id) return COLUMNS[i].name; }
+  return fmt(id);
+}
+function isEdge(s) { return s.status === "in_rotation"; }
+function sealQualifies(s) { return s.stars >= 25; }
+function zoneIndex(family) {
+  for (var i = 0; i < ZONES.length; i++) { if (ZONES[i].families.indexOf(family) > -1) return i; }
+  return 0;
+}
+/* A deck has no role_family of its own; it takes its zone from its first member so it
+   starts near the shelf its stacks would otherwise occupy. Falls back to zone 0, never
+   throws on an empty deck. */
+function itemZone(item) {
+  if (itemType(item.id) === "deck") {
+    var first = item.stack_ids && item.stack_ids.length ? getStack(item.stack_ids[0]) : null;
+    return zoneIndex(first ? first.role_family : "");
+  }
+  return zoneIndex(item.role_family);
+}
+function el(tag, cls, text) {
+  var node = document.createElement(tag);
+  if (cls) node.className = cls;
+  if (text !== undefined && text !== null) node.textContent = text;
+  return node;
+}
+function crestSvg() {
+  var svg = document.createElementNS(SVG_NS, "svg");
+  svg.setAttribute("viewBox", "0 0 64 64");
+  svg.setAttribute("aria-hidden", "true");
+  var use = document.createElementNS(SVG_NS, "use");
+  use.setAttribute("href", "#crest");
+  svg.appendChild(use);
+  return svg;
+}
+function announce(msg) {
+  if (!liveEl) return;
+  liveEl.textContent = "";
+  window.requestAnimationFrame(function () { liveEl.textContent = msg; });
+}
+
+/* Card builders */
+
+function chip(text, cls) { return el("span", "chip" + (cls ? " " + cls : ""), text); }
+
+function buildStagePill(s) {
+  var p = el("span", "stage-pill " + (STAGE_CLASSES[s.stage] || "stage-phone"));
+  var d = el("span", "dot");
+  d.setAttribute("aria-hidden", "true");
+  p.appendChild(d);
+  p.appendChild(document.createTextNode(s.stage));
+  return p;
+}
+
+function buildChips(s) {
+  var c = el("div", "chips");
+  c.appendChild(buildStagePill(s));
+  c.appendChild(chip(fmt(s.role_family)));
+  c.appendChild(chip(s.level));
+  c.appendChild(chip(s.methodology));
+  c.appendChild(chip(s.visibility, "vis"));
+  if (s.forked_from) c.appendChild(chip("forked", "forked"));
+  if (s.screened) c.appendChild(chip("Screened", "screened"));
+  c.appendChild(chip(s.questions + " questions", "qcount"));
+  if (s.flagged > 0) {
+    var f = chip(s.flagged + " flagged", "flag");
+    f.title = "Visible only to you, with the reason.";
+    c.appendChild(f);
+  }
+  return c;
+}
+
+function buildStar(s, big, kind) {
+  var noun = kind === "deck" ? "QDeck" : "stack";
+  var b = el("button", "star-btn" + (big ? " star-big" : ""));
+  b.type = "button";
+  b.setAttribute("aria-label", s.stars + " stars, star this " + noun);
+  var g = el("span", "glyph", "★");
+  g.setAttribute("aria-hidden", "true");
+  b.appendChild(g);
+  b.appendChild(el("span", "count", String(s.stars)));
+  return b;
+}
+
+function buildPinBtn(item) {
+  var pinned = state.pinned.indexOf(item.id) > -1;
+  var b = el("button", "pin-btn");
+  b.type = "button";
+  b.setAttribute("aria-pressed", String(pinned));
+  b.setAttribute("aria-label", (pinned ? "Unpin " : "Pin ") + item.title);
+  b.innerHTML = pinned ? PIN_FILLED_SVG : PIN_OUTLINE_SVG;
+  return b;
+}
+
+function buildSeal(s) {
+  var seal = el("span", "seal");
+  seal.tabIndex = 0;
+  seal.setAttribute("role", "img");
+  seal.setAttribute("aria-label", "Seal: earned at 25 stars");
+  seal.innerHTML = SEAL_SVG;
+  if (!sealQualifies(s)) seal.classList.add("seal-off");
+  return seal;
+}
+
+function buildArrange(s) {
+  var b = el("button", "arrange-btn");
+  b.type = "button";
+  b.setAttribute("aria-haspopup", "menu");
+  b.setAttribute("aria-label", "Arrange " + s.title);
+  var c = el("span", null, "▾");
+  c.setAttribute("aria-hidden", "true");
+  b.appendChild(c);
+  return b;
+}
+
+function buildShare(s) {
+  var b = el("button", "share-btn");
+  b.type = "button";
+  b.setAttribute("aria-label", "Copy share link");
+  b.innerHTML = SHARE_SVG;
+  return b;
+}
+
+function buildStatus(s) {
+  var b = el("button", "status-btn");
+  b.type = "button";
+  b.setAttribute("aria-haspopup", "menu");
+  b.setAttribute("aria-label", "Status " + fmt(s.status) + ", move this stack");
+  b.appendChild(el("span", "status-label", fmt(s.status)));
+  var c = el("span", "caret", "▾");
+  c.setAttribute("aria-hidden", "true");
+  b.appendChild(c);
+  return b;
+}
+
+function buildCard(s, view, index) {
+  var card = el("article", "card card-" + view + " reveal");
+  card.dataset.id = s.id;
+  card.tabIndex = 0;
+  card.style.setProperty("--i", index);
+  card._revealDelay = index * 40;
+
+  if (view === "stack") {
+    var mark = el("span", "set-mark", "ARGO NO. " + pad2(s.id.slice(1)));
+    mark.setAttribute("aria-hidden", "true");
+    card.appendChild(mark);
+    var wm = el("div", "watermark");
+    wm.setAttribute("aria-hidden", "true");
+    wm.appendChild(crestSvg());
+    card.appendChild(wm);
+  }
+
+  var head = el("div", "zone-title");
+  var h = el("h3", "title");
+  if (view === "canvas") {
+    var tb = el("button", "title-btn", s.title);
+    tb.type = "button";
+    tb.setAttribute("aria-expanded", "false");
+    h.appendChild(tb);
+  } else {
+    h.textContent = s.title;
+  }
+  h.appendChild(buildArrange(s));
+  head.appendChild(h);
+  var cluster = el("div", "star-cluster");
+  cluster.appendChild(buildStar(s, view === "stack"));
+  cluster.appendChild(buildSeal(s));
+  head.appendChild(cluster);
+  card.appendChild(head);
+
+  if (view === "stack") card.appendChild(el("div", "card-mid"));
+
+  var foot = el("div", "zone-stub");
+  foot.appendChild(buildChips(s));
+  var actions = el("div", "stub-actions");
+  actions.appendChild(buildShare(s));
+  actions.appendChild(buildStatus(s));
+  foot.appendChild(actions);
+  card.appendChild(foot);
+
+  refreshEdge(card, s);
+  refreshOffboard(card, s);
+  if (view === "stack") attachShineHandlers(card);
+  if (view === "canvas") {
+    card.appendChild(buildPinBtn(s));
+    card.classList.toggle("pinned", state.pinned.indexOf(s.id) > -1);
+  }
+  return card;
+}
+
+/* Deck card: same ticket anatomy contract (title top-left, star cluster top-right,
+   metadata bottom-left, actions bottom-right) but simplified, a deck has no status.
+   In Stack gallery and Canvas it gets two ghost layers plus an explicit face panel so
+   it visibly reads as several cards, not one; List stays a flat register, no ghosts. */
+function buildPeekLabel(d, memberIndex) {
+  var label = el("span", "deck-peek-label");
+  label.setAttribute("aria-hidden", "true");
+  var sid = d.stack_ids && d.stack_ids[memberIndex];
+  var ms = sid ? getStack(sid) : null;
+  if (ms) label.appendChild(buildStagePill(ms));
+  return label;
+}
+
+function buildDeckCard(d, view, index) {
+  var card = el("article", "card card-" + view + " card-deck reveal");
+  card.dataset.id = d.id;
+  card.dataset.deck = "true";
+  card.tabIndex = 0;
+  card.style.setProperty("--i", index);
+  card._revealDelay = index * 40;
+
+  var layered = view === "stack" || view === "canvas";
+  var host = card;
+  if (layered) {
+    var g2 = el("div", "deck-layer"); g2.setAttribute("aria-hidden", "true");
+    var g1 = el("div", "deck-layer"); g1.setAttribute("aria-hidden", "true");
+    if (view === "canvas") {
+      g2.appendChild(buildPeekLabel(d, 0));
+      g1.appendChild(buildPeekLabel(d, 1));
+    }
+    card.appendChild(g2);
+    card.appendChild(g1);
+    host = el("div", "deck-face");
+    card.appendChild(host);
+  }
+
+  var head = el("div", "zone-title");
+  var h = el("h3", "title");
+  if (view === "list") {
+    var expanded = !!state.expandedDecks[d.id];
+    var chev = el("button", "chevron-btn");
+    chev.type = "button";
+    chev.setAttribute("aria-expanded", String(expanded));
+    chev.setAttribute("aria-label", (expanded ? "Collapse " : "Expand ") + d.title + " in place");
+    chev.innerHTML = '<span aria-hidden="true">' + (expanded ? "&#9662;" : "&#9656;") + "</span>";
+    h.appendChild(chev);
+  }
+  var glyph = el("span", "deck-glyph");
+  glyph.setAttribute("aria-hidden", "true");
+  glyph.innerHTML = DECK_SVG;
+  h.appendChild(glyph);
+  var tb = el("button", "title-btn", d.title);
+  tb.type = "button";
+  tb.setAttribute("aria-label", "Open QDeck " + d.title);
+  h.appendChild(tb);
+  h.appendChild(buildArrange(d));
+  head.appendChild(h);
+  var cluster = el("div", "star-cluster");
+  cluster.appendChild(buildStar(d, view === "stack", "deck"));
+  cluster.appendChild(buildSeal(d));
+  head.appendChild(cluster);
+  host.appendChild(head);
+
+  var foot = el("div", "zone-stub");
+  var stub = el("div", "chips");
+  var n = d.stack_ids.length;
+  stub.appendChild(chip(n + (n === 1 ? " QStack" : " QStacks"), "qcount"));
+  foot.appendChild(stub);
+  var actions = el("div", "stub-actions");
+  actions.appendChild(buildShare(d));
+  foot.appendChild(actions);
+  host.appendChild(foot);
+
+  refreshSeal(card, d);
+  if (view === "canvas") {
+    card.appendChild(buildPinBtn(d));
+    card.classList.toggle("pinned", state.pinned.indexOf(d.id) > -1);
+    /* Pass C: the peek, hover and focus only, canvas only. pointerenter/pointerleave
+       do not bubble, so they are bound directly per card rather than delegated. */
+    card.addEventListener("pointerenter", function () { setDeckPeek(card, true); });
+    card.addEventListener("pointerleave", function () { setDeckPeek(card, false); });
+  }
+  return card;
+}
+
+/* Live state refresh: the edge follows status, the seal follows stars */
+
+function refreshEdge(card, s) {
+  var edge = isEdge(s);
+  card.classList.toggle("edge", edge);
+  if (edge && card.classList.contains("card-stack")) {
+    ensureShine(card);
+  } else if (!edge) {
+    var sh = card.querySelector(".shine");
+    if (sh) sh.remove();
+  }
+}
+
+function refreshSeal(card, s) {
+  var seal = card.querySelector(".seal");
+  if (seal) seal.classList.toggle("seal-off", !sealQualifies(s));
+}
+
+function refreshOffboard(card, s) {
+  card.classList.toggle("offb", s.status === "off_board");
+}
+
+function updateStar(card, s) {
+  var btn = card.querySelector(".star-btn");
+  if (!btn) return;
+  btn.setAttribute("aria-label", s.stars + " stars, star this stack");
+  var count = btn.querySelector(".count");
+  if (count) count.textContent = String(s.stars);
+}
+
+function syncStatus(card, s) {
+  var btn = card.querySelector(".status-btn");
+  if (!btn) return;
+  btn.setAttribute("aria-label", "Status " + fmt(s.status) + ", move this stack");
+  var label = btn.querySelector(".status-label");
+  if (label) label.textContent = fmt(s.status);
+  refreshOffboard(card, s);
+}
+
+/* Views */
+
+/* Pass C: a deck's List row carries its own chevron, collapsed by default. Expanded
+   member rows are appended as direct .sheet children, flat, right after their deck's
+   header row, so the existing :first-child/:last-child corner-rounding (which assumes
+   a flat run of .card-list siblings) keeps working without a special case. */
+function renderList() {
+  var sheet = el("section", "sheet");
+  sheet.setAttribute("aria-label", "All QStacks and QDecks, list view");
+  var i = 0;
+  libraryItems().forEach(function (it) {
+    if (it.type === "deck") {
+      var d = it.data;
+      sheet.appendChild(buildDeckCard(d, "list", i++));
+      if (state.expandedDecks[d.id]) {
+        d.stack_ids.forEach(function (sid) {
+          var ms = getStack(sid);
+          if (!ms) return;
+          var mc = buildCard(ms, "list", i++);
+          mc.classList.add("deck-member-indent");
+          sheet.appendChild(mc);
+        });
+      }
+    } else {
+      sheet.appendChild(buildCard(it.data, "list", i++));
+    }
+  });
+  viewRoot.appendChild(sheet);
+}
+
+/* Pass C: List's chevron, separate from the title (which navigates to the QDeck page).
+   Presentation state only, so a full re-render is the simplest correct way to reflect
+   it; the chevron itself gets focus back afterward. */
+function toggleDeckExpanded(deckId) {
+  state.expandedDecks[deckId] = !state.expandedDecks[deckId];
+  render();
+  var card = viewRoot.querySelector('.card[data-id="' + deckId + '"]');
+  var chev = card ? card.querySelector(".chevron-btn") : null;
+  if (chev) chev.focus();
+  var d = getDeck(deckId);
+  announce((state.expandedDecks[deckId] ? "Expanded " : "Collapsed ") + (d ? d.title : "QDeck") + ".");
+}
+
+function renderStack() {
+  var i = 0;
+  /* A QDecks shelf renders first: decks have no role_family, so they cannot join the
+     family shelves below, and folding them into an existing shelf would blur the
+     distinction the deck glyph and ghost layers exist to make. This also gives
+     Arrange-among-decks a clean, self-contained scope. */
+  if (state.decks.length) {
+    var dshelf = el("section", "shelf");
+    var dhead = el("div", "shelf-head");
+    dhead.appendChild(el("h2", "shelf-name", "QDecks"));
+    dhead.appendChild(el("span", "shelf-count", state.decks.length + " in QDecks"));
+    dshelf.appendChild(dhead);
+    var drow = el("div", "shelf-row");
+    state.decks.forEach(function (d) { drow.appendChild(buildDeckCard(d, "stack", i++)); });
+    dshelf.appendChild(drow);
+    viewRoot.appendChild(dshelf);
+  }
+  FAMILY_ORDER.forEach(function (fam) {
+    var items = state.stacks.filter(function (s) { return s.role_family === fam && isLoose(s.id); });
+    if (!items.length) return;
+    var shelf = el("section", "shelf");
+    var head = el("div", "shelf-head");
+    head.appendChild(el("h2", "shelf-name", FAMILY_NAMES[fam]));
+    head.appendChild(el("span", "shelf-count", items.length + " in " + fmt(fam)));
+    shelf.appendChild(head);
+    var row = el("div", "shelf-row");
+    items.forEach(function (s) { row.appendChild(buildCard(s, "stack", i++)); });
+    shelf.appendChild(row);
+    viewRoot.appendChild(shelf);
+  });
+  observeGallery();
+}
+
+/* Board renders loose stacks only. A deck spans multiple stages, which means it spans
+   multiple statuses, and the board is a single-status-per-card Kanban of individual
+   stage-work; there is no status rollup for a deck, deliberately, that is exactly the
+   kind of deck-intelligence judgment this pass does not build. */
+function renderBoard() {
+  var board = el("div", "board");
+  var i = 0;
+  COLUMNS.forEach(function (c) {
+    var col = el("section", "board-col");
+    col.dataset.status = c.id;
+    col.setAttribute("aria-label", c.name);
+    var head = el("div", "col-head");
+    head.appendChild(el("h2", "col-name", c.name));
+    head.appendChild(el("span", "col-count", ""));
+    col.appendChild(head);
+    var body = el("div", "col-body");
+    body.dataset.status = c.id;
+    state.stacks.filter(function (s) { return s.status === c.id && isLoose(s.id); })
+      .forEach(function (s) { body.appendChild(buildCard(s, "board", i++)); });
+    col.appendChild(body);
+    board.appendChild(col);
+  });
+  viewRoot.appendChild(board);
+  updateBoardMeta();
+}
+
+function updateBoardMeta() {
+  var cols = viewRoot.querySelectorAll(".board-col");
+  Array.prototype.forEach.call(cols, function (col) {
+    var body = col.querySelector(".col-body");
+    var n = body.querySelectorAll(".card").length;
+    var count = col.querySelector(".col-count");
+    if (count) count.textContent = n === 1 ? "1 stack" : n + " stacks";
+    var empty = body.querySelector(".col-empty");
+    if (n === 0 && !empty) {
+      var copy = col.dataset.status === "off_board"
+        ? "Nothing waiting here. Stacks land here when they leave the board, and nothing about them is lost."
+        : "Nothing here yet. Move a stack over when it is ready.";
+      body.appendChild(el("p", "col-empty", copy));
+    } else if (n > 0 && empty) {
+      empty.remove();
+    }
+  });
+}
+
+/* Pass C2: row spacing retuned for the shrunk canvas. A canvas card in this dataset
+   runs up to roughly 240px tall (a stack with a full chip row, or a QDeck face); at
+   17 percent of the canvas's own height a second row clears the first with room to
+   spare and still lands short of the next zone's own first row, so a two-row zone
+   never collides with its neighbor. See the paired .canvas height in the CSS, the
+   two values are tuned together, not independently. */
+function defaultPos(item) {
+  var zi = itemZone(item);
+  var within = libraryItems()
+    .map(function (it) { return it.data; })
+    .filter(function (x) { return itemZone(x) === zi; });
+  var k = 0;
+  for (var i = 0; i < within.length; i++) { if (within[i].id === item.id) { k = i; break; } }
+  return { x: 4 + (k % 4) * 23.5, y: zi * 33.333 + 5 + Math.floor(k / 4) * 17 };
+}
+
+/* Pass C: canvas is now a real, scrollable canvas. The viewport is the visible,
+   overflow: auto window; the canvas itself is a fixed content area with no
+   overflow: hidden anywhere in the chain, so nothing painted by a card is ever
+   clipped, only ever a scroll away.
+   Pass C2: the viewport also breaks out of the page's 1220px cap on this view only
+   (see the scoped CSS), the content area is sized to the default arrangement with
+   modest headroom rather than Pass C's oversized fixed canvas, and the zone bands
+   from Pass B are restored as a purely visual, pointer-events: none background cue,
+   they exert no layout constraint on where a card can actually be dragged. */
+function renderCanvas() {
+  viewRoot.appendChild(el("p", "canvas-note",
+    "Arrange your stacks and QDecks however you think. Position changes nothing about them."));
+  var viewport = el("div", "canvas-viewport");
+  var cv = el("div", "canvas");
+  var items = libraryItems();
+  ZONES.forEach(function (z, zi) {
+    var zone = el("div", "zone zone-" + (zi + 1));
+    var n = items.filter(function (it) { return itemZone(it.data) === zi; }).length;
+    var lab = el("div", "zone-label");
+    lab.appendChild(el("span", "zone-name", z.name));
+    lab.appendChild(el("span", "zone-count", n === 1 ? "1 item starts here" : n + " items start here"));
+    zone.appendChild(lab);
+    cv.appendChild(zone);
+  });
+  var guideV = el("div", "guide-v"); guideV.setAttribute("aria-hidden", "true");
+  var guideH = el("div", "guide-h"); guideH.setAttribute("aria-hidden", "true");
+  cv.appendChild(guideV);
+  cv.appendChild(guideH);
+  var zmax = 0;
+  Object.keys(state.z).forEach(function (k) { if (state.z[k] > zmax) zmax = state.z[k]; });
+  items.forEach(function (it, i) {
+    var data = it.data;
+    var card = it.type === "deck" ? buildDeckCard(data, "canvas", i) : buildCard(data, "canvas", i);
+    var pos = state.positions[data.id] || defaultPos(data);
+    state.positions[data.id] = pos;
+    card.style.left = pos.x + "%";
+    card.style.top = pos.y + "%";
+    if (state.z[data.id] === undefined) { zmax += 1; state.z[data.id] = zmax; }
+    card.style.zIndex = state.z[data.id];
+    cv.appendChild(card);
+  });
+  viewport.appendChild(cv);
+  viewRoot.appendChild(viewport);
+}
+
+/* Pass C: the QDeck page. See everything, manage it, one full page, not a panel doing
+   two jobs. headWrap is the single position: relative anchor for every feedback pill
+   this page shows (star, Add a stack, Remove from deck), since there is no longer one
+   card element standing in for "the deck" here. */
+function renderDeckPage() {
+  var deck = getDeck(state.activeDeckId);
+  if (!deck) { setView(state.returnView || "stack"); return; }
+
+  var back = el("button", "deckpage-back");
+  back.type = "button";
+  back.innerHTML = '<span aria-hidden="true">&larr;</span> Back to library';
+  back.addEventListener("click", function () { navigateBack(); });
+  viewRoot.appendChild(back);
+
+  var headWrap = el("div", "deckpage-head");
+  headWrap.dataset.id = deck.id;
+
+  var identity = el("div", "deckpage-identity");
+  var glyphWrap = el("span", "deckpage-glyph");
+  glyphWrap.setAttribute("aria-hidden", "true");
+  glyphWrap.innerHTML = DECK_SVG;
+  identity.appendChild(glyphWrap);
+  identity.appendChild(el("h1", null, deck.title));
+  var cluster = el("div", "star-cluster");
+  var starBtn = buildStar(deck, false, "deck");
+  cluster.appendChild(starBtn);
+  cluster.appendChild(buildSeal(deck));
+  identity.appendChild(cluster);
+  var n = deck.stack_ids.length;
+  identity.appendChild(chip(n + (n === 1 ? " QStack" : " QStacks"), "qcount"));
+  headWrap.appendChild(identity);
+  starBtn.addEventListener("click", function (e) { e.stopPropagation(); star(headWrap); });
+
+  if (deck.stack_ids.length) {
+    var pipeline = el("div", "deckpage-pipeline");
+    pipeline.setAttribute("aria-label", "Stage sequence for " + deck.title);
+    deck.stack_ids.forEach(function (sid, idx) {
+      var ms = getStack(sid);
+      if (idx > 0) {
+        var arrow = el("span", "pipeline-arrow", "→");
+        arrow.setAttribute("aria-hidden", "true");
+        pipeline.appendChild(arrow);
+      }
+      if (ms) pipeline.appendChild(buildStagePill(ms));
+    });
+    headWrap.appendChild(pipeline);
+  }
+
+  var addWrap = el("div", "deckpage-add");
+  var addBtn = el("button", "add-stack-btn", "Add a stack");
+  addBtn.type = "button";
+  addBtn.setAttribute("aria-haspopup", "menu");
+  addBtn.setAttribute("aria-expanded", "false");
+  addWrap.appendChild(addBtn);
+  addBtn.addEventListener("click", function (e) {
+    e.stopPropagation();
+    if (addWrap.querySelector(".move-menu")) { closeMenus(true); }
+    else { openAddToDeckMenu(addWrap, addBtn, deck); addBtn.setAttribute("aria-expanded", "true"); }
+  });
+  headWrap.appendChild(addWrap);
+
+  viewRoot.appendChild(headWrap);
+
+  var sheet = el("section", "sheet deckpage-members");
+  sheet.setAttribute("aria-label", deck.title + " QStacks");
+  deck.stack_ids.forEach(function (sid, idx) {
+    var ms = getStack(sid);
+    if (ms) sheet.appendChild(buildCard(ms, "list", idx));
+  });
+  viewRoot.appendChild(sheet);
+}
+
+/* Pass C: listing every currently loose stack, selecting one calls addStackToDeck
+   directly, no confirm-and-cancel gate. Unlike the canvas drag, where an overlap can
+   be accidental, a person who opened this menu and picked a specific stack from an
+   explicit list has already made a deliberate, unambiguous choice; a second
+   confirmation there would be friction, not a safeguard. */
+function openAddToDeckMenu(wrapper, btn, deck) {
+  closeMenus();
+  var loose = state.stacks.filter(function (s) { return isLoose(s.id); });
+  var menu = el("div", "move-menu add-stack-menu");
+  menu.setAttribute("role", "menu");
+  menu.setAttribute("aria-label", "Add a stack to " + deck.title);
+  menu._returnFocusEl = btn;
+  menu.appendChild(el("div", "menu-label", "Add a stack"));
+  if (!loose.length) {
+    menu.appendChild(el("div", "menu-label", "No loose stacks available."));
+  }
+  loose.forEach(function (s) {
+    var b = el("button", "move-opt");
+    b.type = "button";
+    b.setAttribute("role", "menuitem");
+    b.appendChild(el("span", null, s.title));
+    b.addEventListener("click", function (ev) {
+      ev.stopPropagation();
+      closeMenus(true);
+      addStackToDeck(s.id, deck.id);
+      render();
+      var nh = viewRoot.querySelector('.deckpage-head[data-id="' + deck.id + '"]');
+      if (nh) {
+        showFeedback(nh, "Added " + s.title, "Undo", function () {
+          removeStackFromDeck(s.id, deck.id);
+          render();
+          announce("Undone. " + s.title + " is loose again.");
+        });
+      }
+      announce("Added " + s.title + " to " + deck.title + ".");
+    });
+    menu.appendChild(b);
+  });
+  menu.addEventListener("keydown", menuKeys);
+  wrapper.appendChild(menu);
+  var first = menu.querySelector(".move-opt");
+  if (first) first.focus(); else btn.focus();
+}
+
+function navigateToDeck(deckId) {
+  var deck = getDeck(deckId);
+  if (!deck) return;
+  if (state.view !== "deck") state.returnView = state.view;
+  state.activeDeckId = deckId;
+  state.view = "deck";
+  var btns = document.querySelectorAll(".views button[data-view]");
+  Array.prototype.forEach.call(btns, function (b) { b.setAttribute("aria-pressed", "false"); });
+  render();
+  announce("Opened QDeck " + deck.title + ".");
+}
+
+function navigateBack() {
+  setView(state.returnView || "stack");
+  state.activeDeckId = null;
+}
+
+function render() {
+  closeMenus();
+  viewRoot.innerHTML = "";
+  viewRoot.dataset.view = state.view;
+  viewRoot.dataset.density = state.density;
+  if (state.view === "list") renderList();
+  else if (state.view === "stack") renderStack();
+  else if (state.view === "board") renderBoard();
+  else if (state.view === "deck") renderDeckPage();
+  else renderCanvas();
+  hintsEl.innerHTML = HINTS[state.view] || "";
+}
+
+function setView(v) {
+  if (state.view === v) return;
+  state.view = v;
+  var btns = document.querySelectorAll(".views button[data-view]");
+  Array.prototype.forEach.call(btns, function (b) {
+    b.setAttribute("aria-pressed", String(b.dataset.view === v));
+  });
+  render();
+  announce(v.charAt(0).toUpperCase() + v.slice(1) + " view.");
+}
+
+function setDensity(d, silent) {
+  state.density = d;
+  viewRoot.dataset.density = d;
+  var btns = document.querySelectorAll(".density button[data-density]");
+  Array.prototype.forEach.call(btns, function (b) {
+    b.setAttribute("aria-pressed", String(b.dataset.density === d));
+  });
+  try { localStorage.setItem(DENSITY_KEY, d); } catch (err) { /* visit-only */ }
+  if (!silent) announce(d.charAt(0).toUpperCase() + d.slice(1) + " density.");
+}
+
+/* One feedback pattern: the card-local pill, one per card, message and undo together */
+
+function removeFeedback(card, immediate) {
+  if (!card) return;
+  if (card._fbTimer) { window.clearTimeout(card._fbTimer); card._fbTimer = null; }
+  var pills = card.querySelectorAll(".card-feedback");
+  Array.prototype.forEach.call(pills, function (f) {
+    if (immediate || reduced()) { f.remove(); return; }
+    if (f._leaving) return;
+    f._leaving = true;
+    f.classList.add("leaving");
+    var done = function () { if (f.parentNode) f.remove(); };
+    f.addEventListener("animationend", done, { once: true });
+    window.setTimeout(done, 260);
+  });
+}
+
+function showFeedback(card, text, btnLabel, onUndo, onExpire) {
+  if (!card) return;
+  removeFeedback(card, true);
+  var f = el("div", "card-feedback");
+  f.appendChild(el("span", null, text));
+  if (btnLabel && onUndo) {
+    var b = el("button", null, btnLabel);
+    b.type = "button";
+    b.addEventListener("click", function (e) {
+      e.stopPropagation();
+      removeFeedback(card);
+      onUndo();
+    });
+    f.appendChild(b);
+  }
+  card.appendChild(f);
+  card._fbTimer = window.setTimeout(function () {
+    removeFeedback(card);
+    if (onExpire) onExpire();
+  }, UNDO_MS);
+}
+
+/* Starring: ink count updates, gold pulse at the glyph, seal follows 25 live */
+
+function pulse(card) {
+  var btn = card.querySelector(".star-btn");
+  if (!btn) return;
+  btn.classList.remove("pulsing");
+  void btn.offsetWidth;
+  btn.classList.add("pulsing");
+  window.setTimeout(function () { btn.classList.remove("pulsing"); }, 800);
+}
+
+function moveGlow(card) {
+  if (!card) return;
+  var g = card.querySelector(".card-move-glow");
+  if (!g) {
+    g = el("div", "card-move-glow");
+    g.setAttribute("aria-hidden", "true");
+    card.appendChild(g);
+  }
+  g.classList.remove("pulsing");
+  void g.offsetWidth;
+  g.classList.add("pulsing");
+  window.setTimeout(function () { g.classList.remove("pulsing"); }, 700);
+}
+
+function star(card) {
+  var s = getItem(card.dataset.id);
+  if (!s) return;
+  var isDeck = itemType(s.id) === "deck";
+  s.stars += 1;
+  if (isDeck) saveDecks();
+  card._pendingStars = (card._pendingStars || 0) + 1;
+  updateStar(card, s);
+  pulse(card);
+  refreshSeal(card, s);
+  showFeedback(card, "Starred", "Undo",
+    function () {
+      var n = card._pendingStars || 1;
+      s.stars = Math.max(0, s.stars - n);
+      card._pendingStars = 0;
+      if (isDeck) saveDecks();
+      updateStar(card, s);
+      refreshSeal(card, s);
+      announce("Star removed. " + s.title + " has " + s.stars + " stars.");
+    },
+    function () { card._pendingStars = 0; });
+  announce("Starred " + s.title + ", " + s.stars + " stars.");
+  if (!isDeck && state.view === "stack" && card.classList.contains("edge")) sweep(card);
+}
+
+/* Menus: Move-to and Arrange share one grammar */
+
+function openMove(card) {
+  closeMenus();
+  closeFan();
+  var s = getStack(card.dataset.id);
+  if (!s) return;
+  var menu = el("div", "move-menu");
+  menu.setAttribute("role", "menu");
+  menu.setAttribute("aria-label", "Move to");
+  menu.appendChild(el("div", "menu-label", "Move to"));
+  COLUMNS.forEach(function (c) {
+    var b = el("button", "move-opt");
+    b.type = "button";
+    b.setAttribute("role", "menuitemradio");
+    b.setAttribute("aria-checked", String(c.id === s.status));
+    b.dataset.status = c.id;
+    b.appendChild(el("span", null, c.name));
+    if (c.id === s.status) b.appendChild(el("span", "opt-now", "current"));
+    menu.appendChild(b);
+  });
+  menu.addEventListener("keydown", menuKeys);
+  card.appendChild(menu);
+  card.classList.add("menu-open");
+  liftCanvasCard(card);
+  var first = menu.querySelector(".move-opt");
+  if (first) first.focus();
+}
+
+function arrangeOpts(view) {
+  var frontLabel = view === "canvas" ? "Move to front" : "Move to top";
+  var backLabel = view === "canvas" ? "Move to back" : "Move to bottom";
+  return [
+    { action: "up", name: "Move up" },
+    { action: "down", name: "Move down" },
+    { action: "front", name: frontLabel },
+    { action: "back", name: backLabel }
+  ];
+}
+
+function openArrange(card) {
+  closeMenus();
+  closeFan();
+  var s = getItem(card.dataset.id);
+  if (!s) return;
+  var menu = el("div", "move-menu arrange-menu");
+  menu.setAttribute("role", "menu");
+  menu.setAttribute("aria-label", "Arrange " + s.title);
+  menu._returnSel = ".arrange-btn";
+  menu.appendChild(el("div", "menu-label", "Arrange"));
+  var opts = arrangeOpts(state.view);
+  /* Pass C: a fifth option, scoped by the stack's own membership, not by which screen
+     happens to be showing it, so it works identically on the QDeck page and on an
+     expanded List row. */
+  if (itemType(s.id) === "stack" && !isLoose(s.id)) {
+    opts = opts.concat([{ action: "removeDeck", name: "Remove from deck" }]);
+  }
+  opts.forEach(function (o) {
+    var b = el("button", "move-opt arr-opt");
+    b.type = "button";
+    b.setAttribute("role", "menuitem");
+    b.dataset.action = o.action;
+    b.appendChild(el("span", null, o.name));
+    menu.appendChild(b);
+  });
+  menu.addEventListener("keydown", menuKeys);
+  card.appendChild(menu);
+  card.classList.add("menu-open");
+  liftCanvasCard(card);
+  var first = menu.querySelector(".move-opt");
+  if (first) first.focus();
+}
+
+function liftCanvasCard(card) {
+  if (card.classList.contains("card-canvas")) card.style.zIndex = 80;
+}
+
+function settleCanvasCard(card) {
+  if (!card.classList.contains("card-canvas")) return;
+  if (card.classList.contains("fan-open") || card.classList.contains("peeking") || card.querySelector(".move-menu")) return;
+  card.style.zIndex = state.z[card.dataset.id] || "";
+}
+
+function closeMenus(focusBack) {
+  closeCombinePopover();
+  var menus = document.querySelectorAll(".move-menu");
+  Array.prototype.forEach.call(menus, function (m) {
+    var card = m.closest(".card");
+    var sel = m._returnSel || ".status-btn";
+    var returnEl = m._returnFocusEl;
+    m.remove();
+    if (card) {
+      card.classList.remove("menu-open");
+      settleCanvasCard(card);
+      if (focusBack) {
+        var b = card.querySelector(sel);
+        if (b) b.focus();
+      }
+    } else if (focusBack && returnEl) {
+      returnEl.focus();
+    }
+  });
+  var addBtns = document.querySelectorAll('.add-stack-btn[aria-expanded="true"]');
+  Array.prototype.forEach.call(addBtns, function (b) { b.setAttribute("aria-expanded", "false"); });
+}
+
+function menuKeys(e) {
+  var menu = e.currentTarget;
+  var opts = Array.prototype.slice.call(menu.querySelectorAll(".move-opt"));
+  var i = opts.indexOf(document.activeElement);
+  if (e.key === "ArrowDown") {
+    e.preventDefault();
+    opts[(i + 1) % opts.length].focus();
+  } else if (e.key === "ArrowUp") {
+    e.preventDefault();
+    opts[(i - 1 + opts.length) % opts.length].focus();
+  } else if (e.key === "Escape") {
+    e.preventDefault();
+    e.stopPropagation();
+    closeMenus(true);
+  } else if (e.key === "Tab") {
+    closeMenus();
+  }
+}
+
+/* Status moves: the edge follows live, the pill confirms */
+
+function reparent(card, statusId) {
+  var body = viewRoot.querySelector('.col-body[data-status="' + statusId + '"]');
+  if (body) body.appendChild(card);
+  updateBoardMeta();
+}
+
+function applyMove(card, statusId) {
+  var s = getStack(card.dataset.id);
+  if (!s || s.status === statusId) return;
+  var prev = s.status;
+  s.status = statusId;
+  syncStatus(card, s);
+  refreshEdge(card, s);
+  if (state.view === "board") reparent(card, statusId);
+  moveGlow(card);
+  showFeedback(card, "Moved to " + colName(statusId), "Undo move", function () {
+    s.status = prev;
+    syncStatus(card, s);
+    refreshEdge(card, s);
+    if (state.view === "board") reparent(card, prev);
+    announce("Move undone. " + s.title + " is back in " + colName(prev) + ".");
+    if (state.view === "stack" && statusId !== "in_rotation" && prev === "in_rotation") sweep(card);
+  });
+  announce("Moved " + s.title + " to " + colName(statusId) + ".");
+  if (state.view === "stack" && statusId === "in_rotation") sweep(card);
+}
+
+/* Arrange: order within shelf, list, or column; layer on the canvas */
+
+function applyArrange(card, action) {
+  var s = getItem(card.dataset.id);
+  if (!s) return;
+  if (state.view === "canvas") arrangeLayer(card, s, action);
+  else arrangeOrder(card, s, action);
+}
+
+/* Reorders one item within a scoped slice of a single backing array (a family shelf,
+   a board column, or the whole QDecks shelf), remapping the slice back into the full
+   array so untouched items keep their position. Shared by every non-mixed scope. */
+function reorderWithinScope(item, action, backingArr, scopeFn, setBacking) {
+  var prev = backingArr.slice();
+  var subs = scopeFn ? backingArr.filter(scopeFn) : backingArr.slice();
+  var pos = -1;
+  for (var i = 0; i < subs.length; i++) { if (subs[i].id === item.id) { pos = i; break; } }
+  if (pos === -1) return;
+  var target = action === "up" ? pos - 1
+    : action === "down" ? pos + 1
+    : action === "front" ? 0
+    : subs.length - 1;
+  if (target === pos || target < 0 || target > subs.length - 1) {
+    closeMenus(true);
+    announce(item.title + " is already at the " + (action === "up" || action === "front" ? "front." : "back."));
+    return;
+  }
+  var moved = subs[pos];
+  subs.splice(pos, 1);
+  subs.splice(target, 0, moved);
+  var k = 0;
+  var newArr = scopeFn ? prev.map(function (x) { return scopeFn(x) ? subs[k++] : x; }) : subs;
+  setBacking(newArr);
+  render();
+  var nc = viewRoot.querySelector('.card[data-id="' + item.id + '"]');
+  if (nc) {
+    var ab = nc.querySelector(".arrange-btn");
+    if (ab) ab.focus();
+    moveGlow(nc);
+    showFeedback(nc, "Order saved", "Undo move", function () {
+      setBacking(prev);
+      render();
+      var oc = viewRoot.querySelector('.card[data-id="' + item.id + '"]');
+      if (oc) {
+        var ab2 = oc.querySelector(".arrange-btn");
+        if (ab2) ab2.focus();
+      }
+      announce("Order restored. " + item.title + " is back where it was.");
+    });
+  }
+  announce("Order saved. " + item.title + " is now position " + (target + 1) + " of " + subs.length + ".");
+}
+
+/* List view mixes decks and loose stacks in one flat register, but they live in two
+   separate backing arrays (state.decks and the loose slice of state.stacks). Reorder
+   the merged view, then split the result back into each array in its new order. */
+function arrangeOrderMixed(item, action) {
+  var prevDecks = state.decks.slice();
+  var prevStacks = state.stacks.slice();
+  var merged = libraryItems();
+  var pos = -1;
+  for (var i = 0; i < merged.length; i++) { if (merged[i].data.id === item.id) { pos = i; break; } }
+  if (pos === -1) return;
+  var target = action === "up" ? pos - 1
+    : action === "down" ? pos + 1
+    : action === "front" ? 0
+    : merged.length - 1;
+  if (target === pos || target < 0 || target > merged.length - 1) {
+    closeMenus(true);
+    announce(item.title + " is already at the " + (action === "up" || action === "front" ? "front." : "back."));
+    return;
+  }
+  var moved = merged[pos];
+  merged.splice(pos, 1);
+  merged.splice(target, 0, moved);
+  var newDecks = merged.filter(function (m) { return m.type === "deck"; }).map(function (m) { return m.data; });
+  var newLoose = merged.filter(function (m) { return m.type === "stack"; }).map(function (m) { return m.data; });
+  var k = 0;
+  var newStacks = prevStacks.map(function (x) { return isLoose(x.id) ? newLoose[k++] : x; });
+  function apply(decksArr, stacksArr) {
+    state.decks = decksArr;
+    state.stacks = stacksArr;
+    saveDecks();
+  }
+  apply(newDecks, newStacks);
+  render();
+  var nc = viewRoot.querySelector('.card[data-id="' + item.id + '"]');
+  if (nc) {
+    var ab = nc.querySelector(".arrange-btn");
+    if (ab) ab.focus();
+    moveGlow(nc);
+    showFeedback(nc, "Order saved", "Undo move", function () {
+      apply(prevDecks, prevStacks);
+      render();
+      var oc = viewRoot.querySelector('.card[data-id="' + item.id + '"]');
+      if (oc) {
+        var ab2 = oc.querySelector(".arrange-btn");
+        if (ab2) ab2.focus();
+      }
+      announce("Order restored. " + item.title + " is back where it was.");
+    });
+  }
+  announce("Order saved. " + item.title + " is now position " + (target + 1) + " of " + merged.length + ".");
+}
+
+/* Pass C: reorders one stack within its own deck's stack_ids array, a plain array of
+   ids, not an array of objects with .id, so it needs its own short implementation
+   rather than reorderWithinScope's. Same shape: capture prior order, splice, re-render,
+   refocus the moved card's Arrange caret, feedback pill with Undo restoring the array. */
+function reorderWithinDeck(item, action, deck) {
+  var prev = deck.stack_ids.slice();
+  var pos = deck.stack_ids.indexOf(item.id);
+  if (pos === -1) return;
+  var target = action === "up" ? pos - 1
+    : action === "down" ? pos + 1
+    : action === "front" ? 0
+    : deck.stack_ids.length - 1;
+  if (target === pos || target < 0 || target > deck.stack_ids.length - 1) {
+    closeMenus(true);
+    announce(item.title + " is already at the " + (action === "up" || action === "front" ? "front." : "back."));
+    return;
+  }
+  var moved = deck.stack_ids[pos];
+  deck.stack_ids.splice(pos, 1);
+  deck.stack_ids.splice(target, 0, moved);
+  saveDecks();
+  render();
+  var nc = viewRoot.querySelector('.card[data-id="' + item.id + '"]');
+  if (nc) {
+    var ab = nc.querySelector(".arrange-btn");
+    if (ab) ab.focus();
+    moveGlow(nc);
+    showFeedback(nc, "Order saved", "Undo move", function () {
+      deck.stack_ids = prev;
+      saveDecks();
+      render();
+      var oc = viewRoot.querySelector('.card[data-id="' + item.id + '"]');
+      if (oc) {
+        var ab2 = oc.querySelector(".arrange-btn");
+        if (ab2) ab2.focus();
+      }
+      announce("Order restored. " + item.title + " is back where it was.");
+    });
+  }
+  announce("Order saved. " + item.title + " is now position " + (target + 1) + " of " + deck.stack_ids.length + ".");
+}
+
+/* Pass C: Remove from deck, reachable only where a decked stack ever renders as a full
+   arrangeable card, the QDeck page and an expanded List row. Emptying the deck deletes
+   it outright, seed deck or freshly formed, a zero-member deck has no reason to persist
+   either way. Navigating back only happens when the removal happened on that deck's own
+   page; an expanded List row just collapses to nothing, since the person removing it
+   was never "on" a deck page to begin with. */
+function removeFromDeckViaArrange(card, item) {
+  var deckId = stackDeckId(item.id);
+  var deck = getDeck(deckId);
+  if (!deck) return;
+  var deckTitle = deck.title;
+  var prevIdx = deck.stack_ids.indexOf(item.id);
+  var onOwnPage = state.view === "deck" && state.activeDeckId === deckId;
+  deck.stack_ids.splice(prevIdx, 1);
+  var emptied = deck.stack_ids.length === 0;
+  if (emptied) {
+    var di = state.decks.indexOf(deck);
+    if (di > -1) state.decks.splice(di, 1);
+  }
+  saveDecks();
+  closeMenus(true);
+  if (emptied && onOwnPage) {
+    navigateBack();
+    announce(item.title + " removed. " + deckTitle + " is now empty and was removed.");
+    return;
+  }
+  render();
+  if (emptied) {
+    announce(item.title + " removed. " + deckTitle + " is now empty and was removed.");
+    return;
+  }
+  announce(item.title + " removed from " + deckTitle + ".");
+  var anchor = state.view === "deck"
+    ? viewRoot.querySelector('.deckpage-head[data-id="' + deckId + '"]')
+    : viewRoot.querySelector('.card-list[data-id="' + deckId + '"]');
+  if (!anchor) return;
+  if (state.view !== "deck") {
+    var ab = anchor.querySelector(".arrange-btn");
+    if (ab) ab.focus();
+  }
+  showFeedback(anchor, "Removed from " + deckTitle, "Undo", function () {
+    deck.stack_ids.splice(prevIdx, 0, item.id);
+    saveDecks();
+    render();
+    announce("Removal undone. " + item.title + " is back in " + deckTitle + ".");
+  });
+}
+
+function arrangeOrder(card, item, action) {
+  if (action === "removeDeck") { removeFromDeckViaArrange(card, item); return; }
+  /* Scoped by the stack's own membership, not by the screen currently showing it: a
+     decked stack always reorders within its own deck, whether it is rendered on the
+     QDeck page or as an indented row under an expanded List entry. This must be
+     checked before the state.view === "list" branch below, since a decked stack can
+     appear inside List's mixed register without being part of arrangeOrderMixed's
+     own top-level libraryItems() sequence. */
+  if (itemType(item.id) === "stack" && !isLoose(item.id)) {
+    var deckId = stackDeckId(item.id);
+    var deck = getDeck(deckId);
+    if (deck) { reorderWithinDeck(item, action, deck); return; }
+  }
+  if (state.view === "list") { arrangeOrderMixed(item, action); return; }
+  if (state.view === "stack" && itemType(item.id) === "deck") {
+    reorderWithinScope(item, action, state.decks, null, function (arr) { state.decks = arr; saveDecks(); });
+    return;
+  }
+  var scopeFn;
+  if (state.view === "stack") scopeFn = function (x) { return x.role_family === item.role_family && isLoose(x.id); };
+  else scopeFn = function (x) { return x.status === item.status && isLoose(x.id); };
+  reorderWithinScope(item, action, state.stacks, scopeFn, function (arr) { state.stacks = arr; });
+}
+
+function arrangeLayer(card, s, action) {
+  var prevZ = {};
+  Object.keys(state.z).forEach(function (k) { prevZ[k] = state.z[k]; });
+  var ids = Array.prototype.map.call(viewRoot.querySelectorAll(".card-canvas"), function (c) { return c.dataset.id; });
+  ids.sort(function (a, b) { return (state.z[a] || 0) - (state.z[b] || 0); });
+  var idx = ids.indexOf(s.id);
+  var atFront = idx === ids.length - 1;
+  var atBack = idx === 0;
+  if ((action === "up" || action === "front") && atFront) {
+    closeMenus(true);
+    announce(s.title + " is already at the front.");
+    return;
+  }
+  if ((action === "down" || action === "back") && atBack) {
+    closeMenus(true);
+    announce(s.title + " is already at the back.");
+    return;
+  }
+  ids.splice(idx, 1);
+  if (action === "up") ids.splice(idx + 1, 0, s.id);
+  else if (action === "down") ids.splice(idx - 1, 0, s.id);
+  else if (action === "front") ids.push(s.id);
+  else ids.unshift(s.id);
+  ids.forEach(function (id, i) { state.z[id] = i + 1; });
+  applyLayerZ();
+  closeMenus();
+  var ab = card.querySelector(".arrange-btn");
+  if (ab) ab.focus();
+  moveGlow(card);
+  showFeedback(card, "Layer saved", "Undo move", function () {
+    state.z = prevZ;
+    applyLayerZ();
+    announce("Layer restored. " + s.title + " is back where it was.");
+  });
+  announce("Layer saved. " + s.title + " moved " + (action === "up" || action === "front" ? "forward." : "back."));
+}
+
+function applyLayerZ() {
+  var cards = viewRoot.querySelectorAll(".card-canvas");
+  Array.prototype.forEach.call(cards, function (c) {
+    if (c.classList.contains("fan-open") || c.classList.contains("peeking") || c.querySelector(".move-menu")) return;
+    c.style.zIndex = state.z[c.dataset.id] || 1;
+  });
+}
+
+/* Share: copy the link, confirm on the card */
+
+function shareStack(card) {
+  var s = getItem(card.dataset.id);
+  if (!s) return;
+  try {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      var p = navigator.clipboard.writeText("https://argo.example/share/" + s.id);
+      if (p && typeof p.catch === "function") p.catch(function () {});
+    }
+  } catch (err) { /* clipboard unavailable, the pill still confirms the intent */ }
+  showFeedback(card, "Link copied");
+  announce("Link copied for " + s.title + ".");
+}
+
+/* Dragging: board columns and canvas positions */
+
+function rectContains(r, x, y) { return x >= r.left && x <= r.right && y >= r.top && y <= r.bottom; }
+
+function clampPos(x, y, card, cRect) {
+  var wPct = (card.offsetWidth / cRect.width) * 100;
+  var hPct = (card.offsetHeight / cRect.height) * 100;
+  return {
+    x: Math.min(Math.max(0.5, x), Math.max(0.5, 100 - wPct - 0.5)),
+    y: Math.min(Math.max(0.5, y), Math.max(0.5, 100 - hPct - 0.5))
+  };
+}
+
+function commitPos(card, s, prior) {
+  var pos = state.positions[s.id];
+  state.positions[s.id] = { x: Math.round(pos.x * 100) / 100, y: Math.round(pos.y * 100) / 100 };
+  savePositions();
+  moveGlow(card);
+  showFeedback(card, "Position saved", "Undo move", function () {
+    state.positions[s.id] = { x: prior.x, y: prior.y };
+    savePositions();
+    card.style.left = prior.x + "%";
+    card.style.top = prior.y + "%";
+    announce("Move undone. " + s.title + " is back where it was.");
+  });
+  announce("Position saved for " + s.title + ".");
+}
+
+function startBoardDrag(card, e) {
+  var startX = e.clientX, startY = e.clientY, moved = false;
+  var cols = Array.prototype.map.call(viewRoot.querySelectorAll(".board-col"), function (c) {
+    return { elm: c, status: c.dataset.status, rect: c.getBoundingClientRect() };
+  });
+  try { card.setPointerCapture(e.pointerId); } catch (err) {}
+  function mv(ev) {
+    var dx = ev.clientX - startX, dy = ev.clientY - startY;
+    if (!moved && Math.hypot(dx, dy) > 4) { moved = true; card.classList.add("dragging"); closeMenus(); }
+    if (!moved) return;
+    card.style.transform = "translate(" + dx + "px," + dy + "px)";
+    cols.forEach(function (c) { c.elm.classList.toggle("drop-hint", rectContains(c.rect, ev.clientX, ev.clientY)); });
+  }
+  function finish(ev, dropped) {
+    card.removeEventListener("pointermove", mv);
+    card.removeEventListener("pointerup", up);
+    card.removeEventListener("pointercancel", cancel);
+    cols.forEach(function (c) { c.elm.classList.remove("drop-hint"); });
+    card.style.transform = "";
+    card.classList.remove("dragging");
+    if (moved) {
+      card._suppressClick = Date.now();
+      if (dropped) {
+        var hit = null;
+        cols.forEach(function (c) { if (rectContains(c.rect, ev.clientX, ev.clientY)) hit = c; });
+        var s = getStack(card.dataset.id);
+        if (hit && s && hit.status !== s.status) applyMove(card, hit.status);
+      }
+    }
+  }
+  function up(ev) { finish(ev, true); }
+  function cancel(ev) { finish(ev, false); }
+  card.addEventListener("pointermove", mv);
+  card.addEventListener("pointerup", up);
+  card.addEventListener("pointercancel", cancel);
+}
+
+function startCanvasDrag(card, e) {
+  /* A pinned card's own movement is frozen; it stays fully eligible as a combine
+     target for something else being dragged onto it, only its drag-start no-ops. */
+  if (state.pinned.indexOf(card.dataset.id) > -1) return;
+  var canvas = viewRoot.querySelector(".canvas");
+  var s = getItem(card.dataset.id);
+  if (!canvas || !s) return;
+  var cRect = canvas.getBoundingClientRect();
+  var pos = state.positions[s.id] || defaultPos(s);
+  var prior = { x: pos.x, y: pos.y };
+  var startX = e.clientX, startY = e.clientY, moved = false;
+  /* Only a loose stack can arm a combine as the thing being dragged; a deck being
+     dragged repositions normally but never itself arms one. */
+  var canCombine = itemType(s.id) === "stack";
+  var others = Array.prototype.filter.call(viewRoot.querySelectorAll(".card-canvas"), function (c) { return c !== card; });
+  var guideV = canvas.querySelector(".guide-v");
+  var guideH = canvas.querySelector(".guide-h");
+  var armed = null;
+  /* Pass C: pointer capture is deferred until real movement is confirmed (in mv,
+     below), not taken immediately on pointerdown. Capturing immediately would
+     retarget the synthesized click event to the card itself for every pointerdown,
+     including a clean click with no movement, which breaks a draggable title-btn's
+     own click-driven navigation (its click would never resolve to .title-btn).
+     Deferring loses nothing: 3px of movement is well inside a card's own bounds, so
+     capture still engages before the pointer could plausibly leave the card. */
+
+  function clearArmed() {
+    if (armed) armed.el.classList.remove("combine-target");
+    card.classList.remove("combine-armed");
+    armed = null;
+  }
+  function fracWith(el) {
+    var dr = card.getBoundingClientRect();
+    var or = el.getBoundingClientRect();
+    var dArea = Math.max(1, dr.width * dr.height);
+    var ix = Math.max(0, Math.min(dr.right, or.right) - Math.max(dr.left, or.left));
+    var iy = Math.max(0, Math.min(dr.bottom, or.bottom) - Math.max(dr.top, or.top));
+    return (ix * iy) / dArea;
+  }
+  function snapNearTarget(targetEl) {
+    var tx = parseFloat(targetEl.style.left) || 0;
+    var ty = parseFloat(targetEl.style.top) || 0;
+    var offX = (10 / cRect.width) * 100;
+    var offY = (10 / cRect.height) * 100;
+    var np = clampPos(tx + offX, ty + offY, card, cRect);
+    card.style.left = np.x + "%";
+    card.style.top = np.y + "%";
+    state.positions[s.id] = np;
+  }
+  /* Overlap fraction is intersection area over the dragged card's own area. Arms at
+     roughly 50 percent with the closest candidate; a little hysteresis, disarm only
+     below roughly 35 percent, keeps it from flickering near the threshold. */
+  function checkCombine() {
+    if (armed) {
+      if (fracWith(armed.el) < 0.35) clearArmed();
+      else { snapNearTarget(armed.el); return; }
+    }
+    var best = null, bestFrac = 0;
+    others.forEach(function (o) {
+      var f = fracWith(o);
+      if (f > bestFrac) { bestFrac = f; best = o; }
+    });
+    if (best && bestFrac >= 0.5) {
+      armed = { id: best.dataset.id, el: best };
+      best.classList.add("combine-target");
+      card.classList.add("combine-armed");
+      snapNearTarget(best);
+    }
+  }
+  /* Direction 03's alignment hairline technique, ported without its snap grid: a pure
+     visual aid during drag, it never rounds or locks the committed drop position. */
+  function updateGuides() {
+    var dr = card.getBoundingClientRect();
+    var TOL = 6;
+    var vMatch = null, hMatch = null;
+    others.forEach(function (o) {
+      var or = o.getBoundingClientRect();
+      if (vMatch === null) {
+        if (Math.abs(dr.left - or.left) <= TOL) vMatch = or.left;
+        else if (Math.abs(dr.left - or.right) <= TOL) vMatch = or.right;
+        else if (Math.abs(dr.right - or.left) <= TOL) vMatch = or.left;
+        else if (Math.abs(dr.right - or.right) <= TOL) vMatch = or.right;
+      }
+      if (hMatch === null) {
+        if (Math.abs(dr.top - or.top) <= TOL) hMatch = or.top;
+        else if (Math.abs(dr.top - or.bottom) <= TOL) hMatch = or.bottom;
+        else if (Math.abs(dr.bottom - or.top) <= TOL) hMatch = or.top;
+        else if (Math.abs(dr.bottom - or.bottom) <= TOL) hMatch = or.bottom;
+      }
+    });
+    if (vMatch !== null) { guideV.style.left = (vMatch - cRect.left) + "px"; guideV.style.display = "block"; }
+    else guideV.style.display = "none";
+    if (hMatch !== null) { guideH.style.top = (hMatch - cRect.top) + "px"; guideH.style.display = "block"; }
+    else guideH.style.display = "none";
+  }
+
+  function mv(ev) {
+    var dx = ev.clientX - startX, dy = ev.clientY - startY;
+    if (!moved && Math.hypot(dx, dy) > 3) {
+      moved = true;
+      try { card.setPointerCapture(ev.pointerId); } catch (err) {}
+      card.classList.add("dragging");
+      card.style.zIndex = 75;
+      closeMenus();
+      closeFan();
+    }
+    if (!moved) return;
+    var np = clampPos(prior.x + (dx / cRect.width) * 100, prior.y + (dy / cRect.height) * 100, card, cRect);
+    card.style.left = np.x + "%";
+    card.style.top = np.y + "%";
+    state.positions[s.id] = np;
+    updateGuides();
+    if (canCombine) checkCombine(); else if (armed) clearArmed();
+  }
+  function finish(dropped) {
+    card.removeEventListener("pointermove", mv);
+    card.removeEventListener("pointerup", up);
+    card.removeEventListener("pointercancel", cancel);
+    card.classList.remove("dragging");
+    guideV.style.display = "none";
+    guideH.style.display = "none";
+    if (moved && dropped && armed) {
+      /* Do not commit anything yet: the drop just arms a confirmation. */
+      card._suppressClick = Date.now();
+      card.style.zIndex = 80;
+      openCombinePopover(s.id, armed.id, prior, card);
+      return;
+    }
+    if (armed) clearArmed();
+    card.style.zIndex = state.z[s.id] || "";
+    if (moved) {
+      card._suppressClick = Date.now();
+      if (dropped) {
+        commitPos(card, s, prior);
+      } else {
+        state.positions[s.id] = prior;
+        card.style.left = prior.x + "%";
+        card.style.top = prior.y + "%";
+      }
+    }
+  }
+  function up() { finish(true); }
+  function cancel() { finish(false); }
+  card.addEventListener("pointermove", mv);
+  card.addEventListener("pointerup", up);
+  card.addEventListener("pointercancel", cancel);
+}
+
+function canvasKeyMove(card, key, shiftKey) {
+  if (state.pinned.indexOf(card.dataset.id) > -1) return;
+  var canvas = viewRoot.querySelector(".canvas");
+  var s = getItem(card.dataset.id);
+  if (!canvas || !s) return;
+  var cRect = canvas.getBoundingClientRect();
+  var pos = state.positions[s.id] || defaultPos(s);
+  if (!card._kbPrior) card._kbPrior = { x: pos.x, y: pos.y };
+  var step = shiftKey ? 64 : 16;
+  var dx = 0, dy = 0;
+  if (key === "ArrowLeft") dx = -step;
+  else if (key === "ArrowRight") dx = step;
+  else if (key === "ArrowUp") dy = -step;
+  else dy = step;
+  var np = clampPos(pos.x + (dx / cRect.width) * 100, pos.y + (dy / cRect.height) * 100, card, cRect);
+  state.positions[s.id] = np;
+  card.style.left = np.x + "%";
+  card.style.top = np.y + "%";
+  if (card._kbTimer) window.clearTimeout(card._kbTimer);
+  card._kbTimer = window.setTimeout(function () {
+    var prior = card._kbPrior || { x: np.x, y: np.y };
+    card._kbPrior = null;
+    if (card.isConnected) commitPos(card, s, prior);
+  }, 450);
+}
+
+/* Pinning: canvas only, a utility toggle, never gold. */
+function togglePin(card) {
+  var item = getItem(card.dataset.id);
+  if (!item) return;
+  var id = card.dataset.id;
+  var idx = state.pinned.indexOf(id);
+  var pinned;
+  if (idx > -1) { state.pinned.splice(idx, 1); pinned = false; }
+  else { state.pinned.push(id); pinned = true; }
+  savePinned();
+  card.classList.toggle("pinned", pinned);
+  var btn = card.querySelector(".pin-btn");
+  if (btn) {
+    btn.setAttribute("aria-pressed", String(pinned));
+    btn.setAttribute("aria-label", (pinned ? "Unpin " : "Pin ") + item.title);
+    btn.innerHTML = pinned ? PIN_FILLED_SVG : PIN_OUTLINE_SVG;
+  }
+  announce((pinned ? "Pinned " : "Unpinned ") + item.title + ".");
+}
+
+/* Keyboard parity for deck formation: D on a focused loose stack, canvas only, opens
+   a menu of every other top-level item, reusing the existing menu grammar. Selecting
+   one hands off to the same confirm popover the drag path uses, so the commit logic
+   is shared, not duplicated. */
+function openCombineMenu(card) {
+  closeMenus();
+  closeFan();
+  var s = getStack(card.dataset.id);
+  if (!s) return;
+  var others = libraryItems().filter(function (it) { return it.data.id !== s.id; });
+  var menu = el("div", "move-menu arrange-menu");
+  menu.setAttribute("role", "menu");
+  menu.setAttribute("aria-label", "Combine into QDeck");
+  menu._returnSel = ".title-btn";
+  menu.appendChild(el("div", "menu-label", "Combine into QDeck"));
+  if (!others.length) {
+    menu.appendChild(el("div", "menu-label", "Nothing else to combine with yet."));
+  }
+  others.forEach(function (it) {
+    var b = el("button", "move-opt combine-opt");
+    b.type = "button";
+    b.setAttribute("role", "menuitem");
+    b.dataset.targetId = it.data.id;
+    b.appendChild(el("span", null, it.data.title));
+    menu.appendChild(b);
+  });
+  menu.addEventListener("keydown", menuKeys);
+  card.appendChild(menu);
+  card.classList.add("menu-open");
+  liftCanvasCard(card);
+  var first = menu.querySelector(".move-opt");
+  if (first) first.focus();
+}
+
+/* The confirm popover: distinct from a menu, one line of copy plus two buttons. Shared
+   by the drag-to-combine path and the D key path, committing nothing until confirmed. */
+function openCombinePopover(draggedId, targetId, priorPos, anchorCard) {
+  closeCombinePopover();
+  var draggedItem = getItem(draggedId);
+  var targetItem = getItem(targetId);
+  if (!draggedItem || !targetItem) return;
+  var anchor = anchorCard || viewRoot.querySelector('.card[data-id="' + draggedId + '"]');
+  if (!anchor) return;
+  var targetIsDeck = itemType(targetId) === "deck";
+  var msg = targetIsDeck
+    ? "Add " + draggedItem.title + " to " + targetItem.title + "."
+    : "Combine " + draggedItem.title + " and " + targetItem.title + " into a new QDeck.";
+  var pop = el("div", "combine-pop");
+  pop.setAttribute("role", "group");
+  pop.setAttribute("aria-label", "Combine into QDeck");
+  pop.appendChild(el("p", null, msg));
+  var actions = el("div", "combine-actions");
+  var confirmBtn = el("button", "btn-combine-confirm", "Add to QDeck");
+  confirmBtn.type = "button";
+  var cancelBtn = el("button", "btn-combine-cancel", "Cancel");
+  cancelBtn.type = "button";
+  actions.appendChild(confirmBtn);
+  actions.appendChild(cancelBtn);
+  pop.appendChild(actions);
+
+  function cleanup() {
+    pop.remove();
+    var dc = viewRoot.querySelector('.card[data-id="' + draggedId + '"]');
+    if (dc) { dc.classList.remove("combine-armed"); dc.classList.remove("menu-open"); }
+    var tc = viewRoot.querySelector('.card[data-id="' + targetId + '"]');
+    if (tc) tc.classList.remove("combine-target");
+  }
+  function onCancel() {
+    cleanup();
+    var dc = viewRoot.querySelector('.card[data-id="' + draggedId + '"]');
+    if (dc) {
+      if (state.view === "canvas" && priorPos) {
+        state.positions[draggedId] = priorPos;
+        dc.style.left = priorPos.x + "%";
+        dc.style.top = priorPos.y + "%";
+        dc.style.zIndex = state.z[draggedId] || "";
+      }
+      dc.focus();
+    }
+    announce("Combine canceled. " + draggedItem.title + " is back where it was.");
+  }
+  function onConfirm() {
+    cleanup();
+    commitCombine(draggedId, targetId, priorPos);
+  }
+  pop._onCancel = onCancel;
+  confirmBtn.addEventListener("click", function (ev) { ev.stopPropagation(); onConfirm(); });
+  cancelBtn.addEventListener("click", function (ev) { ev.stopPropagation(); onCancel(); });
+  pop.addEventListener("keydown", function (ev) {
+    var btns = [confirmBtn, cancelBtn];
+    var i = btns.indexOf(document.activeElement);
+    if (ev.key === "ArrowRight" || ev.key === "ArrowDown") {
+      ev.preventDefault();
+      btns[(i + 1) % btns.length].focus();
+    } else if (ev.key === "ArrowLeft" || ev.key === "ArrowUp") {
+      ev.preventDefault();
+      btns[(i - 1 + btns.length) % btns.length].focus();
+    } else if (ev.key === "Tab") {
+      ev.preventDefault();
+      var dir = ev.shiftKey ? -1 : 1;
+      btns[(i + dir + btns.length) % btns.length].focus();
+    } else if (ev.key === "Escape") {
+      ev.preventDefault();
+      ev.stopPropagation();
+      onCancel();
+    }
+  });
+  if (state.view === "canvas") anchor.style.zIndex = 80;
+  anchor.appendChild(pop);
+  anchor.classList.add("menu-open");
+  confirmBtn.focus();
+}
+function closeCombinePopover() {
+  var pop = document.querySelector(".combine-pop");
+  if (pop && pop._onCancel) pop._onCancel();
+}
+
+/* The actual commit: create or extend a QDeck, place it where the target was, glow
+   and confirm with the standard card-local pill, Undo splices the stack back out. */
+function commitCombine(draggedId, targetId, priorPos) {
+  var targetPos = state.positions[targetId] || null;
+  var targetWasStack = itemType(targetId) === "stack";
+  var resultDeck, feedbackMsg;
+  if (targetWasStack) {
+    resultDeck = createDeckFromStacks(draggedId, targetId);
+    feedbackMsg = resultDeck ? resultDeck.title + " created" : "";
+  } else {
+    addStackToDeck(draggedId, targetId);
+    resultDeck = getDeck(targetId);
+    feedbackMsg = resultDeck ? "Added to " + resultDeck.title : "";
+  }
+  if (!resultDeck) return;
+  if (targetPos) state.positions[resultDeck.id] = { x: targetPos.x, y: targetPos.y };
+  savePositions();
+  if (state.z[resultDeck.id] === undefined) {
+    var zmax = 0;
+    Object.keys(state.z).forEach(function (k) { if (state.z[k] > zmax) zmax = state.z[k]; });
+    state.z[resultDeck.id] = zmax + 1;
+  }
+  render();
+  var nc = viewRoot.querySelector('.card[data-id="' + resultDeck.id + '"]');
+  if (nc) {
+    nc.focus();
+    moveGlow(nc);
+    showFeedback(nc, feedbackMsg, "Undo", function () {
+      removeStackFromDeck(draggedId, resultDeck.id);
+      var restored = getStack(draggedId);
+      state.positions[draggedId] = priorPos || (restored ? defaultPos(restored) : { x: 4, y: 5 });
+      if (targetWasStack) {
+        /* A brand new deck absorbed both the dragged stack and the target stack, so
+           undoing it must restore both, not just the one that was dragged, or the
+           target stays permanently trapped in a one-member deck that never cleans up. */
+        removeStackFromDeck(targetId, resultDeck.id);
+        var restoredTarget = getStack(targetId);
+        state.positions[targetId] = targetPos || (restoredTarget ? defaultPos(restoredTarget) : { x: 4, y: 5 });
+      }
+      savePositions();
+      render();
+      var oc = viewRoot.querySelector('.card[data-id="' + draggedId + '"]');
+      if (oc) oc.focus();
+      announce("Combine undone. " + (restored ? restored.title : draggedId) + " is loose again.");
+    });
+  }
+  announce(feedbackMsg + ".");
+}
+
+/* Fan-out preview: metadata rows, never question text. See all expands in place.
+   Pass C: the canvas no longer clips, so this panel needs no dynamic resize
+   workaround, see the canvas-viewport rework and the Pass C footer note on why that
+   meant removing the old grow-and-restore functions rather than patching them. */
+
+function fanRow(i, s) {
+  var row = el("div", "fan-row");
+  row.style.setProperty("--fi", Math.min(i, 6));
+  row.appendChild(el("strong", "qn", "Q" + (i + 1)));
+  row.appendChild(document.createTextNode(" · " + s.cats[i % s.cats.length] + " · " + (i < s.rubrics ? "rubric attached" : "rubric open")));
+  return row;
+}
+
+function fanToggle(card) {
+  var open = card.querySelector(".fanout");
+  var tb = card.querySelector(".title-btn");
+  if (open) {
+    closeFan();
+    announce("Preview closed.");
+    return;
+  }
+  closeFan();
+  closeMenus();
+  var s = getStack(card.dataset.id);
+  if (!s) return;
+  var f = el("div", "fanout");
+  var n = Math.min(3, s.questions);
+  for (var i = 0; i < n; i++) f.appendChild(fanRow(i, s));
+  var more = el("button", "fan-more", "See all " + s.questions + " questions");
+  more.type = "button";
+  more.style.setProperty("--fi", n);
+  f.appendChild(more);
+  card.appendChild(f);
+  card.classList.add("fan-open");
+  card.style.zIndex = 80;
+  if (tb) tb.setAttribute("aria-expanded", "true");
+  announce("Preview open for " + s.title + ", " + n + " question rows.");
+}
+
+function expandFan(card) {
+  var s = getStack(card.dataset.id);
+  var f = card.querySelector(".fanout");
+  if (!s || !f) return;
+  f.innerHTML = "";
+  f.classList.add("fan-flat");
+  for (var i = 0; i < s.questions; i++) f.appendChild(fanRow(i, s));
+  f.tabIndex = -1;
+  f.focus();
+  announce("All " + s.questions + " question rows shown for " + s.title + ".");
+}
+
+function closeFan() {
+  var fans = document.querySelectorAll(".fanout");
+  Array.prototype.forEach.call(fans, function (f) {
+    var card = f.closest(".card");
+    var hadFocus = f.contains(document.activeElement);
+    f.remove();
+    if (card) {
+      if (hadFocus) {
+        var back = card.querySelector(".title-btn") || card;
+        back.focus();
+      }
+      card.classList.remove("fan-open");
+      settleCanvasCard(card);
+      var tb = card.querySelector(".title-btn");
+      if (tb) tb.setAttribute("aria-expanded", "false");
+    }
+  });
+}
+
+/* Pass C: the canvas peek replaces Pass B's deck unfurl entirely. A hover or a focused
+   Enter on a QDeck's body, canvas only, fans the two ghost layers into a genuine arc
+   and reveals at most two representative member stages, a satisfying physical
+   glimpse, never a navigation and never a click target of its own. The front face
+   keeps showing the deck's own identity throughout. See the Pass C footer for why
+   this is a separate surface from the QDeck page rather than an extension of it. */
+function setDeckPeek(card, on) {
+  if (!card || !card.classList.contains("card-deck")) return;
+  var already = card.classList.contains("peeking");
+  if (on === already) return;
+  card.classList.toggle("peeking", on);
+  if (on) liftCanvasCard(card); else settleCanvasCard(card);
+}
+
+/* The shine: rides with the fleece edge, in-rotation gallery cards only */
+
+function ensureShine(card) {
+  if (card.querySelector(".shine")) return;
+  var sh = el("div", "shine");
+  sh.setAttribute("aria-hidden", "true");
+  sh.appendChild(el("div", "shine-band"));
+  card.appendChild(sh);
+}
+
+function sweep(card) {
+  if (reduced() || card._sweeping || !card.classList.contains("edge")) return;
+  ensureShine(card);
+  var sh = card.querySelector(".shine");
+  var band = card.querySelector(".shine-band");
+  if (!sh || !band || typeof band.animate !== "function") return;
+  card._sweeping = true;
+  sh.classList.add("on");
+  var done = function () {
+    sh.classList.remove("on");
+    band.style.left = "";
+    card._sweeping = false;
+  };
+  try {
+    var anim = band.animate([{ left: "-50%" }, { left: "125%" }], { duration: 900, easing: "cubic-bezier(0.4, 0, 0.2, 1)" });
+    anim.onfinish = done;
+    anim.oncancel = done;
+  } catch (err) { done(); }
+}
+
+function attachShineHandlers(card) {
+  card.addEventListener("pointerenter", function () {
+    if (reduced() || card._sweeping || !card.classList.contains("edge")) return;
+    ensureShine(card);
+    var sh = card.querySelector(".shine");
+    if (sh) sh.classList.add("on");
+  });
+  card.addEventListener("pointermove", function (e) {
+    if (reduced() || card._sweeping || !card.classList.contains("edge")) return;
+    var band = card.querySelector(".shine-band");
+    var r = card.getBoundingClientRect();
+    if (!r.width || !r.height) return;
+    var px = ((e.clientX - r.left) / r.width) * 100;
+    var py = ((e.clientY - r.top) / r.height) * 100;
+    card.style.setProperty("--px", px.toFixed(1));
+    card.style.setProperty("--py", py.toFixed(1));
+    var ry = ((px - 50) / 50) * 3;
+    var rx = ((py - 50) / 50) * -3;
+    card.style.transform = "perspective(700px) rotateX(" + rx.toFixed(2) + "deg) rotateY(" + ry.toFixed(2) + "deg)";
+  });
+  card.addEventListener("pointerleave", function () {
+    var sh = card.querySelector(".shine");
+    if (sh && !card._sweeping) {
+      sh.classList.remove("on");
+      var band = card.querySelector(".shine-band");
+      if (band) band.style.left = "";
+    }
+    card.style.transform = "";
+  });
+}
+
+function observeGallery() {
+  if (reduced() || !("IntersectionObserver" in window)) return;
+  var io = new IntersectionObserver(function (entries) {
+    entries.forEach(function (en) {
+      if (!en.isIntersecting) return;
+      var card = en.target;
+      io.unobserve(card);
+      var id = card.dataset.id;
+      if (state.swept[id]) return;
+      state.swept[id] = true;
+      window.setTimeout(function () { if (card.isConnected) sweep(card); }, 350 + (card._revealDelay || 0));
+    });
+  }, { threshold: 0.5 });
+  var cards = viewRoot.querySelectorAll(".card-stack.edge");
+  Array.prototype.forEach.call(cards, function (c) { io.observe(c); });
+}
+
+/* Events */
+
+viewRoot.addEventListener("click", function (e) {
+  var card = e.target.closest(".card");
+  if (card && card._suppressClick && Date.now() - card._suppressClick < 400) return;
+  var starBtn = e.target.closest(".star-btn");
+  if (starBtn && card) { star(card); return; }
+  var pinBtn = e.target.closest(".pin-btn");
+  if (pinBtn && card) { togglePin(card); return; }
+  var combineOpt = e.target.closest(".combine-opt");
+  if (combineOpt && card) {
+    var draggedId = card.dataset.id, targetId = combineOpt.dataset.targetId;
+    var priorPos = state.positions[draggedId] || null;
+    closeMenus(true);
+    openCombinePopover(draggedId, targetId, priorPos, card);
+    return;
+  }
+  var arrOpt = e.target.closest(".arr-opt");
+  if (arrOpt && card) { applyArrange(card, arrOpt.dataset.action); return; }
+  var opt = e.target.closest(".move-opt");
+  if (opt && card) { applyMove(card, opt.dataset.status); closeMenus(true); return; }
+  var statusBtn = e.target.closest(".status-btn");
+  if (statusBtn && card) {
+    if (card.querySelector(".move-menu:not(.arrange-menu)")) closeMenus();
+    else openMove(card);
+    return;
+  }
+  var arrangeBtn = e.target.closest(".arrange-btn");
+  if (arrangeBtn && card) {
+    if (card.querySelector(".arrange-menu")) closeMenus(true);
+    else openArrange(card);
+    return;
+  }
+  var shareBtn = e.target.closest(".share-btn");
+  if (shareBtn && card) { shareStack(card); return; }
+  var more = e.target.closest(".fan-more");
+  if (more && card) { expandFan(card); return; }
+  /* Pass C: the chevron toggle must be checked before the title-btn check below, they
+     sit right next to each other in a deck's List row and must never be confused: the
+     chevron expands or collapses in place, the title always navigates. */
+  var chevBtn = e.target.closest(".chevron-btn");
+  if (chevBtn && card) { toggleDeckExpanded(card.dataset.id); return; }
+  var titleBtn = e.target.closest(".title-btn");
+  if (titleBtn && card) {
+    if (card.classList.contains("card-deck")) navigateToDeck(card.dataset.id);
+    else fanToggle(card);
+  }
+});
+
+viewRoot.addEventListener("keydown", function (e) {
+  var card = e.target.closest(".card");
+  if (!card) return;
+  if (e.target.closest(".move-menu") || e.target.closest(".combine-pop")) return;
+  var k = e.key;
+  if (k === "s" || k === "S") {
+    e.preventDefault();
+    star(card);
+  } else if (k === "m" || k === "M") {
+    e.preventDefault();
+    if (card.querySelector(".move-menu:not(.arrange-menu)")) closeMenus(true);
+    else openMove(card);
+  } else if ((k === "d" || k === "D") && state.view === "canvas" && itemType(card.dataset.id) !== "deck") {
+    e.preventDefault();
+    openCombineMenu(card);
+  } else if (k === "Enter" && state.view === "canvas" && e.target === card) {
+    e.preventDefault();
+    if (card.classList.contains("card-deck")) setDeckPeek(card, !card.classList.contains("peeking"));
+    else fanToggle(card);
+  } else if (k === "Escape") {
+    if (card.querySelector(".fanout")) { closeFan(); announce("Preview closed."); }
+    closeMenus(true);
+  } else if (state.view === "canvas" && e.target === card &&
+    (k === "ArrowLeft" || k === "ArrowRight" || k === "ArrowUp" || k === "ArrowDown")) {
+    e.preventDefault();
+    canvasKeyMove(card, k, e.shiftKey);
+  }
+});
+
+/* Pass C: keyboard parity for the canvas peek. Enter on the outer card toggles it
+   (handled above); losing focus entirely closes it, so a keyboard user is never left
+   with it stuck open. relatedTarget, not document.activeElement: during focusout,
+   activeElement has typically already reverted to document.body before the new
+   element receives focus, which would read as "focus left the card" even when focus
+   is only moving to the card's own title-btn, a false close this avoids. */
+viewRoot.addEventListener("focusout", function (e) {
+  var card = e.target.closest ? e.target.closest(".card-canvas.card-deck.peeking") : null;
+  if (card && !card.contains(e.relatedTarget)) setDeckPeek(card, false);
+});
+
+/* Pass C: fixes the drag dead-space bug. The old exclusion, a blanket "button" token,
+   caught .title-btn along with the real controls, since a QDeck's title is a real
+   button in every view and a stack's title is a real button on canvas. That silently
+   killed drag-start from the title text, verified empirically with a real rendered
+   canvas card (elementFromPoint at the title's own coordinates resolved to
+   BUTTON.title-btn, and the old selector matched it). The title is meant to be both
+   draggable and clickable, exactly like the rest of the card body already is: the
+   card-level suppress-click window, set once a drag actually moves past the 3px
+   threshold, already exists to keep a real drag from also firing a stray click on
+   whatever it started over, so enumerating the real controls here instead of "button"
+   loses nothing. */
+viewRoot.addEventListener("pointerdown", function (e) {
+  if (e.pointerType === "mouse" && e.button !== 0) return;
+  var card = e.target.closest(".card");
+  if (!card) return;
+  if (e.target.closest(".star-btn, .arrange-btn, .share-btn, .status-btn, .pin-btn, .chevron-btn, a, .move-menu, .fanout, .card-feedback, .seal, .combine-pop")) return;
+  if (state.view === "board") startBoardDrag(card, e);
+  else if (state.view === "canvas") startCanvasDrag(card, e);
+});
+
+viewRoot.addEventListener("focusin", function (e) {
+  var card = e.target.closest ? e.target.closest(".card-stack.edge") : null;
+  if (card && e.target === card && state.view === "stack") {
+    try { if (card.matches(":focus-visible")) sweep(card); }
+    catch (err) { sweep(card); }
+  }
+});
+
+document.addEventListener("pointerdown", function (e) {
+  if (!e.target.closest(".move-menu") && !e.target.closest(".status-btn") && !e.target.closest(".arrange-btn") && !e.target.closest(".add-stack-btn") && !e.target.closest(".combine-pop")) closeMenus();
+  if (!e.target.closest(".card")) closeFan();
+});
+
+document.addEventListener("keydown", function (e) {
+  if (e.key === "Escape") { closeCombinePopover(); closeMenus(); closeFan(); }
+});
+
+var toggles = document.querySelectorAll(".views button[data-view]");
+Array.prototype.forEach.call(toggles, function (b) {
+  b.addEventListener("click", function () { setView(b.dataset.view); });
+});
+
+var densityBtns = document.querySelectorAll(".density button[data-density]");
+Array.prototype.forEach.call(densityBtns, function (b) {
+  b.addEventListener("click", function () { setDensity(b.dataset.density); });
+});
+
+var newStack = document.getElementById("newStack");
+if (newStack) newStack.addEventListener("click", function (e) { e.preventDefault(); });
+
+setDensity(state.density, true);
+render();
+})();
+</script>
+</body>
+</html>

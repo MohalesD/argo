@@ -1,0 +1,1157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Argo &#183; The Chart Room &#183; QStack Library</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Ccircle cx='8' cy='8' r='6' fill='%23e3a81c'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --gold: #e3a81c;
+  --gold-hover: #c9971a;
+  --gold-soft: #f7e8c3;
+  --cream: #fbf6e9;
+  --ink: #2b2a26;
+  --ink-soft: #55524a;
+  --forest: #2e4a3a;
+  --forest-soft: #e6efe9;
+  --flag: #b3402a;
+  --flag-soft: #f7e5e0;
+  --line: #e9e2d0;
+  --shadow-card: 0 1px 2px rgb(43 42 38 / 0.06), 0 4px 16px rgb(43 42 38 / 0.07);
+  --shadow-lift: 0 2px 4px rgb(43 42 38 / 0.08), 0 12px 32px rgb(43 42 38 / 0.12);
+  --font-display: 'Source Serif 4', Georgia, serif;
+  --font-body: 'Inter', system-ui, sans-serif;
+}
+html { background: var(--cream); color: var(--ink); font-family: var(--font-body); }
+h1, h2, h3 { font-family: var(--font-display); }
+:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; border-radius: 4px; }
+::selection { background: var(--gold-soft); }
+
+/* Base */
+* { box-sizing: border-box; }
+body { margin: 0; font-size: 14px; line-height: 1.5; -webkit-font-smoothing: antialiased; }
+button { font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer; }
+.vh { position: absolute; width: 1px; height: 1px; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+/* Masthead */
+.masthead { max-width: 1240px; margin: 0 auto; padding: 26px 32px 0; }
+.mast-row { display: flex; align-items: center; gap: 16px; }
+.wordmark { display: flex; align-items: center; gap: 9px; font-family: var(--font-display); font-weight: 700; font-size: 19px; color: var(--ink); }
+.wordmark svg { display: block; color: var(--ink); }
+.cta { margin-left: auto; background: var(--gold); color: var(--ink); font-weight: 600; font-size: 13.5px; padding: 9px 16px; border-radius: 8px; text-decoration: none; }
+.cta:hover { background: var(--gold-hover); }
+.title-row { display: flex; align-items: flex-end; justify-content: space-between; gap: 18px; margin-top: 26px; flex-wrap: wrap; }
+h1 { font-size: 30px; font-weight: 600; margin: 0; line-height: 1.15; }
+.sub { color: var(--ink-soft); font-size: 13px; margin: 5px 0 0; }
+.view-toggle { display: flex; gap: 2px; border: 1px solid var(--line); background: #ffffff; border-radius: 8px; padding: 3px; }
+.view-toggle button { font-size: 13px; font-weight: 500; padding: 6px 14px; border-radius: 6px; color: var(--ink-soft); }
+.view-toggle button:hover { color: var(--ink); }
+.view-toggle button[aria-pressed="true"] { background: var(--gold); color: var(--ink); font-weight: 600; }
+
+/* Layout */
+main { max-width: 1240px; margin: 0 auto; padding: 20px 32px 8px; }
+.view { display: none; }
+.view.active { display: block; }
+
+/* Card: maritime document */
+.card { position: relative; background: #ffffff; border: 1px solid var(--line); border-radius: 3px; padding: 14px 16px 13px; }
+.card:hover { border-color: color-mix(in srgb, var(--line) 55%, var(--ink-soft) 45%); }
+.card.dragging { box-shadow: var(--shadow-lift); cursor: grabbing; z-index: 30; border-color: color-mix(in srgb, var(--line) 45%, var(--ink-soft) 55%); }
+.ticks { position: absolute; inset: 5px; pointer-events: none; opacity: 0.45;
+  background-image:
+    linear-gradient(var(--ink-soft), var(--ink-soft)), linear-gradient(var(--ink-soft), var(--ink-soft)),
+    linear-gradient(var(--ink-soft), var(--ink-soft)), linear-gradient(var(--ink-soft), var(--ink-soft)),
+    linear-gradient(var(--ink-soft), var(--ink-soft)), linear-gradient(var(--ink-soft), var(--ink-soft)),
+    linear-gradient(var(--ink-soft), var(--ink-soft)), linear-gradient(var(--ink-soft), var(--ink-soft));
+  background-repeat: no-repeat;
+  background-size: 6px 1px, 1px 6px, 6px 1px, 1px 6px, 6px 1px, 1px 6px, 6px 1px, 1px 6px;
+  background-position: top left, top left, top right, top right, bottom left, bottom left, bottom right, bottom right; }
+.card-head { display: flex; align-items: flex-start; gap: 8px; }
+.card-title { font-family: var(--font-display); font-size: 15.5px; font-weight: 600; line-height: 1.3; margin: 0; margin-right: auto; }
+.title-fan { cursor: pointer; }
+.title-fan:hover { text-decoration: underline dotted; text-underline-offset: 3px; }
+.stamp-slot { display: inline-flex; align-items: center; color: var(--forest); margin-top: 3px; }
+.seal { flex: none; margin-top: 1px; line-height: 0; }
+.seal-off { display: none; }
+.star-btn { flex: none; display: inline-flex; align-items: center; gap: 4px; position: relative; padding: 2px 4px; border-radius: 4px; }
+.star-glyph { color: var(--gold); font-size: 14px; line-height: 1; }
+.star-btn:hover .star-glyph { color: var(--gold-hover); }
+.star-count { font-size: 12.5px; font-weight: 600; color: var(--ink); font-variant-numeric: tabular-nums; }
+.pulse { position: absolute; left: 9px; top: 50%; width: 6px; height: 6px; margin: -3px 0 0 -3px; border-radius: 50%; pointer-events: none;
+  animation: pulse 480ms cubic-bezier(0.4, 0, 0.2, 1); }
+@keyframes pulse { 0% { box-shadow: 0 0 0 0 rgb(227 168 28 / 0.55); } 100% { box-shadow: 0 0 0 14px rgb(227 168 28 / 0); } }
+.card-foot { display: flex; justify-content: space-between; align-items: flex-end; gap: 12px; margin-top: 14px; }
+.chips { display: flex; flex-wrap: wrap; gap: 5px; align-items: center; }
+.chip { font-size: 11px; line-height: 1; padding: 4px 8px; border: 1px solid var(--line); border-radius: 999px; color: var(--ink); background: #ffffff; white-space: nowrap; }
+.chip--screened { background: var(--forest-soft); border-color: var(--forest-soft); color: var(--forest); font-weight: 500; }
+.mark-forked { font-size: 11px; color: var(--forest); font-weight: 500; }
+.status-btn { flex: none; display: inline-flex; align-items: center; gap: 5px; font-size: 10.5px; letter-spacing: 0.07em; text-transform: uppercase;
+  color: var(--ink); border: 1px solid var(--line); background: #ffffff; border-radius: 3px; padding: 5px 8px; }
+.status-btn:hover { border-color: color-mix(in srgb, var(--line) 45%, var(--ink-soft) 55%); }
+.status-caret { font-size: 8px; line-height: 1; }
+
+/* Move menu */
+.move-menu { position: absolute; right: 10px; bottom: 40px; z-index: 40; background: #ffffff; border: 1px solid var(--line); border-radius: 6px;
+  box-shadow: var(--shadow-lift); padding: 5px; min-width: 176px; }
+.menu-label { font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink); padding: 5px 9px 4px; }
+.move-menu button { display: flex; width: 100%; text-align: left; font-size: 13px; padding: 7px 9px; border-radius: 4px; gap: 8px; align-items: center; }
+.move-menu button:hover { background: var(--cream); }
+.move-menu.menu-below { bottom: auto; top: calc(100% + 4px); }
+.menu-dot { width: 5px; height: 5px; border-radius: 50%; border: 1px solid var(--line); flex: none; }
+.move-menu button[aria-checked="true"] .menu-dot { background: var(--forest); border-color: var(--forest); }
+
+/* Card-local feedback */
+.card-live { display: none; margin-top: 10px; align-items: center; gap: 10px; font-size: 11.5px; }
+.card-live.on { display: flex; }
+.flash { color: var(--forest); background: var(--forest-soft); padding: 3px 8px; border-radius: 999px; font-weight: 500; line-height: 1.2; }
+.undo-link { color: var(--ink); text-decoration: underline; text-underline-offset: 2px; font-size: 11.5px; }
+.undo-link:hover { color: var(--gold-hover); }
+
+/* List view */
+.list-rows { display: flex; flex-direction: column; gap: 10px; }
+.view-list-pad .card { padding: 12px 18px 11px; }
+.view-list-pad .card-foot { margin-top: 10px; }
+
+/* Stack view: the plotting table */
+.stack-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 40px 32px; padding: 18px 6px 6px; }
+.stack-item { display: flex; flex-direction: column; }
+.view-stack-pad .card { padding: 18px 18px 16px; min-height: 150px; display: flex; flex-direction: column; }
+.view-stack-pad .card-foot { margin-top: auto; padding-top: 16px; }
+.view-stack-pad .card-title { font-size: 17px; }
+.plate-cap { margin-top: 9px; text-align: center; font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink); }
+
+/* Board view */
+.board { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; align-items: start; }
+.col { background: rgb(255 255 255 / 0.45); border: 1px solid var(--line); border-radius: 6px; padding: 10px; min-height: 240px; }
+.col.drop-target { border-color: var(--gold); background: rgb(247 232 195 / 0.25); }
+.col-head { display: flex; justify-content: space-between; align-items: center; font-size: 10.5px; letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--ink); padding: 4px 6px 10px; }
+.col-count { font-variant-numeric: tabular-nums; background: #ffffff; border: 1px solid var(--line); padding: 1px 7px; border-radius: 999px; font-size: 10.5px; }
+.col-cards { display: flex; flex-direction: column; gap: 10px; min-height: 40px; }
+.col-empty { font-size: 12.5px; color: var(--ink-soft); padding: 14px 10px; line-height: 1.55; }
+.col-empty svg { display: block; color: var(--ink-soft); opacity: 0.6; margin-bottom: 8px; }
+.view-board-pad .card { cursor: grab; touch-action: none; }
+
+/* Canvas view: the chart */
+.canvas-caption { font-size: 12.5px; color: var(--ink-soft); margin: 2px 2px 10px; }
+.chart-outer { position: relative; background: #ffffff; border: 1px solid color-mix(in srgb, var(--ink-soft) 55%, var(--line) 45%); padding: 12px; }
+.tick-strip { position: absolute; pointer-events: none; color: var(--ink-soft); opacity: 0.55; }
+.tick-top { top: 2px; left: 12px; right: 12px; height: 5px; background: repeating-linear-gradient(90deg, currentColor 0 1px, transparent 1px 48px); }
+.tick-bottom { bottom: 2px; left: 12px; right: 12px; height: 5px; background: repeating-linear-gradient(90deg, currentColor 0 1px, transparent 1px 48px); }
+.tick-left { left: 2px; top: 12px; bottom: 12px; width: 5px; background: repeating-linear-gradient(180deg, currentColor 0 1px, transparent 1px 48px); }
+.tick-right { right: 2px; top: 12px; bottom: 12px; width: 5px; background: repeating-linear-gradient(180deg, currentColor 0 1px, transparent 1px 48px); }
+.chart-inner { position: relative; border: 1px solid color-mix(in srgb, var(--ink-soft) 40%, var(--line) 60%); height: 900px; overflow: hidden; }
+.chart-grid { position: absolute; inset: 0; z-index: 0;
+  background-image: linear-gradient(rgb(43 42 38 / 0.05) 1px, transparent 1px), linear-gradient(90deg, rgb(43 42 38 / 0.05) 1px, transparent 1px);
+  background-size: 32px 32px; }
+.guide-v { position: absolute; top: 0; bottom: 0; width: 1px; background: rgb(85 82 74 / 0.32); display: none; pointer-events: none; z-index: 1; }
+.guide-h { position: absolute; left: 0; right: 0; height: 1px; background: rgb(85 82 74 / 0.32); display: none; pointer-events: none; z-index: 1; }
+#lineage { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 1; pointer-events: none; }
+.lineage-path { stroke: var(--ink-soft); opacity: 0.55; stroke-dasharray: 5 5; fill: none; stroke-width: 1; }
+.lineage-halo { fill: #ffffff; opacity: 0.9; }
+.lineage-label { fill: var(--ink); font-family: var(--font-body); font-size: 9px; letter-spacing: 1.2px; }
+.waypoint { position: absolute; z-index: 1; display: inline-flex; align-items: center; gap: 6px; background: #ffffff; padding: 3px 5px;
+  font-size: 10.5px; letter-spacing: 0.09em; text-transform: uppercase; color: var(--ink); pointer-events: none; }
+.waypoint svg { display: block; color: var(--ink-soft); }
+.compass { position: absolute; right: 16px; bottom: 14px; color: var(--gold); opacity: 0.38; pointer-events: none; z-index: 0; line-height: 0; }
+.chart-inner .card { position: absolute; width: 236px; z-index: 2; cursor: grab; touch-action: none; }
+.card.fan-open { z-index: 25; }
+.fanout { position: absolute; left: 0; right: 0; top: calc(100% + 6px); display: flex; flex-direction: column; gap: 4px; z-index: 25; }
+.fan-row { background: #ffffff; border: 1px solid var(--line); border-radius: 3px; padding: 6px 10px; font-size: 11.5px; color: var(--ink);
+  box-shadow: var(--shadow-card); animation: fanin 240ms cubic-bezier(0.4, 0, 0.2, 1) backwards; }
+@keyframes fanin { from { opacity: 0; transform: translateY(-4px); } }
+
+/* Reveal stagger */
+.reveal { animation: rise 360ms cubic-bezier(0.4, 0, 0.2, 1) backwards; }
+@keyframes rise { from { opacity: 0; transform: translateY(8px); } }
+
+/* Keyboard hint bar */
+.hintbar { display: flex; gap: 18px; flex-wrap: wrap; font-size: 11px; color: var(--ink); padding: 12px 2px; border-top: 1px solid var(--line); margin-top: 22px; }
+.hint { display: inline-flex; align-items: center; gap: 5px; }
+kbd { font-family: var(--font-body); font-size: 10px; border: 1px solid var(--line); background: #ffffff; border-radius: 3px; padding: 1px 5px;
+  box-shadow: 0 1px 0 var(--line); color: var(--ink); }
+
+/* Direction notes */
+.direction-notes { max-width: 1240px; margin: 8px auto 44px; padding: 0 32px; color: var(--ink-soft); font-size: 13px; }
+.direction-notes summary { cursor: pointer; font-family: var(--font-display); font-weight: 600; color: var(--ink); font-size: 14px; padding: 8px 0; }
+.direction-notes ol { line-height: 1.65; padding-left: 20px; margin: 6px 0 0; }
+.direction-notes li { margin-bottom: 6px; }
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .reveal, .fan-row, .pulse { animation: none !important; }
+}
+
+/* Responsive */
+@media (max-width: 980px) {
+  .board { grid-template-columns: repeat(2, 1fr); }
+  .masthead, main, .direction-notes { padding-left: 18px; padding-right: 18px; }
+}
+</style>
+</head>
+<body>
+<div class="vh" aria-live="polite" id="live"></div>
+
+<header class="masthead">
+  <div class="mast-row">
+    <div class="wordmark">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M12 3.2v9.8"/>
+        <path d="M12 4.4 C8.6 6 6.7 8.7 6.1 12 L12 12 Z" fill="currentColor" fill-opacity="0.14"/>
+        <path d="M4.2 15h15.6l-2.2 3.6H6.4z"/>
+        <path d="M2.8 21.2c1.6-1.1 3.2-1.1 4.8 0 1.6 1.1 3.2 1.1 4.8 0 1.6-1.1 3.2-1.1 4.8 0 1.05.72 2.1.99 3.2.55"/>
+      </svg>
+      <span>Argo</span>
+    </div>
+    <a class="cta" href="#" id="new-cta">New QStack</a>
+  </div>
+  <div class="title-row">
+    <div>
+      <h1>Your QStacks</h1>
+      <p class="sub">Ten stacks on the table. Arrange, star, and move them as your loops take shape.</p>
+    </div>
+    <div class="view-toggle" role="group" aria-label="View">
+      <button type="button" data-view="list" aria-pressed="false">List</button>
+      <button type="button" data-view="stack" aria-pressed="false">Stack</button>
+      <button type="button" data-view="board" aria-pressed="false">Board</button>
+      <button type="button" data-view="canvas" aria-pressed="true">Canvas</button>
+    </div>
+  </div>
+</header>
+
+<main>
+  <section id="view-list" class="view view-list-pad" aria-label="List view">
+    <div class="list-rows" id="list-rows"></div>
+  </section>
+
+  <section id="view-stack" class="view view-stack-pad" aria-label="Stack view">
+    <div class="stack-grid" id="stack-grid"></div>
+  </section>
+
+  <section id="view-board" class="view view-board-pad" aria-label="Board view">
+    <div class="board" id="board"></div>
+  </section>
+
+  <section id="view-canvas" class="view" aria-label="Canvas view">
+    <p class="canvas-caption">Arrange your stacks however you think. Position changes nothing about them.</p>
+    <div class="chart-outer">
+      <i class="tick-strip tick-top" aria-hidden="true"></i>
+      <i class="tick-strip tick-bottom" aria-hidden="true"></i>
+      <i class="tick-strip tick-left" aria-hidden="true"></i>
+      <i class="tick-strip tick-right" aria-hidden="true"></i>
+      <div class="chart-inner" id="chart-inner">
+        <div class="chart-grid" aria-hidden="true"></div>
+        <svg id="lineage" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"></svg>
+        <div class="guide-v" id="guide-v" aria-hidden="true"></div>
+        <div class="guide-h" id="guide-h" aria-hidden="true"></div>
+        <span class="waypoint" style="left:2.5%; top:3%;">
+          <svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1" aria-hidden="true"><path d="M5 0.8v2.4M5 6.8v2.4M0.8 5h2.4M6.8 5h2.4"/><circle cx="5" cy="5" r="1.1"/></svg>
+          Engineering
+        </span>
+        <span class="waypoint" style="left:55%; top:3%;">
+          <svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1" aria-hidden="true"><path d="M5 0.8v2.4M5 6.8v2.4M0.8 5h2.4M6.8 5h2.4"/><circle cx="5" cy="5" r="1.1"/></svg>
+          Product and Sales
+        </span>
+        <span class="waypoint" style="left:2.5%; top:64%;">
+          <svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1" aria-hidden="true"><path d="M5 0.8v2.4M5 6.8v2.4M0.8 5h2.4M6.8 5h2.4"/><circle cx="5" cy="5" r="1.1"/></svg>
+          People and Design
+        </span>
+        <div class="compass" aria-hidden="true">
+          <svg width="76" height="76" viewBox="0 0 80 80" fill="none" stroke="currentColor" stroke-width="1">
+            <circle cx="40" cy="40" r="34"/>
+            <circle cx="40" cy="40" r="26.5"/>
+            <path d="M40 3v10M40 67v10M3 40h10M67 40h10"/>
+            <path d="M64 16l-4.2 4.2M16 16l4.2 4.2M64 64l-4.2-4.2M16 64l4.2-4.2"/>
+            <path d="M40 16l2 12-2-3-2 3z" fill="currentColor" fill-opacity="0.5" stroke="none"/>
+            <circle cx="40" cy="40" r="1.3" fill="currentColor" stroke="none"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="hintbar" id="hintbar" aria-label="Keyboard hints"></div>
+</main>
+
+<details class="direction-notes">
+  <summary>Direction notes</summary>
+  <ol>
+    <li><strong>Double neatline and a functional grid.</strong> The canvas carries an inner hairline neatline and a separate outer border with coordinate ticks, the two-border convention of real charts. The grid behind it sits at 5 percent alpha and earns its place: while a card is being dragged, the nearest grid lines light up as alignment guides, then fall silent at rest. Serves honest data: decoration must do work, and feedback belongs to the active state.</li>
+    <li><strong>Maritime document cards, flat at rest.</strong> White surface, hairline border, four corner tick marks like a plotting sheet, serif titles. Shadow appears only while dragging, so elevation always means motion, never decoration. Serves locality and honest state feedback: what you see on the card is the card's true state.</li>
+    <li><strong>The gold seal.</strong> A small matte seal, concentric rings around an eight-point star, appears only on accomplished stacks: 25 stars or more, or in rotation. It is the single gold ornament on a card face, so gold keeps its meaning. Serves gold scarcity: accomplishment is the only thing that earns the metal.</li>
+    <li><strong>Fork lineage lines in ink, never gold.</strong> Dashed curved lines on the canvas connect a parent stack to its fork, labeled "forked from" in letterspaced small caps, recomputed live as cards move. Lineage is fact, not praise. Serves honest data: relationships are drawn as record-keeping, not celebration.</li>
+    <li><strong>Waypoint labels and one corner compass rose.</strong> Cluster names render as small-caps tags with a compass tick glyph, placed like chart place names; empty canvas stays bare, and a single reduced-opacity compass rose sits in one corner as instrument linework. Every control stays on the card it affects, and the keyboard can do everything the pointer can: star, move, nudge, fan out. Serves locality and input parity.</li>
+  </ol>
+</details>
+
+<script>
+(function () {
+  "use strict";
+
+/* SHARED DATASET, do not diverge */
+const STACKS = [
+  { id:"s1",  title:"Senior Backend Loop",         role_family:"engineering",        level:"senior", methodology:"structured", visibility:"org",     forked_from:null, stars:32, status:"in_rotation", questions:9, rubrics:9, screened:true,  cats:["system design","debugging","collaboration"] },
+  { id:"s2",  title:"Platform Engineering Screen", role_family:"engineering",        level:"lead",   methodology:"behavioral", visibility:"private", forked_from:null, stars:7,  status:"ready",       questions:6, rubrics:5, screened:true,  cats:["architecture","incident response","leadership"] },
+  { id:"s3",  title:"Junior Frontend Screen",      role_family:"engineering",        level:"junior", methodology:"structured", visibility:"public",  forked_from:"s1", stars:18, status:"in_rotation", questions:7, rubrics:7, screened:true,  cats:["fundamentals","css layout","communication"] },
+  { id:"s4",  title:"Product Sense Deep Dive",     role_family:"product_management", level:"senior", methodology:"case",       visibility:"public",  forked_from:null, stars:41, status:"in_rotation", questions:8, rubrics:8, screened:true,  cats:["product sense","prioritization","metrics"] },
+  { id:"s5",  title:"APM First Round",             role_family:"product_management", level:"junior", methodology:"structured", visibility:"org",     forked_from:null, stars:5,  status:"drafting",    questions:5, rubrics:3, screened:false, cats:["analytical thinking","curiosity","communication"] },
+  { id:"s6",  title:"Enterprise AE Loop",          role_family:"sales",              level:"mid",    methodology:"behavioral", visibility:"org",     forked_from:null, stars:12, status:"ready",       questions:8, rubrics:6, screened:true,  cats:["discovery","negotiation","territory planning"] },
+  { id:"s7",  title:"SDR Screen",                  role_family:"sales",              level:"junior", methodology:"structured", visibility:"private", forked_from:"s6", stars:2,  status:"drafting",    questions:5, rubrics:2, screened:false, cats:["outreach","resilience","coachability"] },
+  { id:"s8",  title:"People Ops Generalist Loop",  role_family:"people_ops",         level:"mid",    methodology:"behavioral", visibility:"org",     forked_from:null, stars:9,  status:"ready",       questions:7, rubrics:7, screened:true,  cats:["employee relations","process design","judgment"] },
+  { id:"s9",  title:"Design Portfolio Review",     role_family:"design",             level:"senior", methodology:"portfolio",  visibility:"public",  forked_from:null, stars:27, status:"in_rotation", questions:6, rubrics:6, screened:true,  cats:["craft","process","critique"] },
+  { id:"s10", title:"Brand Designer Screen",       role_family:"design",             level:"mid",    methodology:"structured", visibility:"private", forked_from:null, stars:0,  status:"off_board",   questions:4, rubrics:1, screened:false, cats:["visual systems","typography","storytelling"] }
+];
+const COLUMNS = [
+  { id:"drafting",    name:"Drafting" },
+  { id:"ready",       name:"Ready to run" },
+  { id:"in_rotation", name:"In rotation" },
+  { id:"off_board",   name:"Not on the board" }
+];
+const FLASH_MS = 1600;
+const UNDO_MS = 5000;
+
+  var CANVAS_KEY = "argo-proto-01-canvas-v1";
+  var GRID = 32;
+  var SVGNS = "http://www.w3.org/2000/svg";
+
+  var SEAL_SVG =
+    '<svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true">' +
+    '<circle cx="12" cy="12" r="10.5" fill="var(--gold-hover)"/>' +
+    '<circle cx="12" cy="12" r="10" fill="none" stroke="var(--gold)" stroke-width="1"/>' +
+    '<circle cx="12" cy="12" r="7.6" fill="none" stroke="rgb(251 246 233 / 0.75)" stroke-width="0.8"/>' +
+    '<rect x="8.9" y="8.9" width="6.2" height="6.2" fill="var(--cream)"/>' +
+    '<rect x="8.9" y="8.9" width="6.2" height="6.2" fill="var(--cream)" transform="rotate(45 12 12)"/>' +
+    "</svg>";
+
+  var STAMP_SVG =
+    '<svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.2" aria-hidden="true">' +
+    '<path d="M5 1v8M1 5h8"/><circle cx="5" cy="5" r="2.2"/>' +
+    "</svg>";
+
+  var SHIP_MINI =
+    '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
+    '<path d="M12 3.2v9.8"/>' +
+    '<path d="M12 4.4 C8.6 6 6.7 8.7 6.1 12 L12 12 Z" fill="currentColor" fill-opacity="0.14"/>' +
+    '<path d="M4.2 15h15.6l-2.2 3.6H6.4z"/>' +
+    "</svg>";
+
+  var EMPTY_COPY = {
+    drafting: "No drafts on the table. Start a new QStack and shape it here.",
+    ready: "Nothing staged to run. Move a draft here once its rubrics are set.",
+    in_rotation: "Nothing in rotation yet. Move a ready stack here when interviews begin.",
+    off_board: "Nothing waiting here. Stacks land here when they leave the board, and nothing about them is lost."
+  };
+
+  var HINTS = {
+    list:   [["Tab", "focus a card"], ["S", "star"], ["M", "move"]],
+    stack:  [["Tab", "focus a card"], ["S", "star"], ["M", "move"]],
+    board:  [["Tab", "focus a card"], ["S", "star"], ["M", "move"], ["Drag", "between columns"]],
+    canvas: [["Tab", "focus a card"], ["S", "star"], ["M", "move"], ["Enter", "fan out"], ["Arrows", "nudge 16 px"], ["Shift+Arrows", "nudge 64 px"], ["Esc", "close"]]
+  };
+
+  var DEFAULT_POS = {
+    s1: { x: 1,  y: 7 },  s2: { x: 28, y: 7 },  s3: { x: 1,  y: 46 },
+    s4: { x: 55, y: 7 },  s5: { x: 82, y: 7 },  s6: { x: 55, y: 46 }, s7: { x: 82, y: 46 },
+    s8: { x: 1,  y: 98 }, s9: { x: 28, y: 98 }, s10: { x: 55, y: 98 }
+  };
+
+  var stacks = STACKS.map(function (s) { return Object.assign({}, s); });
+  var byId = {};
+  stacks.forEach(function (s) { byId[s.id] = s; });
+
+  var view = "stack";
+  var positions = loadPositions();
+  var liveEl = document.getElementById("live");
+
+  /* Helpers */
+  function el(tag, cls, text) {
+    var n = document.createElement(tag);
+    if (cls) n.className = cls;
+    if (text !== undefined) n.textContent = text;
+    return n;
+  }
+  function chip(text, cls) { return el("span", cls || "chip", text); }
+  function humanize(v) { return String(v).replace(/_/g, " "); }
+  function clamp(v, lo, hi) { return Math.min(hi, Math.max(lo, v)); }
+  function r1(v) { return Math.round(v * 10) / 10; }
+  function colName(id) {
+    for (var i = 0; i < COLUMNS.length; i++) { if (COLUMNS[i].id === id) return COLUMNS[i].name; }
+    return id;
+  }
+  function prefersReduced() {
+    return !!(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches);
+  }
+  function chartInner() { return document.getElementById("chart-inner"); }
+  function announce(msg) {
+    if (!liveEl) return;
+    liveEl.textContent = "";
+    window.setTimeout(function () { liveEl.textContent = msg; }, 30);
+  }
+  function clonePos(src) {
+    var out = {};
+    Object.keys(src).forEach(function (k) { out[k] = { x: src[k].x, y: src[k].y }; });
+    return out;
+  }
+  function sealQualifies(s) { return s.stars >= 25 || s.status === "in_rotation"; }
+  function setStarLabel(btn, s) { btn.setAttribute("aria-label", s.stars + " stars, star this stack"); }
+
+  /* localStorage, defensively */
+  function loadPositions() {
+    var out = clonePos(DEFAULT_POS);
+    try {
+      var raw = window.localStorage.getItem(CANVAS_KEY);
+      if (!raw) return out;
+      var parsed = JSON.parse(raw);
+      stacks.forEach(function (s) {
+        var p = parsed && parsed[s.id];
+        if (p && isFinite(p.x) && isFinite(p.y)) {
+          out[s.id] = { x: clamp(Number(p.x), 0, 100), y: clamp(Number(p.y), 0, 100) };
+        }
+      });
+    } catch (e) { /* storage unavailable or corrupt, fall back to defaults */ }
+    return out;
+  }
+  function savePositions() {
+    try { window.localStorage.setItem(CANVAS_KEY, JSON.stringify(positions)); }
+    catch (e) { /* storage unavailable, arrangement lives for this session only */ }
+  }
+
+  /* Card-local feedback: flash, stamp, undo */
+  function addTimer(card, t) {
+    if (!card.__timers) card.__timers = [];
+    card.__timers.push(t);
+  }
+  function clearLive(card) {
+    if (card.__timers) { card.__timers.forEach(function (t) { window.clearTimeout(t); }); card.__timers = []; }
+    var live = card.querySelector(".card-live");
+    if (live) { live.innerHTML = ""; live.classList.remove("on"); }
+    var slot = card.querySelector(".stamp-slot");
+    if (slot) slot.innerHTML = "";
+  }
+  function hideIfEmpty(live) {
+    if (live && live.children.length === 0) live.classList.remove("on");
+  }
+  function showLive(card, opts) {
+    var live = card.querySelector(".card-live");
+    if (!live) return;
+    clearLive(card);
+    live.classList.add("on");
+    if (opts.flash) {
+      var f = el("span", "flash", opts.flash);
+      live.appendChild(f);
+      addTimer(card, window.setTimeout(function () {
+        if (f.parentNode) f.parentNode.removeChild(f);
+        hideIfEmpty(live);
+      }, FLASH_MS));
+    }
+    if (opts.stamp) {
+      var slot = card.querySelector(".stamp-slot");
+      if (slot) {
+        slot.innerHTML = STAMP_SVG;
+        addTimer(card, window.setTimeout(function () { slot.innerHTML = ""; }, FLASH_MS));
+      }
+    }
+    if (opts.undoText) {
+      var u = document.createElement("button");
+      u.type = "button";
+      u.className = "undo-link";
+      u.textContent = opts.undoText;
+      u.addEventListener("click", function (e) {
+        e.stopPropagation();
+        clearLive(card);
+        if (opts.onUndo) opts.onUndo();
+      });
+      live.appendChild(u);
+      addTimer(card, window.setTimeout(function () {
+        if (u.parentNode) u.parentNode.removeChild(u);
+        hideIfEmpty(live);
+      }, UNDO_MS));
+    }
+  }
+
+  /* Star */
+  function starStack(s, card) {
+    s.stars += 1;
+    updateStars(card, s);
+    patchSeal(card, s);
+    var btn = card.querySelector(".star-btn");
+    if (btn && !prefersReduced()) {
+      var p = el("span", "pulse");
+      btn.appendChild(p);
+      window.setTimeout(function () { if (p.parentNode) p.parentNode.removeChild(p); }, 600);
+    }
+    announce("Starred " + s.title + ", " + s.stars + " stars");
+    showLive(card, {
+      undoText: "Starred, undo",
+      onUndo: function () {
+        s.stars = Math.max(0, s.stars - 1);
+        updateStars(card, s);
+        patchSeal(card, s);
+        announce("Star removed from " + s.title + ", " + s.stars + " stars");
+      }
+    });
+  }
+  function updateStars(card, s) {
+    var count = card.querySelector(".star-count");
+    if (count) count.textContent = s.stars;
+    var btn = card.querySelector(".star-btn");
+    if (btn) setStarLabel(btn, s);
+  }
+  function patchSeal(card, s) {
+    var seal = card.querySelector(".seal");
+    if (seal) seal.classList.toggle("seal-off", !sealQualifies(s));
+  }
+
+  /* Move menu */
+  function closeAllMenus() {
+    var menus = document.querySelectorAll(".move-menu");
+    for (var i = 0; i < menus.length; i++) {
+      var m = menus[i];
+      var card = m.closest(".card");
+      if (card) {
+        var b = card.querySelector(".status-btn");
+        if (b) b.setAttribute("aria-expanded", "false");
+      }
+      if (m.parentNode) m.parentNode.removeChild(m);
+    }
+  }
+  function toggleMoveMenu(s, card, btn) {
+    var existing = card.querySelector(".move-menu");
+    closeAllMenus();
+    if (existing) return;
+    var menu = el("div", "move-menu");
+    menu.setAttribute("role", "menu");
+    menu.appendChild(el("div", "menu-label", "Move to"));
+    COLUMNS.forEach(function (c) {
+      var b = document.createElement("button");
+      b.type = "button";
+      b.setAttribute("role", "menuitemradio");
+      b.setAttribute("aria-checked", String(s.status === c.id));
+      var dot = el("span", "menu-dot");
+      dot.setAttribute("aria-hidden", "true");
+      b.appendChild(dot);
+      b.appendChild(document.createTextNode(c.name));
+      b.addEventListener("click", function (e) {
+        e.stopPropagation();
+        closeAllMenus();
+        if (c.id !== s.status) moveStack(s, c.id, card);
+        card.focus();
+      });
+      menu.appendChild(b);
+    });
+    menu.addEventListener("keydown", function (e) {
+      if (e.key === "Escape") {
+        e.stopPropagation();
+        closeAllMenus();
+        btn.focus();
+        return;
+      }
+      if (e.key === "ArrowDown" || e.key === "ArrowUp") {
+        e.preventDefault();
+        e.stopPropagation();
+        var items = Array.prototype.slice.call(menu.querySelectorAll("button"));
+        var i = items.indexOf(document.activeElement);
+        var n = e.key === "ArrowDown" ? (i + 1) % items.length : (i - 1 + items.length) % items.length;
+        items[n].focus();
+      }
+    });
+    card.appendChild(menu);
+    var mr = menu.getBoundingClientRect();
+    var topLimit = 0;
+    if (view === "canvas") {
+      var inner = chartInner();
+      if (inner) topLimit = inner.getBoundingClientRect().top;
+    }
+    if (mr.top < topLimit) menu.classList.add("menu-below");
+    btn.setAttribute("aria-expanded", "true");
+    var first = menu.querySelector("button");
+    if (first) first.focus();
+  }
+  function moveStack(s, toId, card) {
+    var from = s.status;
+    s.status = toId;
+    patchStatus(card, s);
+    announce("Moved " + s.title + " to " + colName(toId));
+    showLive(card, {
+      flash: "Moved",
+      undoText: "Undo move",
+      onUndo: function () {
+        s.status = from;
+        patchStatus(card, s);
+        announce("Move undone, " + s.title + " back in " + colName(from));
+      }
+    });
+  }
+  function patchStatus(card, s) {
+    var t = card.querySelector(".status-text");
+    if (t) t.textContent = humanize(s.status);
+    patchSeal(card, s);
+    card.setAttribute("aria-label", s.title + ", " + humanize(s.status));
+    if (view === "board") {
+      var wrap = document.querySelector('#board .col[data-col="' + s.status + '"] .col-cards');
+      if (wrap && card.parentNode !== wrap) wrap.appendChild(card);
+      updateBoardChrome();
+    }
+  }
+
+  /* Card builder, same anatomy in all four views */
+  function makeCard(s, ctx) {
+    var card = document.createElement("article");
+    card.className = "card";
+    card.tabIndex = 0;
+    card.dataset.id = s.id;
+    card.setAttribute("aria-label", s.title + ", " + humanize(s.status));
+
+    var ticks = document.createElement("i");
+    ticks.className = "ticks";
+    ticks.setAttribute("aria-hidden", "true");
+    card.appendChild(ticks);
+
+    var head = el("div", "card-head");
+    var title = document.createElement("h3");
+    title.className = "card-title";
+    title.textContent = s.title;
+    if (ctx === "canvas") {
+      title.classList.add("title-fan");
+      title.addEventListener("click", function (e) {
+        e.stopPropagation();
+        toggleFan(s, card);
+      });
+    }
+    head.appendChild(title);
+
+    var stampSlot = el("span", "stamp-slot");
+    stampSlot.setAttribute("aria-hidden", "true");
+    head.appendChild(stampSlot);
+
+    var seal = el("span", "seal");
+    seal.setAttribute("aria-hidden", "true");
+    seal.innerHTML = SEAL_SVG;
+    if (!sealQualifies(s)) seal.classList.add("seal-off");
+    head.appendChild(seal);
+
+    var star = document.createElement("button");
+    star.type = "button";
+    star.className = "star-btn";
+    star.innerHTML = '<span class="star-glyph" aria-hidden="true">&#9733;</span><span class="star-count">' + s.stars + "</span>";
+    setStarLabel(star, s);
+    star.addEventListener("click", function (e) {
+      e.stopPropagation();
+      starStack(s, card);
+    });
+    head.appendChild(star);
+    card.appendChild(head);
+
+    var foot = el("div", "card-foot");
+    var chipsWrap = el("div", "chips");
+    chipsWrap.appendChild(chip(humanize(s.role_family)));
+    chipsWrap.appendChild(chip(s.level));
+    chipsWrap.appendChild(chip(s.methodology));
+    chipsWrap.appendChild(chip(s.visibility));
+    if (s.forked_from) chipsWrap.appendChild(el("span", "mark-forked", "forked"));
+    if (s.screened) chipsWrap.appendChild(chip("Screened", "chip chip--screened"));
+    chipsWrap.appendChild(chip(s.questions + " questions"));
+    foot.appendChild(chipsWrap);
+
+    var statusBtn = document.createElement("button");
+    statusBtn.type = "button";
+    statusBtn.className = "status-btn";
+    statusBtn.setAttribute("aria-haspopup", "menu");
+    statusBtn.setAttribute("aria-expanded", "false");
+    statusBtn.innerHTML = '<span class="status-text"></span><span class="status-caret" aria-hidden="true">&#9662;</span>';
+    statusBtn.querySelector(".status-text").textContent = humanize(s.status);
+    statusBtn.addEventListener("click", function (e) {
+      e.stopPropagation();
+      toggleMoveMenu(s, card, statusBtn);
+    });
+    foot.appendChild(statusBtn);
+    card.appendChild(foot);
+
+    card.appendChild(el("div", "card-live"));
+
+    card.addEventListener("keydown", function (e) {
+      if (e.target && e.target.closest && e.target.closest(".move-menu")) return;
+      var k = e.key;
+      if (k === "s" || k === "S") { e.preventDefault(); starStack(s, card); }
+      else if (k === "m" || k === "M") { e.preventDefault(); toggleMoveMenu(s, card, statusBtn); }
+      else if (ctx === "canvas") { canvasKey(e, s, card); }
+    });
+    if (ctx === "canvas") {
+      card.addEventListener("keyup", function (e) {
+        if (["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown"].indexOf(e.key) === -1) return;
+        if (!card.__kbPending) return;
+        card.__kbPending = false;
+        var prev = card.__kbPrev;
+        card.__kbPrev = null;
+        hideGuides();
+        commitPosition(s, card, prev);
+      });
+    }
+
+    if (ctx === "board") attachBoardDrag(card, s);
+    if (ctx === "canvas") attachCanvasDrag(card, s);
+    return card;
+  }
+
+  function reveal(card, i) {
+    if (prefersReduced()) return;
+    card.classList.add("reveal");
+    card.style.animationDelay = (i * 40) + "ms";
+  }
+
+  /* Fan-out, canvas only, metadata rows never question text */
+  function toggleFan(s, card) {
+    if (card.querySelector(".fanout")) { closeFan(card); return; }
+    var open = document.querySelectorAll(".card.fan-open");
+    for (var j = 0; j < open.length; j++) closeFan(open[j]);
+    var fan = el("div", "fanout");
+    var n = Math.min(3, s.cats.length, s.questions);
+    for (var i = 0; i < n; i++) {
+      var row = el("div", "fan-row", "Q" + (i + 1) + " · " + s.cats[i] + " · " + (i < s.rubrics ? "rubric attached" : "rubric pending"));
+      row.style.animationDelay = (i * 40) + "ms";
+      fan.appendChild(row);
+    }
+    card.appendChild(fan);
+    card.classList.add("fan-open");
+    announce(s.title + ", showing " + n + " question outlines");
+  }
+  function closeFan(card) {
+    if (!card) return;
+    var f = card.querySelector(".fanout");
+    if (f && f.parentNode) f.parentNode.removeChild(f);
+    card.classList.remove("fan-open");
+  }
+
+  /* Canvas keyboard nudge */
+  function canvasKey(e, s, card) {
+    var k = e.key;
+    if (k === "Enter") {
+      if (e.target === card) { e.preventDefault(); toggleFan(s, card); }
+      return;
+    }
+    if (k === "Escape") { closeFan(card); closeAllMenus(); return; }
+    var step = e.shiftKey ? 64 : 16;
+    var dx = 0, dy = 0;
+    if (k === "ArrowLeft") dx = -step;
+    else if (k === "ArrowRight") dx = step;
+    else if (k === "ArrowUp") dy = -step;
+    else if (k === "ArrowDown") dy = step;
+    else return;
+    e.preventDefault();
+    var inner = chartInner();
+    if (!inner) return;
+    if (!card.__kbPrev) card.__kbPrev = { x: positions[s.id].x, y: positions[s.id].y };
+    var maxX = Math.max(0, inner.clientWidth - card.offsetWidth);
+    var maxY = Math.max(0, inner.clientHeight - card.offsetHeight);
+    card.style.left = clamp(card.offsetLeft + dx, 0, maxX) + "px";
+    card.style.top = clamp(card.offsetTop + dy, 0, maxY) + "px";
+    showGuides(card.offsetLeft, card.offsetTop);
+    scheduleLineage();
+    card.__kbPending = true;
+  }
+
+  /* Grid alignment guides, drag-state only */
+  function showGuides(nx, ny) {
+    var gv = document.getElementById("guide-v");
+    var gh = document.getElementById("guide-h");
+    if (!gv || !gh) return;
+    gv.style.display = "block";
+    gh.style.display = "block";
+    gv.style.left = (Math.round(nx / GRID) * GRID) + "px";
+    gh.style.top = (Math.round(ny / GRID) * GRID) + "px";
+  }
+  function hideGuides() {
+    var gv = document.getElementById("guide-v");
+    var gh = document.getElementById("guide-h");
+    if (gv) gv.style.display = "none";
+    if (gh) gh.style.display = "none";
+  }
+
+  /* Canvas positions, percent of available range */
+  function placeCard(card, s) {
+    var inner = chartInner();
+    if (!inner) return;
+    var p = positions[s.id] || { x: 0, y: 0 };
+    var maxX = Math.max(0, inner.clientWidth - card.offsetWidth);
+    var maxY = Math.max(0, inner.clientHeight - card.offsetHeight);
+    card.style.left = (p.x / 100 * maxX) + "px";
+    card.style.top = (p.y / 100 * maxY) + "px";
+  }
+  function pctFromPx(card, inner) {
+    var maxX = Math.max(1, inner.clientWidth - card.offsetWidth);
+    var maxY = Math.max(1, inner.clientHeight - card.offsetHeight);
+    return {
+      x: clamp(card.offsetLeft / maxX * 100, 0, 100),
+      y: clamp(card.offsetTop / maxY * 100, 0, 100)
+    };
+  }
+  function commitPosition(s, card, prev) {
+    var inner = chartInner();
+    if (!inner) return;
+    positions[s.id] = pctFromPx(card, inner);
+    savePositions();
+    scheduleLineage();
+    announce("Position saved for " + s.title);
+    showLive(card, {
+      flash: "Position saved",
+      stamp: true,
+      undoText: "Undo move",
+      onUndo: function () {
+        if (!prev) return;
+        positions[s.id] = { x: prev.x, y: prev.y };
+        savePositions();
+        placeCard(card, s);
+        scheduleLineage();
+        announce("Position restored for " + s.title);
+      }
+    });
+  }
+
+  /* Canvas drag */
+  function attachCanvasDrag(card, s) {
+    var sx = 0, sy = 0, ox = 0, oy = 0, dragging = false, pid;
+    card.addEventListener("pointerdown", function (e) {
+      if (e.pointerType === "mouse" && e.button !== 0) return;
+      if (e.target.closest("button, a, .move-menu, .card-live, .fanout, .title-fan")) return;
+      sx = e.clientX; sy = e.clientY;
+      ox = card.offsetLeft; oy = card.offsetTop;
+      dragging = false;
+      pid = e.pointerId;
+      try { card.setPointerCapture(pid); } catch (err) {}
+    });
+    card.addEventListener("pointermove", function (e) {
+      if (pid === undefined || e.pointerId !== pid) return;
+      var dx = e.clientX - sx, dy = e.clientY - sy;
+      if (!dragging && Math.abs(dx) + Math.abs(dy) > 4) {
+        dragging = true;
+        card.classList.add("dragging");
+        card.__prevPos = { x: positions[s.id].x, y: positions[s.id].y };
+      }
+      if (!dragging) return;
+      var inner = chartInner();
+      if (!inner) return;
+      var maxX = Math.max(0, inner.clientWidth - card.offsetWidth);
+      var maxY = Math.max(0, inner.clientHeight - card.offsetHeight);
+      var nx = clamp(ox + dx, 0, maxX);
+      var ny = clamp(oy + dy, 0, maxY);
+      card.style.left = nx + "px";
+      card.style.top = ny + "px";
+      showGuides(nx, ny);
+      scheduleLineage();
+    });
+    function finish(e) {
+      if (pid === undefined || e.pointerId !== pid) return;
+      try { card.releasePointerCapture(pid); } catch (err) {}
+      pid = undefined;
+      if (!dragging) return;
+      dragging = false;
+      card.classList.remove("dragging");
+      hideGuides();
+      commitPosition(s, card, card.__prevPos);
+      card.__prevPos = null;
+    }
+    card.addEventListener("pointerup", finish);
+    card.addEventListener("pointercancel", function () {
+      pid = undefined;
+      dragging = false;
+      card.classList.remove("dragging");
+      hideGuides();
+    });
+  }
+
+  /* Board drag */
+  function columnAt(x, y) {
+    var cols = document.querySelectorAll("#board .col");
+    for (var i = 0; i < cols.length; i++) {
+      var r = cols[i].getBoundingClientRect();
+      if (x >= r.left && x <= r.right && y >= r.top && y <= r.bottom) return cols[i].dataset.col;
+    }
+    return null;
+  }
+  function highlightDropColumn(x, y) {
+    var id = columnAt(x, y);
+    var cols = document.querySelectorAll("#board .col");
+    for (var i = 0; i < cols.length; i++) {
+      cols[i].classList.toggle("drop-target", cols[i].dataset.col === id);
+    }
+  }
+  function clearDropHighlights() {
+    var cols = document.querySelectorAll("#board .col.drop-target");
+    for (var i = 0; i < cols.length; i++) cols[i].classList.remove("drop-target");
+  }
+  function attachBoardDrag(card, s) {
+    var sx = 0, sy = 0, dragging = false, pid;
+    card.addEventListener("pointerdown", function (e) {
+      if (e.pointerType === "mouse" && e.button !== 0) return;
+      if (e.target.closest("button, a, .move-menu, .card-live")) return;
+      sx = e.clientX; sy = e.clientY;
+      dragging = false;
+      pid = e.pointerId;
+      try { card.setPointerCapture(pid); } catch (err) {}
+    });
+    card.addEventListener("pointermove", function (e) {
+      if (pid === undefined || e.pointerId !== pid) return;
+      var dx = e.clientX - sx, dy = e.clientY - sy;
+      if (!dragging && Math.abs(dx) + Math.abs(dy) > 5) {
+        dragging = true;
+        card.classList.add("dragging");
+      }
+      if (!dragging) return;
+      card.style.transform = "translate(" + dx + "px," + dy + "px)";
+      highlightDropColumn(e.clientX, e.clientY);
+    });
+    function finish(e) {
+      if (pid === undefined || e.pointerId !== pid) return;
+      try { card.releasePointerCapture(pid); } catch (err) {}
+      pid = undefined;
+      if (!dragging) return;
+      dragging = false;
+      card.classList.remove("dragging");
+      card.style.transform = "";
+      var col = columnAt(e.clientX, e.clientY);
+      clearDropHighlights();
+      if (col && col !== s.status) moveStack(s, col, card);
+    }
+    card.addEventListener("pointerup", finish);
+    card.addEventListener("pointercancel", function () {
+      pid = undefined;
+      dragging = false;
+      card.classList.remove("dragging");
+      card.style.transform = "";
+      clearDropHighlights();
+    });
+  }
+
+  /* Fork lineage lines, canvas only, ink never gold */
+  var lineageRaf = 0;
+  function scheduleLineage() {
+    if (lineageRaf) return;
+    lineageRaf = window.requestAnimationFrame(function () {
+      lineageRaf = 0;
+      drawLineage();
+    });
+  }
+  function edgePoint(fromEl, toEl) {
+    var fx = fromEl.offsetLeft + fromEl.offsetWidth / 2;
+    var fy = fromEl.offsetTop + fromEl.offsetHeight / 2;
+    var tx = toEl.offsetLeft + toEl.offsetWidth / 2;
+    var ty = toEl.offsetTop + toEl.offsetHeight / 2;
+    var dx = tx - fx, dy = ty - fy;
+    if (dx === 0 && dy === 0) return { x: fx, y: fy };
+    var hw = fromEl.offsetWidth / 2, hh = fromEl.offsetHeight / 2;
+    var scale = 1 / Math.max(Math.abs(dx) / hw, Math.abs(dy) / hh);
+    return { x: fx + dx * scale, y: fy + dy * scale };
+  }
+  function drawLineage() {
+    if (view !== "canvas") return;
+    var svg = document.getElementById("lineage");
+    var inner = chartInner();
+    if (!svg || !inner) return;
+    svg.setAttribute("viewBox", "0 0 " + inner.clientWidth + " " + inner.clientHeight);
+    while (svg.firstChild) svg.removeChild(svg.firstChild);
+    stacks.forEach(function (child) {
+      if (!child.forked_from) return;
+      var a = inner.querySelector('.card[data-id="' + child.forked_from + '"]');
+      var b = inner.querySelector('.card[data-id="' + child.id + '"]');
+      if (!a || !b) return;
+      var p1 = edgePoint(a, b);
+      var p2 = edgePoint(b, a);
+      var dx = p2.x - p1.x, dy = p2.y - p1.y;
+      var len = Math.max(1, Math.sqrt(dx * dx + dy * dy));
+      var bow = Math.min(46, len * 0.22);
+      var nxv = -dy / len * bow, nyv = dx / len * bow;
+      var c1x = p1.x + dx * 0.3 + nxv, c1y = p1.y + dy * 0.3 + nyv;
+      var c2x = p1.x + dx * 0.7 + nxv, c2y = p1.y + dy * 0.7 + nyv;
+      var path = document.createElementNS(SVGNS, "path");
+      path.setAttribute("class", "lineage-path");
+      path.setAttribute("d", "M" + r1(p1.x) + " " + r1(p1.y) +
+        " C" + r1(c1x) + " " + r1(c1y) + ", " + r1(c2x) + " " + r1(c2y) + ", " + r1(p2.x) + " " + r1(p2.y));
+      svg.appendChild(path);
+      var lx = (p1.x + 3 * c1x + 3 * c2x + p2.x) / 8;
+      var ly = (p1.y + 3 * c1y + 3 * c2y + p2.y) / 8;
+      var text = document.createElementNS(SVGNS, "text");
+      text.setAttribute("class", "lineage-label");
+      text.setAttribute("x", r1(lx));
+      text.setAttribute("y", r1(ly + 3));
+      text.setAttribute("text-anchor", "middle");
+      text.textContent = "FORKED FROM";
+      svg.appendChild(text);
+      try {
+        var bb = text.getBBox();
+        var rect = document.createElementNS(SVGNS, "rect");
+        rect.setAttribute("class", "lineage-halo");
+        rect.setAttribute("x", r1(bb.x - 4));
+        rect.setAttribute("y", r1(bb.y - 2));
+        rect.setAttribute("width", r1(bb.width + 8));
+        rect.setAttribute("height", r1(bb.height + 4));
+        svg.insertBefore(rect, text);
+      } catch (err) { /* getBBox unavailable while hidden, label stays haloless */ }
+    });
+  }
+
+  /* Views */
+  function renderList() {
+    var wrap = document.getElementById("list-rows");
+    wrap.innerHTML = "";
+    stacks.forEach(function (s, i) {
+      var card = makeCard(s, "list");
+      reveal(card, i);
+      wrap.appendChild(card);
+    });
+  }
+  function renderStack() {
+    var grid = document.getElementById("stack-grid");
+    grid.innerHTML = "";
+    stacks.forEach(function (s, i) {
+      var item = el("div", "stack-item");
+      var card = makeCard(s, "stack");
+      reveal(card, i);
+      item.appendChild(card);
+      item.appendChild(el("div", "plate-cap", "Plate " + s.id.toUpperCase() + " · " + humanize(s.role_family)));
+      grid.appendChild(item);
+    });
+  }
+  function renderBoard() {
+    var board = document.getElementById("board");
+    board.innerHTML = "";
+    var i = 0;
+    COLUMNS.forEach(function (c) {
+      var col = el("section", "col");
+      col.dataset.col = c.id;
+      col.setAttribute("aria-label", c.name);
+      var head = el("div", "col-head");
+      head.appendChild(el("span", "col-name", c.name));
+      head.appendChild(el("span", "col-count", "0"));
+      col.appendChild(head);
+      var wrap = el("div", "col-cards");
+      stacks.forEach(function (s) {
+        if (s.status !== c.id) return;
+        var card = makeCard(s, "board");
+        reveal(card, i);
+        i += 1;
+        wrap.appendChild(card);
+      });
+      col.appendChild(wrap);
+      board.appendChild(col);
+    });
+    updateBoardChrome();
+  }
+  function updateBoardChrome() {
+    var cols = document.querySelectorAll("#board .col");
+    for (var i = 0; i < cols.length; i++) {
+      var col = cols[i];
+      var id = col.dataset.col;
+      var wrap = col.querySelector(".col-cards");
+      var n = wrap ? wrap.querySelectorAll(".card").length : 0;
+      var count = col.querySelector(".col-count");
+      if (count) count.textContent = n;
+      var empty = col.querySelector(".col-empty");
+      if (n === 0 && !empty) {
+        empty = el("div", "col-empty");
+        if (id === "off_board") {
+          empty.innerHTML = SHIP_MINI;
+          empty.appendChild(el("span", "", EMPTY_COPY[id]));
+        } else {
+          empty.textContent = EMPTY_COPY[id];
+        }
+        col.appendChild(empty);
+      } else if (n > 0 && empty && empty.parentNode) {
+        empty.parentNode.removeChild(empty);
+      }
+    }
+  }
+  function renderCanvas() {
+    var inner = chartInner();
+    if (!inner) return;
+    var old = inner.querySelectorAll(".card");
+    for (var i = 0; i < old.length; i++) {
+      if (old[i].parentNode) old[i].parentNode.removeChild(old[i]);
+    }
+    stacks.forEach(function (s, idx) {
+      var card = makeCard(s, "canvas");
+      reveal(card, idx);
+      inner.appendChild(card);
+      placeCard(card, s);
+    });
+    scheduleLineage();
+  }
+  function renderActive() {
+    closeAllMenus();
+    if (view === "list") renderList();
+    else if (view === "stack") renderStack();
+    else if (view === "board") renderBoard();
+    else renderCanvas();
+  }
+  function updateHints() {
+    var bar = document.getElementById("hintbar");
+    if (!bar) return;
+    bar.innerHTML = "";
+    HINTS[view].forEach(function (h) {
+      var spn = el("span", "hint");
+      var kbd = document.createElement("kbd");
+      kbd.textContent = h[0];
+      spn.appendChild(kbd);
+      spn.appendChild(document.createTextNode(" " + h[1]));
+      bar.appendChild(spn);
+    });
+  }
+  function setView(v) {
+    view = v;
+    var btns = document.querySelectorAll(".view-toggle button");
+    for (var i = 0; i < btns.length; i++) {
+      btns[i].setAttribute("aria-pressed", String(btns[i].dataset.view === v));
+    }
+    ["list", "stack", "board", "canvas"].forEach(function (name) {
+      var sec = document.getElementById("view-" + name);
+      if (sec) sec.classList.toggle("active", name === v);
+    });
+    renderActive();
+    updateHints();
+  }
+
+  /* Wiring */
+  var toggleBtns = document.querySelectorAll(".view-toggle button");
+  for (var ti = 0; ti < toggleBtns.length; ti++) {
+    (function (b) {
+      b.addEventListener("click", function () { setView(b.dataset.view); });
+    })(toggleBtns[ti]);
+  }
+  var cta = document.getElementById("new-cta");
+  if (cta) cta.addEventListener("click", function (e) { e.preventDefault(); });
+
+  document.addEventListener("click", function (e) {
+    if (!e.target || !e.target.closest) { closeAllMenus(); return; }
+    if (!e.target.closest(".move-menu") && !e.target.closest(".status-btn")) closeAllMenus();
+  });
+  document.addEventListener("keydown", function (e) {
+    if (e.key !== "Escape") return;
+    closeAllMenus();
+    var open = document.querySelectorAll(".card.fan-open");
+    for (var i = 0; i < open.length; i++) closeFan(open[i]);
+  });
+
+  var resizeTimer = 0;
+  window.addEventListener("resize", function () {
+    if (view !== "canvas") return;
+    window.clearTimeout(resizeTimer);
+    resizeTimer = window.setTimeout(function () {
+      var inner = chartInner();
+      if (!inner) return;
+      var cards = inner.querySelectorAll(".card");
+      for (var i = 0; i < cards.length; i++) {
+        var s = byId[cards[i].dataset.id];
+        if (s) placeCard(cards[i], s);
+      }
+      scheduleLineage();
+    }, 120);
+  });
+
+  setView("stack");
+})();
+</script>
+</body>
+</html>

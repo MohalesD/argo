@@ -1,0 +1,1014 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Argo, QStack Library, Direction 03: The Modern Voyage</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Ccircle cx='8' cy='8' r='6' fill='%23e3a81c'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&display=swap" rel="stylesheet">
+<style>
+/* Design tokens, shared spec, verbatim */
+:root {
+  --gold: #e3a81c;
+  --gold-hover: #c9971a;
+  --gold-soft: #f7e8c3;
+  --cream: #fbf6e9;
+  --ink: #2b2a26;
+  --ink-soft: #55524a;
+  --forest: #2e4a3a;
+  --forest-soft: #e6efe9;
+  --flag: #b3402a;
+  --flag-soft: #f7e5e0;
+  --line: #e9e2d0;
+  --shadow-card: 0 1px 2px rgb(43 42 38 / 0.06), 0 4px 16px rgb(43 42 38 / 0.07);
+  --shadow-lift: 0 2px 4px rgb(43 42 38 / 0.08), 0 12px 32px rgb(43 42 38 / 0.12);
+  --font-display: 'Source Serif 4', Georgia, serif;
+  --font-body: 'Inter', system-ui, sans-serif;
+}
+html { background: var(--cream); color: var(--ink); font-family: var(--font-body); }
+h1, h2, h3 { font-family: var(--font-display); }
+:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; border-radius: 4px; }
+::selection { background: var(--gold-soft); }
+
+/* Base */
+*, *::before, *::after { box-sizing: border-box; }
+body { margin: 0; font-size: 15px; line-height: 1.5; -webkit-font-smoothing: antialiased; }
+button { font-family: var(--font-body); color: var(--ink); }
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+.page { max-width: 1180px; margin: 0 auto; padding: 48px 48px 120px; }
+
+/* Editorial masthead */
+.mast-top { display: flex; justify-content: space-between; align-items: center; }
+.wordmark { display: inline-flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase; color: var(--ink); }
+.wordmark svg { display: block; }
+h1 { margin: 56px 0 0; font-size: clamp(40px, 5.5vw, 56px); font-weight: 600; line-height: 1.04; letter-spacing: -0.015em; }
+.standfirst { margin: 16px 0 0; font-family: var(--font-display); font-size: 18px; color: var(--ink-soft); max-width: 60ch; }
+.toolbar { margin-top: 40px; padding-top: 16px; border-top: 1px solid var(--line); display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; }
+
+/* Segmented view toggle */
+.views { display: inline-flex; gap: 2px; background: #ffffff; border: 1px solid var(--line); border-radius: 10px; padding: 3px; }
+.views button { border: 0; background: none; cursor: pointer; padding: 7px 14px; border-radius: 7px; font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink); }
+.views button:hover { background: var(--cream); }
+.views button[aria-pressed="true"] { background: var(--gold); color: var(--ink); }
+
+/* Primary action */
+.cta { display: inline-flex; align-items: center; background: var(--gold); color: var(--ink); text-decoration: none; font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; padding: 12px 20px; border-radius: 10px; }
+.cta:hover { background: var(--gold-hover); }
+
+main { margin-top: 48px; }
+.view[hidden] { display: none; }
+
+/* Ticket card, shared anatomy */
+.card { position: relative; background: #ffffff; border-radius: 8px; box-shadow: var(--shadow-card); transition: background-color 350ms ease; }
+.card.flash-moved { background: var(--forest-soft); }
+.zone-title { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; padding: 20px 20px 16px 26px; }
+.card-title { margin: 0; font-size: 19px; font-weight: 600; line-height: 1.25; }
+.title-btn { border: 0; background: none; padding: 0; cursor: pointer; font: inherit; color: inherit; text-align: left; }
+.title-btn:hover { text-decoration: underline; text-underline-offset: 3px; text-decoration-thickness: 1px; }
+.star { position: relative; display: inline-flex; align-items: baseline; gap: 6px; border: 0; background: none; cursor: pointer; padding: 2px 4px; }
+.star .glyph { display: inline-block; color: var(--gold); font-size: 15px; line-height: 1; }
+.star .count { font-size: 13px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.zone-stub { position: relative; border-top: 1px dashed var(--line); padding: 14px 20px 16px 26px; display: flex; justify-content: space-between; align-items: flex-end; gap: 12px; }
+.zone-stub::before, .zone-stub::after { content: ""; position: absolute; top: 0; width: 14px; height: 14px; background: var(--cream); border: 1px solid var(--line); border-radius: 50%; transform: translateY(-50%); }
+.zone-stub::before { left: -8px; }
+.zone-stub::after { right: -8px; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.chip { font-size: 11px; font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink); border: 1px solid var(--line); background: #ffffff; padding: 3px 9px; border-radius: 999px; white-space: nowrap; }
+.chip--screened { color: var(--forest); background: var(--forest-soft); border-color: transparent; font-weight: 600; }
+.chip--forked { color: var(--forest); border-color: transparent; background: none; padding-left: 0; padding-right: 0; font-weight: 600; }
+.status-btn { border: 0; background: none; cursor: pointer; font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink); padding: 4px 0; white-space: nowrap; }
+.status-btn:hover, .status-btn:focus-visible { text-decoration: underline; text-underline-offset: 3px; }
+.status-btn .caret { opacity: 0.55; }
+
+/* The status spine: presence and color, never continuous width */
+.spine { position: absolute; left: 0; top: 0; bottom: 0; width: 16px; border: 0; background: transparent; cursor: pointer; border-radius: 8px 0 0 8px; padding: 0; }
+.spine:hover { background: color-mix(in srgb, var(--cream) 65%, transparent); }
+.spine::before { content: ""; position: absolute; left: 0; top: 6px; bottom: 6px; border-radius: 2px; }
+.card[data-status="drafting"] .spine::before { width: 1px; background: var(--line); }
+.card[data-status="ready"] .spine::before { width: 3px; background: var(--forest); }
+.card[data-status="in_rotation"] .spine::before { width: 5px; background: var(--gold); }
+.card[data-status="off_board"] .spine::before { width: 0; border-left: 1px dashed color-mix(in srgb, var(--ink-soft) 55%, #ffffff); }
+
+/* Card-local feedback pill */
+.card-feedback { position: absolute; left: 50%; bottom: -13px; transform: translateX(-50%); display: flex; align-items: center; gap: 8px; background: #ffffff; border: 1px solid var(--line); border-radius: 999px; box-shadow: var(--shadow-card); padding: 5px 12px; font-size: 12px; color: var(--ink); white-space: nowrap; z-index: 30; animation: pill-in 150ms cubic-bezier(0.4, 0, 0.2, 1) both; }
+.card-feedback button { border: 0; background: none; cursor: pointer; font-size: 12px; font-weight: 600; text-decoration: underline; text-underline-offset: 2px; padding: 0; }
+@keyframes pill-in { from { opacity: 0; transform: translateX(-50%) translateY(4px); } to { opacity: 1; transform: translateX(-50%) translateY(0); } }
+
+/* Move menu */
+.move-menu { position: absolute; right: 12px; bottom: 46px; min-width: 190px; background: #ffffff; border: 1px solid var(--line); border-radius: 8px; box-shadow: var(--shadow-lift); padding: 6px; z-index: 40; animation: pill-in-menu 130ms cubic-bezier(0.4, 0, 0.2, 1) both; }
+@keyframes pill-in-menu { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+.menu-label { font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink); padding: 6px 10px 4px; }
+.move-menu button { display: flex; width: 100%; justify-content: space-between; align-items: center; gap: 12px; border: 0; background: none; cursor: pointer; padding: 8px 10px; border-radius: 6px; font-size: 13px; font-weight: 500; text-align: left; }
+.move-menu button:hover { background: var(--cream); }
+.move-menu .mark { color: var(--forest); font-weight: 600; }
+
+/* Star pulse and burst */
+.star.pulsing .glyph { animation: star-pulse 260ms cubic-bezier(0.4, 0, 0.2, 1); }
+@keyframes star-pulse { 0% { transform: scale(1); } 40% { transform: scale(1.5); } 100% { transform: scale(1); } }
+.burst { position: absolute; left: 10px; top: 8px; width: 0; height: 0; pointer-events: none; z-index: 20; }
+.burst .ring { position: absolute; left: -11px; top: -11px; width: 22px; height: 22px; border: 1.5px solid var(--gold); border-radius: 50%; animation: ring-out 300ms cubic-bezier(0.4, 0, 0.2, 1) forwards; }
+@keyframes ring-out { from { transform: scale(0.4); opacity: 1; } to { transform: scale(1.5); opacity: 0; } }
+.burst .tick { position: absolute; left: -0.75px; top: -2.5px; width: 1.5px; height: 5px; background: var(--gold); border-radius: 1px; transform: rotate(var(--a)) translateY(-11px); animation: tick-out 300ms cubic-bezier(0.4, 0, 0.2, 1) forwards; }
+@keyframes tick-out { from { opacity: 1; transform: rotate(var(--a)) translateY(-11px); } to { opacity: 0; transform: rotate(var(--a)) translateY(-17px); } }
+
+/* Stagger reveal */
+@keyframes rise { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+.card.reveal { animation: rise 320ms cubic-bezier(0.4, 0, 0.2, 1) both; animation-delay: var(--d, 0ms); }
+
+/* Drag states */
+.card.dragging { box-shadow: var(--shadow-lift); z-index: 50; cursor: grabbing; transition: none; }
+.card.settling { transition-property: left, top; transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1); }
+
+/* List view: editorial index */
+.list { border-top: 1px solid var(--line); }
+.card--list { background: transparent; box-shadow: none; border-radius: 0; border-bottom: 1px solid var(--line); }
+.card--list:hover { background: rgb(255 255 255 / 0.55); }
+.card--list .zone-title { padding: 20px 8px 4px 30px; }
+.card--list .card-title { font-size: 22px; }
+.card--list .star { flex-direction: row-reverse; min-width: 72px; justify-content: flex-start; }
+.card--list .star .count { font-family: var(--font-display); font-size: 21px; font-weight: 600; }
+.card--list .star .glyph { font-size: 12px; }
+.card--list .zone-stub { border-top: 0; padding: 0 8px 20px 30px; }
+.card--list .zone-stub::before, .card--list .zone-stub::after { display: none; }
+.card--list .spine { border-radius: 0; }
+.card--list .spine::before { top: 50%; bottom: auto; height: 30px; transform: translateY(-50%); }
+
+/* Stack view: the gallery */
+.stack-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 24px; }
+.stack-grid .card { display: flex; flex-direction: column; min-height: 180px; }
+.stack-grid .zone-title { flex: 1; }
+
+/* Board view: editorial sections */
+.board { display: grid; grid-template-columns: repeat(4, 1fr); gap: 32px; align-items: start; }
+.col-head { display: flex; justify-content: space-between; align-items: baseline; padding-bottom: 10px; border-bottom: 1px solid var(--line); }
+.col-name { font-size: 11px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; }
+.col-count { font-family: var(--font-display); font-size: 14px; color: var(--ink-soft); font-variant-numeric: tabular-nums; }
+.col-body { display: flex; flex-direction: column; gap: 16px; padding-top: 16px; min-height: 140px; }
+.board .card { cursor: grab; touch-action: none; }
+.board .card-title { font-size: 16px; }
+.board .zone-title { padding: 14px 12px 12px 22px; }
+.board .zone-stub { padding: 10px 12px 12px 22px; flex-direction: column; align-items: stretch; gap: 6px; }
+.board .zone-stub .status-btn { align-self: flex-end; }
+.board .chip { font-size: 10px; padding: 2px 7px; }
+.board .status-btn { font-size: 10px; }
+.col-empty { font-size: 13px; color: var(--ink-soft); line-height: 1.55; padding: 8px 2px; max-width: 30ch; }
+.col-empty svg { display: block; color: var(--ink-soft); margin-bottom: 8px; }
+
+/* Canvas view: the magnetic canvas, zero chrome */
+.canvas-caption { margin: 0 0 8px; font-size: 12px; color: var(--ink-soft); }
+.canvas-wrap { overflow-x: auto; }
+.canvas { position: relative; height: 900px; min-width: 960px; }
+.zone-label { position: absolute; top: 8px; font-family: var(--font-display); font-size: clamp(24px, 2.8vw, 34px); font-weight: 600; color: rgb(43 42 38 / 0.15); pointer-events: none; user-select: none; white-space: nowrap; }
+.canvas .card { position: absolute; width: 260px; cursor: grab; touch-action: none; }
+.canvas .card-title { font-size: 16px; }
+.canvas .zone-title { padding: 14px 12px 12px 22px; }
+.canvas .zone-stub { padding: 10px 12px 12px 22px; flex-direction: column; align-items: stretch; gap: 6px; }
+.canvas .zone-stub .status-btn { align-self: flex-end; }
+.canvas .chip { font-size: 10px; padding: 2px 7px; }
+.canvas .status-btn { font-size: 10px; }
+.canvas .card.fanned { z-index: 25; }
+.guide-v, .guide-h { position: absolute; display: none; background: color-mix(in srgb, var(--ink-soft) 35%, transparent); pointer-events: none; z-index: 5; }
+.guide-v { top: 0; bottom: 0; width: 1px; }
+.guide-h { left: 0; right: 0; height: 1px; }
+.ghost { position: absolute; right: 8px; bottom: 16px; width: 240px; height: 104px; border: 1.5px dashed color-mix(in srgb, var(--ink-soft) 40%, #ffffff); border-radius: 8px; display: grid; place-items: center; font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-soft); pointer-events: none; }
+.ghost span { font-size: 12px; }
+
+/* Fan-out rows, metadata only */
+.fanout { position: absolute; top: calc(100% + 8px); left: 0; right: 0; background: #ffffff; border: 1px solid var(--line); border-radius: 8px; box-shadow: var(--shadow-lift); padding: 4px 0; z-index: 35; }
+.fanout .frow { padding: 8px 16px; font-size: 12.5px; color: var(--ink); border-top: 1px dashed var(--line); animation: rise 180ms cubic-bezier(0.4, 0, 0.2, 1) both; }
+.fanout .frow:nth-child(1) { border-top: 0; animation-delay: 0ms; }
+.fanout .frow:nth-child(2) { animation-delay: 40ms; }
+.fanout .frow:nth-child(3) { animation-delay: 80ms; }
+.fanout .fq { font-family: var(--font-display); font-weight: 600; margin-right: 2px; }
+
+/* Hint bar */
+.hintbar { margin-top: 32px; font-size: 12px; color: var(--ink-soft); }
+.hintbar kbd { display: inline-block; border: 1px solid var(--line); background: #ffffff; border-radius: 4px; padding: 1px 6px; font-family: var(--font-body); font-size: 11px; color: var(--ink); margin: 0 2px; }
+
+/* Direction notes footer */
+.direction-notes { margin-top: 64px; border-top: 1px solid var(--line); padding-top: 16px; color: var(--ink-soft); font-size: 13px; max-width: 72ch; }
+.direction-notes summary { cursor: pointer; font-size: 11px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink); }
+.direction-notes ol { padding-left: 20px; line-height: 1.6; }
+.direction-notes li { margin-bottom: 8px; }
+
+@media (max-width: 960px) {
+  .page { padding: 32px 24px 96px; }
+  .board { grid-template-columns: repeat(2, 1fr); }
+  .stack-grid { grid-template-columns: repeat(auto-fill, minmax(270px, 1fr)); }
+}
+
+/* Reduced motion: decorative motion off, state color changes stay instant */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+  .card.reveal { opacity: 1; transform: none; }
+}
+</style>
+</head>
+<body>
+<div class="page">
+
+<header>
+  <div class="mast-top">
+    <div class="wordmark">
+      <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M3.5 14.5h17l-2.6 3.6a1.5 1.5 0 0 1-1.2.6H7.3a1.5 1.5 0 0 1-1.2-.6z"/>
+        <path d="M12 14.5V3.5"/>
+        <path d="M12 4.2c3.6 1.2 5.6 4.4 5.2 8.3H12z" fill="currentColor" fill-opacity="0.09"/>
+        <path d="M12 6.4c-2.6 1-4.1 3.3-3.9 6.1H12z" fill="currentColor" fill-opacity="0.09"/>
+        <path d="M2.5 20.6c1.6 1 3.2 1 4.75 0s3.15-1 4.75 0 3.15 1 4.75 0 3.15-1 4.75 0"/>
+      </svg>
+      <span>Argo</span>
+    </div>
+    <a class="cta" href="#" id="new-stack">New QStack</a>
+  </div>
+  <h1>Your QStacks</h1>
+  <p class="standfirst">Ten stacks in the library, from first draft to in rotation, ready for the loops your team runs.</p>
+  <div class="toolbar">
+    <div class="views" role="group" aria-label="View">
+      <button type="button" data-viewbtn="list" aria-pressed="false">List</button>
+      <button type="button" data-viewbtn="stack" aria-pressed="true">Stack</button>
+      <button type="button" data-viewbtn="board" aria-pressed="false">Board</button>
+      <button type="button" data-viewbtn="canvas" aria-pressed="false">Canvas</button>
+    </div>
+  </div>
+</header>
+
+<main>
+  <section id="view-list" class="view" hidden aria-label="List view">
+    <div class="list" id="list-root"></div>
+  </section>
+
+  <section id="view-stack" class="view" aria-label="Stack view">
+    <div class="stack-grid" id="stack-root"></div>
+  </section>
+
+  <section id="view-board" class="view" hidden aria-label="Board view">
+    <div class="board" id="board-root"></div>
+  </section>
+
+  <section id="view-canvas" class="view" hidden aria-label="Canvas view">
+    <p class="canvas-caption">Arrange your stacks however you think. Position changes nothing about them.</p>
+    <div class="canvas-wrap">
+      <div class="canvas" id="canvas-root">
+        <span class="zone-label" style="left:1%" aria-hidden="true">Engineering</span>
+        <span class="zone-label" style="left:35%" aria-hidden="true">Product and Sales</span>
+        <span class="zone-label" style="left:69%" aria-hidden="true">People and Design</span>
+        <div class="guide-v" id="guide-v"></div>
+        <div class="guide-h" id="guide-h"></div>
+        <div class="ghost" aria-hidden="true"><span>Room for your next stack</span></div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<div class="hintbar" id="hintbar"></div>
+
+<div class="sr-only" aria-live="polite" id="live"></div>
+
+<details class="direction-notes">
+  <summary>Direction notes</summary>
+  <ol>
+    <li><strong>Editorial type scale.</strong> One serif headline, one standfirst, small letterspaced labels everywhere else. A single reading order per screen serves locality: the card title anchors each object, and every control sits inside that object's visual neighborhood.</li>
+    <li><strong>Ticket anatomy with a notch pair.</strong> The notch and dashed rule split each card into a title zone and a metadata stub, so metadata and its actions live together at the stub, next to what they describe. Locality-first, preserved across all four views.</li>
+    <li><strong>The status spine.</strong> Board status is encoded by presence and color on the left edge, and the spine is a real control: click it, or press M, and the card-local Move menu opens. Metadata is actionable, never inert. Gold appears only on in-rotation stacks, keeping gold scarce and reserved for accomplishment.</li>
+    <li><strong>The magnetic canvas.</strong> Placement is thinking, so the canvas has zero chrome. Cards snap softly to an 8 px grid, alignment hairlines appear against neighbors, and every settle offers Undo move. Arrow keys move cards with the same saved-position feedback, keeping input parity between pointer and keyboard.</li>
+    <li><strong>Motion as the craft signal.</strong> Feedback belongs to the point of change: the star bursts at the star, the moved flash lands on the card, drag alone earns a lifted shadow. Nothing decorative persists at rest, and all decorative motion is disabled under reduced-motion. Immediate visible feedback, never a silent update.</li>
+  </ol>
+</details>
+
+</div>
+<script>
+(function () {
+"use strict";
+
+/* SHARED DATASET, do not diverge */
+const STACKS = [
+  { id:"s1",  title:"Senior Backend Loop",         role_family:"engineering",        level:"senior", methodology:"structured", visibility:"org",     forked_from:null, stars:32, status:"in_rotation", questions:9, rubrics:9, screened:true,  cats:["system design","debugging","collaboration"] },
+  { id:"s2",  title:"Platform Engineering Screen", role_family:"engineering",        level:"lead",   methodology:"behavioral", visibility:"private", forked_from:null, stars:7,  status:"ready",       questions:6, rubrics:5, screened:true,  cats:["architecture","incident response","leadership"] },
+  { id:"s3",  title:"Junior Frontend Screen",      role_family:"engineering",        level:"junior", methodology:"structured", visibility:"public",  forked_from:"s1", stars:18, status:"in_rotation", questions:7, rubrics:7, screened:true,  cats:["fundamentals","css layout","communication"] },
+  { id:"s4",  title:"Product Sense Deep Dive",     role_family:"product_management", level:"senior", methodology:"case",       visibility:"public",  forked_from:null, stars:41, status:"in_rotation", questions:8, rubrics:8, screened:true,  cats:["product sense","prioritization","metrics"] },
+  { id:"s5",  title:"APM First Round",             role_family:"product_management", level:"junior", methodology:"structured", visibility:"org",     forked_from:null, stars:5,  status:"drafting",    questions:5, rubrics:3, screened:false, cats:["analytical thinking","curiosity","communication"] },
+  { id:"s6",  title:"Enterprise AE Loop",          role_family:"sales",              level:"mid",    methodology:"behavioral", visibility:"org",     forked_from:null, stars:12, status:"ready",       questions:8, rubrics:6, screened:true,  cats:["discovery","negotiation","territory planning"] },
+  { id:"s7",  title:"SDR Screen",                  role_family:"sales",              level:"junior", methodology:"structured", visibility:"private", forked_from:"s6", stars:2,  status:"drafting",    questions:5, rubrics:2, screened:false, cats:["outreach","resilience","coachability"] },
+  { id:"s8",  title:"People Ops Generalist Loop",  role_family:"people_ops",         level:"mid",    methodology:"behavioral", visibility:"org",     forked_from:null, stars:9,  status:"ready",       questions:7, rubrics:7, screened:true,  cats:["employee relations","process design","judgment"] },
+  { id:"s9",  title:"Design Portfolio Review",     role_family:"design",             level:"senior", methodology:"portfolio",  visibility:"public",  forked_from:null, stars:27, status:"in_rotation", questions:6, rubrics:6, screened:true,  cats:["craft","process","critique"] },
+  { id:"s10", title:"Brand Designer Screen",       role_family:"design",             level:"mid",    methodology:"structured", visibility:"private", forked_from:null, stars:0,  status:"off_board",   questions:4, rubrics:1, screened:false, cats:["visual systems","typography","storytelling"] }
+];
+const COLUMNS = [
+  { id:"drafting",    name:"Drafting" },
+  { id:"ready",       name:"Ready to run" },
+  { id:"in_rotation", name:"In rotation" },
+  { id:"off_board",   name:"Not on the board" }
+];
+const FLASH_MS = 1600;
+const UNDO_MS = 5000;
+
+const LS_KEY = "argo-proto-03-canvas-v1";
+const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+
+const state = {
+  stacks: STACKS.map(function (s) { return Object.assign({}, s); }),
+  view: "stack",
+  positions: loadPositions()
+};
+
+/* Default canvas positions, percent of the free range in each axis */
+const DEFAULT_POS = {
+  s1:  { x: 0,  y: 8 },  s2: { x: 12, y: 40 }, s3: { x: 2,  y: 72 },
+  s4:  { x: 34, y: 6 },  s5: { x: 56, y: 36 }, s6: { x: 34, y: 67 }, s7: { x: 56, y: 97 },
+  s8:  { x: 74, y: 8 },  s9: { x: 88, y: 40 }, s10:{ x: 72, y: 70 }
+};
+
+const SHIP_SVG = '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.5 14.5h17l-2.6 3.6a1.5 1.5 0 0 1-1.2.6H7.3a1.5 1.5 0 0 1-1.2-.6z"/><path d="M12 14.5V3.5"/><path d="M12 4.2c3.6 1.2 5.6 4.4 5.2 8.3H12z"/><path d="M2.5 20.6c1.6 1 3.2 1 4.75 0s3.15-1 4.75 0 3.15 1 4.75 0 3.15-1 4.75 0"/></svg>';
+
+const EMPTY_COPY = {
+  drafting: "Nothing in drafting. Start a new stack when an opening calls for one.",
+  ready: "Nothing staged right now. Move a draft here when it is ready to run.",
+  in_rotation: "Nothing in rotation yet. Move a ready stack here when a loop begins.",
+  off_board: "Nothing waiting here. Stacks land here when they leave the board, and nothing about them is lost."
+};
+
+const liveEl = document.getElementById("live");
+const hintEl = document.getElementById("hintbar");
+const canvasEl = document.getElementById("canvas-root");
+const guideV = document.getElementById("guide-v");
+const guideH = document.getElementById("guide-h");
+
+const instances = { list: {}, stack: {}, board: {}, canvas: {} };
+const colBodies = {};
+const colCounts = {};
+let openMenu = null;
+
+function fmt(s) { return String(s).replace(/_/g, " "); }
+function getStack(id) {
+  for (let i = 0; i < state.stacks.length; i++) { if (state.stacks[i].id === id) return state.stacks[i]; }
+  return null;
+}
+function colName(id) {
+  for (let i = 0; i < COLUMNS.length; i++) { if (COLUMNS[i].id === id) return COLUMNS[i].name; }
+  return fmt(id);
+}
+function clamp(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
+function div(cls) { const d = document.createElement("div"); d.className = cls; return d; }
+function chipEl(text, cls) {
+  const s = document.createElement("span");
+  s.className = "chip" + (cls ? " " + cls : "");
+  s.textContent = text;
+  return s;
+}
+function announce(msg) {
+  liveEl.textContent = "";
+  window.setTimeout(function () { liveEl.textContent = msg; }, 40);
+}
+function starLabel(st) { return st.stars + " stars, star this stack"; }
+function moveLabel(st) { return "Status " + fmt(st.status) + ". Move to another column"; }
+
+function loadPositions() {
+  try {
+    const raw = window.localStorage.getItem(LS_KEY);
+    if (!raw) return {};
+    const parsed = JSON.parse(raw);
+    if (parsed && typeof parsed === "object") return parsed;
+  } catch (err) { /* storage unavailable or corrupt, fall through */ }
+  return {};
+}
+function persistPositions() {
+  try { window.localStorage.setItem(LS_KEY, JSON.stringify(state.positions)); }
+  catch (err) { /* storage unavailable, prototype continues without persistence */ }
+}
+
+/* Card factory: one anatomy, four dressings */
+function buildCard(st, view) {
+  const card = document.createElement("article");
+  card.className = "card card--" + view;
+  card.tabIndex = 0;
+  card.dataset.id = st.id;
+  card.dataset.view = view;
+  card.dataset.status = st.status;
+  card.setAttribute("aria-label", st.title + ", QStack");
+
+  const spine = document.createElement("button");
+  spine.type = "button";
+  spine.className = "spine";
+  spine.setAttribute("aria-label", moveLabel(st));
+  card.appendChild(spine);
+
+  const zt = div("zone-title");
+  const h3 = document.createElement("h3");
+  h3.className = "card-title";
+  if (view === "canvas") {
+    const tb = document.createElement("button");
+    tb.type = "button";
+    tb.className = "title-btn";
+    tb.textContent = st.title;
+    tb.setAttribute("aria-expanded", "false");
+    tb.setAttribute("aria-label", st.title + ". Fan out its question outline");
+    h3.appendChild(tb);
+  } else {
+    h3.textContent = st.title;
+  }
+  const star = document.createElement("button");
+  star.type = "button";
+  star.className = "star";
+  star.setAttribute("aria-label", starLabel(st));
+  const glyph = document.createElement("span");
+  glyph.className = "glyph";
+  glyph.setAttribute("aria-hidden", "true");
+  glyph.textContent = "★";
+  const count = document.createElement("span");
+  count.className = "count";
+  count.textContent = st.stars;
+  star.appendChild(glyph);
+  star.appendChild(count);
+  zt.appendChild(h3);
+  zt.appendChild(star);
+
+  const zs = div("zone-stub");
+  const chips = div("chips");
+  chips.appendChild(chipEl(fmt(st.role_family)));
+  chips.appendChild(chipEl(st.level));
+  chips.appendChild(chipEl(st.methodology));
+  chips.appendChild(chipEl(st.visibility));
+  if (st.forked_from) {
+    const src = getStack(st.forked_from);
+    const fk = chipEl("forked", "chip--forked");
+    if (src) fk.setAttribute("aria-label", "Forked from " + src.title);
+    chips.appendChild(fk);
+  }
+  if (st.screened) chips.appendChild(chipEl("Screened", "chip--screened"));
+  chips.appendChild(chipEl(st.questions + " questions"));
+
+  const statusBtn = document.createElement("button");
+  statusBtn.type = "button";
+  statusBtn.className = "status-btn";
+  statusBtn.setAttribute("aria-haspopup", "menu");
+  statusBtn.setAttribute("aria-label", moveLabel(st));
+  const stext = document.createElement("span");
+  stext.className = "status-text";
+  stext.textContent = fmt(st.status);
+  const caret = document.createElement("span");
+  caret.className = "caret";
+  caret.setAttribute("aria-hidden", "true");
+  caret.textContent = " ▾";
+  statusBtn.appendChild(stext);
+  statusBtn.appendChild(caret);
+
+  zs.appendChild(chips);
+  zs.appendChild(statusBtn);
+  card.appendChild(zt);
+  card.appendChild(zs);
+
+  wireCard(card, st.id, view);
+  instances[view][st.id] = card;
+  return card;
+}
+
+function renderAll() {
+  const listRoot = document.getElementById("list-root");
+  const stackRoot = document.getElementById("stack-root");
+  const boardRoot = document.getElementById("board-root");
+
+  state.stacks.forEach(function (st) { listRoot.appendChild(buildCard(st, "list")); });
+  state.stacks.forEach(function (st) { stackRoot.appendChild(buildCard(st, "stack")); });
+
+  COLUMNS.forEach(function (col) {
+    const section = div("col");
+    section.dataset.col = col.id;
+    const head = div("col-head");
+    const name = document.createElement("h2");
+    name.className = "col-name";
+    name.textContent = col.name;
+    const cnt = document.createElement("span");
+    cnt.className = "col-count";
+    head.appendChild(name);
+    head.appendChild(cnt);
+    const body = div("col-body");
+    body.dataset.col = col.id;
+    section.appendChild(head);
+    section.appendChild(body);
+    boardRoot.appendChild(section);
+    colBodies[col.id] = body;
+    colCounts[col.id] = cnt;
+  });
+  state.stacks.forEach(function (st) { colBodies[st.status].appendChild(buildCard(st, "board")); });
+  updateBoardCounts();
+
+  state.stacks.forEach(function (st) { canvasEl.appendChild(buildCard(st, "canvas")); });
+}
+
+function updateBoardCounts() {
+  COLUMNS.forEach(function (col) {
+    const body = colBodies[col.id];
+    const n = state.stacks.filter(function (s) { return s.status === col.id; }).length;
+    colCounts[col.id].textContent = n;
+    const empty = body.querySelector(".col-empty");
+    if (n === 0 && !empty) {
+      const e = div("col-empty");
+      if (col.id === "off_board") e.innerHTML = SHIP_SVG;
+      e.appendChild(document.createTextNode(EMPTY_COPY[col.id]));
+      body.appendChild(e);
+    } else if (n > 0 && empty) {
+      empty.remove();
+    }
+  });
+}
+
+/* Canvas positions: stored as percent of the free range per axis */
+function applyPositions() {
+  state.stacks.forEach(function (st) {
+    const card = instances.canvas[st.id];
+    const pos = state.positions[st.id] || DEFAULT_POS[st.id] || { x: 50, y: 50 };
+    const maxL = Math.max(0, canvasEl.clientWidth - card.offsetWidth);
+    const maxT = Math.max(0, canvasEl.clientHeight - card.offsetHeight);
+    card.style.left = Math.round(clamp(pos.x, 0, 100) / 100 * maxL) + "px";
+    card.style.top = Math.round(clamp(pos.y, 0, 100) / 100 * maxT) + "px";
+  });
+}
+function savePosition(id, leftPx, topPx) {
+  const card = instances.canvas[id];
+  const maxL = Math.max(1, canvasEl.clientWidth - card.offsetWidth);
+  const maxT = Math.max(1, canvasEl.clientHeight - card.offsetHeight);
+  state.positions[id] = {
+    x: Math.round(clamp(leftPx / maxL * 100, 0, 100) * 100) / 100,
+    y: Math.round(clamp(topPx / maxT * 100, 0, 100) * 100) / 100
+  };
+  persistPositions();
+}
+
+/* View switching */
+const HINTS = {
+  list: "<kbd>Tab</kbd> focus a card · <kbd>S</kbd> star · <kbd>M</kbd> move · <kbd>Esc</kbd> close",
+  stack: "<kbd>Tab</kbd> focus a card · <kbd>S</kbd> star · <kbd>M</kbd> move · <kbd>Esc</kbd> close",
+  board: "<kbd>Tab</kbd> focus a card · <kbd>S</kbd> star · <kbd>M</kbd> move · drag between columns · <kbd>Esc</kbd> close",
+  canvas: "<kbd>Tab</kbd> focus a card · <kbd>S</kbd> star · <kbd>M</kbd> move · <kbd>Enter</kbd> fan out · <kbd>←↑↓→</kbd> nudge, <kbd>Shift</kbd> for 64 px · <kbd>Esc</kbd> close"
+};
+
+function setView(v) {
+  state.view = v;
+  closeMoveMenu(false);
+  document.querySelectorAll("[data-viewbtn]").forEach(function (b) {
+    b.setAttribute("aria-pressed", b.dataset.viewbtn === v ? "true" : "false");
+  });
+  ["list", "stack", "board", "canvas"].forEach(function (name) {
+    document.getElementById("view-" + name).hidden = name !== v;
+  });
+  hintEl.innerHTML = HINTS[v];
+  if (v === "canvas") applyPositions();
+  staggerReveal(v);
+}
+
+function staggerReveal(v) {
+  if (reduceMotion.matches) return;
+  const cards = Object.keys(instances[v]).map(function (id) { return instances[v][id]; });
+  cards.forEach(function (card, i) {
+    card.classList.remove("reveal");
+    void card.offsetWidth;
+    card.style.setProperty("--d", (i * 40) + "ms");
+    card.classList.add("reveal");
+  });
+  window.setTimeout(function () {
+    cards.forEach(function (card) { card.classList.remove("reveal"); card.style.removeProperty("--d"); });
+  }, 320 + cards.length * 40 + 60);
+}
+/* Card-local feedback: flash plus pill, always on the card itself */
+function flash(card) {
+  if (!card) return;
+  card.classList.add("flash-moved");
+  if (card._flashTimer) window.clearTimeout(card._flashTimer);
+  card._flashTimer = window.setTimeout(function () { card.classList.remove("flash-moved"); }, FLASH_MS);
+}
+function removeFeedback(card) {
+  if (!card) return;
+  if (card._fbTimer) { window.clearTimeout(card._fbTimer); card._fbTimer = null; }
+  const f = card.querySelector(".card-feedback");
+  if (f) f.remove();
+}
+function showFeedback(card, text, btnLabel, onUndo) {
+  if (!card) return;
+  removeFeedback(card);
+  const f = div("card-feedback");
+  const t = document.createElement("span");
+  t.textContent = text;
+  const b = document.createElement("button");
+  b.type = "button";
+  b.textContent = btnLabel;
+  b.addEventListener("click", function (e) {
+    e.stopPropagation();
+    removeFeedback(card);
+    onUndo();
+  });
+  f.appendChild(t);
+  f.appendChild(b);
+  card.appendChild(f);
+  card._fbTimer = window.setTimeout(function () { removeFeedback(card); }, UNDO_MS);
+}
+function activeInstance(id) { return instances[state.view][id]; }
+
+/* Star: immediate count, pulse and burst at the star, undo link */
+function updateStarUI(id) {
+  const st = getStack(id);
+  ["list", "stack", "board", "canvas"].forEach(function (v) {
+    const card = instances[v][id];
+    if (!card) return;
+    const star = card.querySelector(".star");
+    star.querySelector(".count").textContent = st.stars;
+    star.setAttribute("aria-label", starLabel(st));
+  });
+}
+function burstAt(star) {
+  if (reduceMotion.matches) return;
+  const glyph = star.querySelector(".glyph");
+  star.classList.remove("pulsing");
+  void star.offsetWidth;
+  star.classList.add("pulsing");
+  const burst = document.createElement("span");
+  burst.className = "burst";
+  burst.setAttribute("aria-hidden", "true");
+  const ring = document.createElement("span");
+  ring.className = "ring";
+  burst.appendChild(ring);
+  for (let i = 0; i < 5; i++) {
+    const tick = document.createElement("span");
+    tick.className = "tick";
+    tick.style.setProperty("--a", (i * 72 - 18) + "deg");
+    burst.appendChild(tick);
+  }
+  star.appendChild(burst);
+  window.setTimeout(function () {
+    burst.remove();
+    star.classList.remove("pulsing");
+  }, 340);
+}
+function doStar(id) {
+  const st = getStack(id);
+  st.stars += 1;
+  updateStarUI(id);
+  const card = activeInstance(id);
+  if (card) burstAt(card.querySelector(".star"));
+  announce("Starred " + st.title + ". " + st.stars + " stars.");
+  showFeedback(card, "Starred,", "undo", function () {
+    st.stars = Math.max(0, st.stars - 1);
+    updateStarUI(id);
+    announce("Star removed. " + st.title + ", " + st.stars + " stars.");
+  });
+}
+
+/* Move: menu, status change, board reparent, flash, undo */
+function closeMoveMenu(refocus) {
+  if (!openMenu) return;
+  const opener = openMenu.opener;
+  openMenu.el.remove();
+  document.removeEventListener("pointerdown", onOutsidePointer, true);
+  openMenu = null;
+  if (refocus && opener && document.contains(opener)) opener.focus();
+}
+function onOutsidePointer(e) {
+  if (openMenu && !openMenu.el.contains(e.target)) closeMoveMenu(false);
+}
+function openMoveMenu(card, id, opener) {
+  if (openMenu && openMenu.card === card) { closeMoveMenu(true); return; }
+  closeMoveMenu(false);
+  const st = getStack(id);
+  const menu = div("move-menu");
+  menu.setAttribute("role", "menu");
+  menu.setAttribute("aria-label", "Move to");
+  const label = div("menu-label");
+  label.setAttribute("aria-hidden", "true");
+  label.textContent = "Move to";
+  menu.appendChild(label);
+  COLUMNS.forEach(function (col) {
+    const b = document.createElement("button");
+    b.type = "button";
+    b.setAttribute("role", "menuitem");
+    const nm = document.createElement("span");
+    nm.textContent = col.name;
+    b.appendChild(nm);
+    if (col.id === st.status) {
+      b.setAttribute("aria-current", "true");
+      const mk = document.createElement("span");
+      mk.className = "mark";
+      mk.setAttribute("aria-hidden", "true");
+      mk.textContent = "✓";
+      b.appendChild(mk);
+    }
+    b.addEventListener("click", function (e) {
+      e.stopPropagation();
+      closeMoveMenu(false);
+      if (col.id !== st.status) moveStack(id, col.id, true);
+      const back = card.querySelector(".status-btn");
+      if (back && document.contains(back)) back.focus();
+    });
+    menu.appendChild(b);
+  });
+  menu.addEventListener("keydown", function (e) {
+    const items = Array.prototype.slice.call(menu.querySelectorAll("button"));
+    const idx = items.indexOf(document.activeElement);
+    if (e.key === "Escape") { e.stopPropagation(); closeMoveMenu(true); }
+    else if (e.key === "ArrowDown") { e.preventDefault(); items[(idx + 1) % items.length].focus(); }
+    else if (e.key === "ArrowUp") { e.preventDefault(); items[(idx - 1 + items.length) % items.length].focus(); }
+  });
+  card.appendChild(menu);
+  openMenu = { el: menu, opener: opener, card: card };
+  document.addEventListener("pointerdown", onOutsidePointer, true);
+  const first = menu.querySelector("button");
+  if (first) first.focus();
+}
+function moveStack(id, to, withUndo) {
+  const st = getStack(id);
+  const from = st.status;
+  if (from === to) return;
+  st.status = to;
+  ["list", "stack", "board", "canvas"].forEach(function (v) {
+    const card = instances[v][id];
+    if (!card) return;
+    card.dataset.status = to;
+    card.querySelector(".status-text").textContent = fmt(to);
+    card.querySelector(".status-btn").setAttribute("aria-label", moveLabel(st));
+    card.querySelector(".spine").setAttribute("aria-label", moveLabel(st));
+  });
+  colBodies[to].appendChild(instances.board[id]);
+  updateBoardCounts();
+  const card = activeInstance(id);
+  flash(card);
+  announce(st.title + " moved to " + colName(to) + ".");
+  if (withUndo) {
+    showFeedback(card, "Moved to " + colName(to), "Undo move", function () {
+      moveStack(id, from, false);
+    });
+  }
+}
+
+/* Board drag: pointer capture, translate, hit-test columns */
+function hitColumn(x, y) {
+  for (let i = 0; i < COLUMNS.length; i++) {
+    const sec = colBodies[COLUMNS[i].id].parentElement;
+    const r = sec.getBoundingClientRect();
+    if (x >= r.left && x <= r.right && y >= r.top && y <= r.bottom) return COLUMNS[i].id;
+  }
+  return null;
+}
+function enableBoardDrag(card, id) {
+  card.addEventListener("pointerdown", function (e) {
+    if (e.button !== 0) return;
+    if (e.target.closest("button, a, .move-menu, .card-feedback")) return;
+    const startX = e.clientX, startY = e.clientY;
+    let dragging = false;
+    try { card.setPointerCapture(e.pointerId); } catch (err) { /* capture unsupported, drag still works */ }
+    function onMove(ev) {
+      const dx = ev.clientX - startX, dy = ev.clientY - startY;
+      if (!dragging && Math.hypot(dx, dy) > 4) { dragging = true; card.classList.add("dragging"); }
+      if (dragging) card.style.transform = "translate(" + dx + "px, " + dy + "px)";
+    }
+    function cleanup() {
+      card.removeEventListener("pointermove", onMove);
+      card.removeEventListener("pointerup", onUp);
+      card.removeEventListener("pointercancel", onCancel);
+    }
+    function onUp(ev) {
+      cleanup();
+      if (!dragging) return;
+      card.classList.remove("dragging");
+      card.style.transform = "";
+      const target = hitColumn(ev.clientX, ev.clientY);
+      const st = getStack(id);
+      if (target && target !== st.status) moveStack(id, target, true);
+    }
+    function onCancel() {
+      cleanup();
+      card.classList.remove("dragging");
+      card.style.transform = "";
+    }
+    card.addEventListener("pointermove", onMove);
+    card.addEventListener("pointerup", onUp);
+    card.addEventListener("pointercancel", onCancel);
+  });
+}
+
+/* Canvas drag: guides while dragging, magnetic settle on release */
+function eachCanvasCard(fn) {
+  state.stacks.forEach(function (st) { fn(instances.canvas[st.id]); });
+}
+function computeAlign(card) {
+  const w = card.offsetWidth, h = card.offsetHeight;
+  const L = card.offsetLeft, T = card.offsetTop, R = L + w, B = T + h;
+  let v = null, hz = null;
+  eachCanvasCard(function (other) {
+    if (other === card) return;
+    const oL = other.offsetLeft, oT = other.offsetTop;
+    const oR = oL + other.offsetWidth, oB = oT + other.offsetHeight;
+    const vPairs = [[L, oL, oL], [L, oR, oR], [R, oL, oL - w], [R, oR, oR - w]];
+    for (let i = 0; i < vPairs.length; i++) {
+      if (v === null && Math.abs(vPairs[i][0] - vPairs[i][1]) <= 6) v = { x: vPairs[i][1], left: vPairs[i][2] };
+    }
+    const hPairs = [[T, oT, oT], [T, oB, oB], [B, oT, oT - h], [B, oB, oB - h]];
+    for (let i = 0; i < hPairs.length; i++) {
+      if (hz === null && Math.abs(hPairs[i][0] - hPairs[i][1]) <= 6) hz = { y: hPairs[i][1], top: hPairs[i][2] };
+    }
+  });
+  return { v: v, h: hz };
+}
+function updateGuides(card) {
+  const a = computeAlign(card);
+  if (a.v) { guideV.style.left = a.v.x + "px"; guideV.style.display = "block"; }
+  else { guideV.style.display = "none"; }
+  if (a.h) { guideH.style.top = a.h.y + "px"; guideH.style.display = "block"; }
+  else { guideH.style.display = "none"; }
+}
+function clearGuides() {
+  guideV.style.display = "none";
+  guideH.style.display = "none";
+}
+function settleCanvasCard(card, id, origin) {
+  const st = getStack(id);
+  const L = card.offsetLeft, T = card.offsetTop;
+  const maxL = Math.max(0, canvasEl.clientWidth - card.offsetWidth);
+  const maxT = Math.max(0, canvasEl.clientHeight - card.offsetHeight);
+  const a = computeAlign(card);
+  let tL = a.v ? a.v.left : Math.round(L / 8) * 8;
+  let tT = a.h ? a.h.top : Math.round(T / 8) * 8;
+  if (Math.abs(tL - L) > 12) tL = L;
+  if (Math.abs(tT - T) > 12) tT = T;
+  tL = clamp(tL, 0, maxL);
+  tT = clamp(tT, 0, maxT);
+  const dist = Math.max(Math.abs(tL - L), Math.abs(tT - T));
+  if (!reduceMotion.matches && (tL !== L || tT !== T)) {
+    const dur = Math.round(clamp(130 + dist * 5, 130, 220));
+    card.classList.add("settling");
+    card.style.transitionDuration = dur + "ms";
+    void card.offsetWidth;
+    card.style.left = tL + "px";
+    card.style.top = tT + "px";
+    window.setTimeout(function () {
+      card.classList.remove("settling");
+      card.style.transitionDuration = "";
+    }, dur + 40);
+  } else {
+    card.style.left = tL + "px";
+    card.style.top = tT + "px";
+  }
+  savePosition(id, tL, tT);
+  flash(card);
+  announce(st.title + " position saved.");
+  showFeedback(card, "Position saved", "Undo move", function () {
+    card.style.left = origin.left + "px";
+    card.style.top = origin.top + "px";
+    savePosition(id, origin.left, origin.top);
+    announce("Move undone. " + st.title + " returned to its prior spot.");
+  });
+}
+function enableCanvasDrag(card, id) {
+  card.addEventListener("pointerdown", function (e) {
+    if (e.button !== 0) return;
+    if (e.target.closest("button, a, .move-menu, .card-feedback, .fanout")) return;
+    closeFanout(card);
+    const startX = e.clientX, startY = e.clientY;
+    const origin = { left: card.offsetLeft, top: card.offsetTop };
+    let dragging = false;
+    try { card.setPointerCapture(e.pointerId); } catch (err) { /* capture unsupported, drag still works */ }
+    function onMove(ev) {
+      const dx = ev.clientX - startX, dy = ev.clientY - startY;
+      if (!dragging && Math.hypot(dx, dy) > 3) { dragging = true; card.classList.add("dragging"); }
+      if (!dragging) return;
+      const maxL = Math.max(0, canvasEl.clientWidth - card.offsetWidth);
+      const maxT = Math.max(0, canvasEl.clientHeight - card.offsetHeight);
+      card.style.left = clamp(origin.left + dx, 0, maxL) + "px";
+      card.style.top = clamp(origin.top + dy, 0, maxT) + "px";
+      updateGuides(card);
+    }
+    function cleanup() {
+      card.removeEventListener("pointermove", onMove);
+      card.removeEventListener("pointerup", onUp);
+      card.removeEventListener("pointercancel", onCancel);
+      clearGuides();
+    }
+    function onUp() {
+      cleanup();
+      if (!dragging) return;
+      card.classList.remove("dragging");
+      settleCanvasCard(card, id, origin);
+    }
+    function onCancel() {
+      cleanup();
+      card.classList.remove("dragging");
+      card.style.left = origin.left + "px";
+      card.style.top = origin.top + "px";
+    }
+    card.addEventListener("pointermove", onMove);
+    card.addEventListener("pointerup", onUp);
+    card.addEventListener("pointercancel", onCancel);
+  });
+}
+
+/* Canvas keyboard: arrows nudge, release saves, undo restores */
+const ARROWS = { ArrowLeft: [-1, 0], ArrowRight: [1, 0], ArrowUp: [0, -1], ArrowDown: [0, 1] };
+function canvasKeyMove(e, card) {
+  const d = ARROWS[e.key];
+  if (!d) return false;
+  e.preventDefault();
+  if (!card._keyOrigin) card._keyOrigin = { left: card.offsetLeft, top: card.offsetTop };
+  const step = e.shiftKey ? 64 : 16;
+  const maxL = Math.max(0, canvasEl.clientWidth - card.offsetWidth);
+  const maxT = Math.max(0, canvasEl.clientHeight - card.offsetHeight);
+  card.style.left = clamp(card.offsetLeft + d[0] * step, 0, maxL) + "px";
+  card.style.top = clamp(card.offsetTop + d[1] * step, 0, maxT) + "px";
+  updateGuides(card);
+  return true;
+}
+function canvasKeyRelease(e, card, id) {
+  if (!ARROWS[e.key] || !card._keyOrigin) return;
+  const origin = card._keyOrigin;
+  card._keyOrigin = null;
+  clearGuides();
+  if (origin.left === card.offsetLeft && origin.top === card.offsetTop) return;
+  settleCanvasCard(card, id, origin);
+}
+
+/* Fan-out: metadata-only question outline, canvas view */
+function closeFanout(card) {
+  if (!card) return;
+  const f = card.querySelector(".fanout");
+  if (f) f.remove();
+  card.classList.remove("fanned");
+  const tb = card.querySelector(".title-btn");
+  if (tb) tb.setAttribute("aria-expanded", "false");
+}
+function closeAllFanouts() {
+  eachCanvasCard(function (card) { closeFanout(card); });
+}
+function toggleFanout(card, id) {
+  if (card.querySelector(".fanout")) { closeFanout(card); return; }
+  closeAllFanouts();
+  const st = getStack(id);
+  const f = div("fanout");
+  const n = Math.min(3, st.cats.length);
+  for (let i = 0; i < n; i++) {
+    const row = div("frow");
+    const q = document.createElement("span");
+    q.className = "fq";
+    q.textContent = "Q" + (i + 1);
+    row.appendChild(q);
+    const tag = i < st.rubrics ? "rubric attached" : "rubric open";
+    row.appendChild(document.createTextNode(" · " + st.cats[i] + " · " + tag));
+    f.appendChild(row);
+  }
+  card.appendChild(f);
+  card.classList.add("fanned");
+  const tb = card.querySelector(".title-btn");
+  if (tb) tb.setAttribute("aria-expanded", "true");
+}
+
+/* Wiring */
+function wireCard(card, id, view) {
+  card.querySelector(".star").addEventListener("click", function (e) {
+    e.stopPropagation();
+    doStar(id);
+  });
+  card.querySelector(".spine").addEventListener("click", function (e) {
+    e.stopPropagation();
+    openMoveMenu(card, id, e.currentTarget);
+  });
+  card.querySelector(".status-btn").addEventListener("click", function (e) {
+    e.stopPropagation();
+    openMoveMenu(card, id, e.currentTarget);
+  });
+  if (view === "canvas") {
+    const tb = card.querySelector(".title-btn");
+    tb.addEventListener("click", function (e) {
+      e.stopPropagation();
+      toggleFanout(card, id);
+    });
+    enableCanvasDrag(card, id);
+    card.addEventListener("keyup", function (e) { canvasKeyRelease(e, card, id); });
+  }
+  if (view === "board") enableBoardDrag(card, id);
+  card.addEventListener("keydown", function (e) {
+    if (e.target.closest(".move-menu")) return;
+    const k = e.key;
+    if (k === "s" || k === "S") { e.preventDefault(); doStar(id); }
+    else if (k === "m" || k === "M") { e.preventDefault(); openMoveMenu(card, id, card.querySelector(".status-btn")); }
+    else if (k === "Escape") { closeMoveMenu(true); if (view === "canvas") closeFanout(card); removeFeedback(card); }
+    else if (view === "canvas" && k === "Enter" && e.target === card) { e.preventDefault(); toggleFanout(card, id); }
+    else if (view === "canvas" && ARROWS[k] && e.target === card) { canvasKeyMove(e, card); }
+  });
+}
+
+/* Page wiring and init */
+document.querySelectorAll("[data-viewbtn]").forEach(function (b) {
+  b.addEventListener("click", function () { setView(b.dataset.viewbtn); });
+});
+document.getElementById("new-stack").addEventListener("click", function (e) { e.preventDefault(); });
+document.addEventListener("keydown", function (e) {
+  if (e.key === "Escape") closeMoveMenu(true);
+});
+window.addEventListener("resize", function () {
+  if (state.view === "canvas") applyPositions();
+});
+
+renderAll();
+setView("stack");
+})();
+</script>
+</body>
+</html>
