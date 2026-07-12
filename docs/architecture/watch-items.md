@@ -27,3 +27,15 @@ and may not agree on shape, not yet verified.
 **Before building out interview or response sharing further: decide whether
 these need a shared typed contract like brief.ts, or whether staying
 page-local is intentional for now.**
+
+## QStackRow does not yet read stage or deck_id
+
+**Date:** 2026-07-12
+**Status:** WATCH
+**Source:** Schema/backend track (migrations 0013-0017, hosted-verified)
+
+QStackRow in components/QStackCard.tsx does not yet read stage or deck_id,
+both now live on hosted as of migration 0013-0017. The visual track that
+would normally consume this closed before schema landed. Whoever picks up
+QStack UI work next needs to wire these two fields before Canvas or the
+deck page can render real stage pills or deck membership from live data.
