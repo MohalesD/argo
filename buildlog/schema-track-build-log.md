@@ -57,3 +57,12 @@ Mo's go-ahead per plan.
 3. The loose-stack seeding rule (near the departed deck, never at the
    origin) is a UI-track contract in surface contract v1.1, guarantee 9;
    schema guarantees only that the position row survives.
+4. Stage is free text (D-ST-2) with no CHECK, no enum, and no lookup
+   table. This is fine while stage values are seeded, but nothing
+   prevents drift ("onsite" vs "Onsite" vs "on-site") once users type
+   them. The backlog already commits to stage becoming user-defined and
+   unbounded once pipelines are customizable by department and position,
+   which is the point at which an org-scoped stages lookup table with an
+   order_index becomes the right shape. Revisit before the Board's
+   responsive rail count work, since that work depends on stage being
+   real, ordered data.
