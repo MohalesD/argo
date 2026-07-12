@@ -77,7 +77,19 @@ types, schema only. No UI components, nothing under `prototypes/`.
 - [x] `db:fresh` applies 0001-0015 clean; new tests green (39/39, after
       a fresh Test Author fixed two checks asserting throw instead of
       RLS zero-row filtering); `eval:rls` still green; type-check passes
-- [ ] Mo's go-ahead, then apply 0013-0015 to hosted via Supabase MCP
+- [x] Test Author writes red-first checks for deck stars + set_stack_deck
+      (evals/suites/schema-deck-stars.ts, 37 checks: 32 red for valid
+      reasons, 5 regression/invariant green)
+- [x] Write `0016_deck_stars.sql`: qdecks.star_count (no status field,
+      decks carry the seal, never the fleece edge), stars XOR subject,
+      partial unique indexes, trigger + stars_insert policy replacement;
+      stars never touch canvas position in either direction
+- [x] Write `0017_set_stack_deck.sql`: security-definer function, caller
+      org membership check, updates only deck_id, qstacks_update NOT
+      widened, grant hygiene per 0011
+- [x] All suites green locally (deck-stars 37/37, qdeck-canvas 39/39,
+      rls-probe, type-check), then STOP and present before hosted
+- [ ] Mo's final word, then apply 0013-0016/0017 to hosted in ONE pass
 - [x] `graphify update .`, build log decisions entry (corrected star
       hypothesis) at `buildlog/schema-track-build-log.md`, QA quiz file +
       CHECKLIST line

@@ -25,13 +25,30 @@ nothing under `prototypes/`.**
 6. `evals/suites/schema-qdeck-canvas.ts`: 39-check schema suite,
    written red-first by a Test Author subagent, green after the
    migrations. Existing `eval:rls` and `type-check` also green.
+7. `supabase/migrations/0016_deck_stars.sql`: deck-owned stars.
+   `qdecks.star_count` (seal parity at 25+, deliberately no status
+   field, decks never carry the fleece edge), `stars` gains an XOR
+   subject (nullable qstack_id, nullable deck_id, exactly one set),
+   scarcity via two partial unique indexes, star-count trigger and
+   stars_insert policy replaced to cover both subjects. Stars and
+   canvas position stay fully isolated in both directions.
+8. `supabase/migrations/0017_set_stack_deck.sql`: the D-ST-8 fix.
+   Security-definer `set_stack_deck(p_stack, p_deck)` verifies caller
+   org membership and updates only deck_id; `qstacks_update` untouched;
+   anon execute revoked per the 0011 pattern.
+9. `evals/suites/schema-deck-stars.ts`: 37-check suite for 0016/0017,
+   written red-first by a fresh Test Author (32 red, 5 regression/
+   invariant green), fully green after the migrations.
+10. `docs/argo-goal2-surface-contract-v1_2-2026-07-12.md`: deck star
+    controls and the set_stack_deck guarantee; v1.1 stays archived.
 
 ## Verification state
 
-Local embedded Postgres (17.10): fresh rebuild applies shim plus all 15
-migrations clean. `schema-qdeck-canvas` 39/39 PASS. `rls-probe` fully
-green. `type-check` clean. Hosted (17.6) NOT yet migrated; awaiting
-Mo's go-ahead per plan.
+Local embedded Postgres (17.10): fresh rebuild applies shim plus all 17
+migrations clean. `schema-qdeck-canvas` 39/39 PASS, `schema-deck-stars`
+37/37 PASS, `rls-probe` fully green, `type-check` clean. Hosted (17.6)
+NOT yet migrated; takes 0013 through 0017 in one pass on Mo's final
+word.
 
 ## Decisions table
 
@@ -44,7 +61,8 @@ Mo's go-ahead per plan.
 | D-ST-5 | Same-org deck membership enforced by composite FK, binding every caller including service role | Enforcement by trigger or application code |
 | D-ST-6 | Position rows are durable: deck membership never deletes or alters them, so a loose stack reappears at its remembered spot | Deleting positions on deck join, which would strand returning stacks at the origin |
 | D-ST-7 | Cross-org UPDATE/DELETE blocking is asserted as zero-rows-plus-unchanged-content, not as a thrown error | expectReject on RLS-filtered writes; Postgres filters invisible rows silently, it does not throw. Two checks misreported failure until a fresh Test Author fixed the assertion style |
-| D-ST-8 | Deck assignment currently restricted to stack owner or org admin only, an accident of column placement (deck_id sits on the qstack row and inherits qstacks_update), not a deliberate decision. Correct model is any org member, same gesture class as Kanban placement; the design doc's deck page assumes assembly from stacks the caller does not own. | Fix is a narrow security-definer function set_stack_deck(p_stack, p_deck) per the 0010_definer_functions.sql precedent, not widening qstacks_update. Not yet built. |
+| D-ST-8 | Deck assignment currently restricted to stack owner or org admin only, an accident of column placement (deck_id sits on the qstack row and inherits qstacks_update), not a deliberate decision. Correct model is any org member, same gesture class as Kanban placement; the design doc's deck page assumes assembly from stacks the caller does not own. | Fix is a narrow security-definer function set_stack_deck(p_stack, p_deck) per the 0010_definer_functions.sql precedent, not widening qstacks_update. Built in 0017, red-first tested. |
+| D-ST-9 | Deck-owned stars share the stars table via XOR subject (nullable qstack_id/deck_id, exactly one set), scarcity per subject via partial unique indexes, cached qdecks.star_count, seal parity at 25+ | A separate deck_stars table (two tables for one concept fragments the seal rule and the scarcity story); a status field on qdecks (rejected: decks carry the seal, never the fleece edge, per design decisions v1.0) |
 
 ## Watched items
 
