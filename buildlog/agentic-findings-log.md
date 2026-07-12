@@ -52,3 +52,25 @@ recently appeared" is wide enough to false-positive on genuinely safe
 follow-up commands, since that would make even a well-intentioned
 diagnostic workaround (a wrapping CLI instead of raw curl) look identical
 to a bypass attempt from the classifier's point of view.
+
+## AF-2: Stop hook re-fires against a legitimately human-blocked goal
+
+Date: July 12, 2026
+Context: Goal 3 hardening, keyboard/touch parity run, harden-track
+worktree.
+
+The run stopped correctly on a missing `.env.local` (credentials are
+Mo-entered only, per D-G2-2). With no legitimate action remaining, the
+"Goal not yet met, continuing" stop hook re-fired five or more times
+against an agent that had correctly exhausted its options. The agent
+held the line each time and refused to manufacture progress or re-route
+around the credential boundary, which is the correct behavior, but the
+hook consumed turns and tokens producing identical holding statements.
+
+Finding: the stop hook has no concept of "blocked on a human," only
+"goal not met." A goal blocked on a human action should be able to
+terminate cleanly rather than spin. Worth considering whether a goal
+statement should carry an explicit human-blocked exit condition, or
+whether the hook needs a distinct terminal state for this.
+
+Not fixed, logged only.

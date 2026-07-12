@@ -39,3 +39,22 @@ both now live on hosted as of migration 0013-0017. The visual track that
 would normally consume this closed before schema landed. Whoever picks up
 QStack UI work next needs to wire these two fields before Canvas or the
 deck page can render real stage pills or deck membership from live data.
+
+## Interview surface accessibility comes from native elements, not from custom handlers
+
+**Date:** 2026-07-12
+**Status:** WATCH
+**Source:** Goal 3 keyboard/touch parity verification (buildlog/goal3-hardening-build-log.md, D-G3-5)
+
+Both keyboard-only and touch-only Playwright specs passed on the
+interview capture surface without any implementation change. Root cause:
+every control on that surface is a native HTML button, input, or
+textarea with no custom keydown interception, so it is keyboard- and
+touch-operable by construction.
+
+This is not a property the QStack canvas and deck work will inherit
+automatically. Drag-and-drop, deck unfurl, and canvas positioning are
+exactly where custom handlers replace native semantics and keyboard
+operability gets lost silently. Before shipping QStack canvas UI, drive
+the same keyboard-only and touch-only spec bar against it. Do not assume
+parity carries over from the interview surface.
