@@ -46,9 +46,58 @@ nothing under `prototypes/`.**
 
 Local embedded Postgres (17.10): fresh rebuild applies shim plus all 17
 migrations clean. `schema-qdeck-canvas` 39/39 PASS, `schema-deck-stars`
-37/37 PASS, `rls-probe` fully green, `type-check` clean. Hosted (17.6)
-NOT yet migrated; takes 0013 through 0017 in one pass on Mo's final
-word.
+37/37 PASS, `rls-probe` fully green, `type-check` clean.
+
+Hosted (17.6, project rtqgisbotvxidvzphyhn): 0013 through 0017 applied
+2026-07-12, one migration per `apply_migration` call, in order. Applying
+0017 was initially blocked by the Claude Code auto-mode permission
+classifier (it could not itself confirm the cross-org bypass test
+precondition from the transcript); Mo re-authorized explicitly and it
+applied clean on retry. All five confirmed live via `list_migrations`.
+
+Post-apply verification against hosted directly (not inferred from the
+local run):
+1. Schema shape: `stars` carries `stars_one_subject` CHECK
+   (`num_nonnulls(qstack_id, deck_id) = 1`) plus both partial unique
+   indexes (`stars_user_qstack_key`, `stars_user_deck_key`); `qdecks`
+   has exactly `{id, org_id, owner_id, title, created_at, star_count}`,
+   no status column; `canvas_positions` carries the spatial-memory-only
+   `comment on table`; `set_stack_deck(uuid, uuid)` exists,
+   `prosecdef = true`.
+2. Grant-hygiene finding (pre-existing, not introduced by this track):
+   `set_stack_deck`'s EXECUTE grant list includes `PUBLIC`, same as
+   every other definer function on hosted (`is_org_member`,
+   `clone_qstack`, `accept_share_invite`, `create_org`). The 0011
+   pattern only ever revoked from `anon` specifically; Postgres grants
+   EXECUTE to PUBLIC by default on function creation, and every role
+   implicitly inherits PUBLIC grants, so the anon-specific revoke never
+   actually closed the door on any of these functions, on hosted, this
+   migration included. Not fixed here (Goal 1 scope, not this track's).
+   Practical exposure for `set_stack_deck` specifically is low: its own
+   internal `is_org_member(auth.uid())` check rejects any caller
+   without a valid authenticated `auth.uid()`, which anon never has, so
+   the function is callable but never effective for anon. Logged as
+   D-ST-10 below and as a watch item; the real fix is
+   `revoke execute on function ... from public` across all definer
+   functions, a systemic pass outside this track.
+3. Two-user RLS probe against hosted directly: the actual
+   `evals/suites/rls-probe.ts` script could not target hosted from this
+   worktree (`DATABASE_URL_HOSTED` is not present in this worktree's
+   `.env.local`, which Mo manages personally). Ran an equivalent probe
+   via the Supabase MCP instead: two fixture orgs/users, role-switched
+   with `SET LOCAL ROLE authenticated` plus `request.jwt.claims`
+   (the same technique `evals/lib/harness.ts`'s `asUser` uses), scoped
+   to the surfaces this track changed. 11 of 11 checks passed: alpha
+   sees and stars its own deck (star_count increments to 1),
+   `set_stack_deck` assigns live on hosted, beta cannot see the deck,
+   its canvas position, its star, or the now-decked stack, and beta's
+   direct attempts to insert a canvas position, insert a star, or call
+   `set_stack_deck` on alpha's stack are all rejected by RLS. Entire
+   probe ran inside one uncommitted transaction; connection close
+   auto-aborted it; a follow-up query confirmed zero leftover rows.
+   This is a scoped hosted-specific check, not a re-run of all sixteen
+   tables in the local `rls-probe.ts` suite (those tables' RLS is
+   unchanged by 0013-0017 and already verified green locally).
 
 ## Decisions table
 
@@ -63,6 +112,7 @@ word.
 | D-ST-7 | Cross-org UPDATE/DELETE blocking is asserted as zero-rows-plus-unchanged-content, not as a thrown error | expectReject on RLS-filtered writes; Postgres filters invisible rows silently, it does not throw. Two checks misreported failure until a fresh Test Author fixed the assertion style |
 | D-ST-8 | Deck assignment currently restricted to stack owner or org admin only, an accident of column placement (deck_id sits on the qstack row and inherits qstacks_update), not a deliberate decision. Correct model is any org member, same gesture class as Kanban placement; the design doc's deck page assumes assembly from stacks the caller does not own. | Fix is a narrow security-definer function set_stack_deck(p_stack, p_deck) per the 0010_definer_functions.sql precedent, not widening qstacks_update. Built in 0017, red-first tested. |
 | D-ST-9 | Deck-owned stars share the stars table via XOR subject (nullable qstack_id/deck_id, exactly one set), scarcity per subject via partial unique indexes, cached qdecks.star_count, seal parity at 25+ | A separate deck_stars table (two tables for one concept fragments the seal rule and the scarcity story); a status field on qdecks (rejected: decks carry the seal, never the fleece edge, per design decisions v1.0) |
+| D-ST-10 | The 0011 grant-hygiene pattern (revoke EXECUTE from anon) does not close PUBLIC's default EXECUTE grant; every definer function on hosted, including set_stack_deck, remains PUBLIC-executable. Left unfixed here: pre-existing, systemic, Goal 1 scope. Practical exposure on set_stack_deck is low (its own auth.uid() membership check rejects anon regardless). | Fixing it inside this track's migrations; a systemic revoke-from-PUBLIC pass belongs to whichever track owns Goal 1 grant hygiene, not a one-off patch buried in 0017 |
 
 ## Watched items
 

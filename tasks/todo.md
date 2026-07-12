@@ -89,7 +89,19 @@ types, schema only. No UI components, nothing under `prototypes/`.
       widened, grant hygiene per 0011
 - [x] All suites green locally (deck-stars 37/37, qdeck-canvas 39/39,
       rls-probe, type-check), then STOP and present before hosted
-- [ ] Mo's final word, then apply 0013-0016/0017 to hosted in ONE pass
+- [x] Surface contract: add the star control on qdeck-card line that
+      0016 requires. Done as v1.2 (not an edit to v1.1, which was
+      already committed; versioning discipline forced the bump):
+      `docs/argo-goal2-surface-contract-v1_2-2026-07-12.md`, testid
+      item 38 plus guarantees 6, 11, 12. Committed in 006946f.
+- [x] Mo's final word, then apply 0013-0016/0017 to hosted in ONE pass
+      (0017 hit an auto-mode classifier block on first attempt over the
+      cross-org bypass-test precondition; Mo re-authorized explicitly,
+      retry succeeded). Verified live against hosted: schema shape,
+      grant hygiene (found and logged D-ST-10, not fixed here), and an
+      11-check hosted-scoped RLS probe run via Supabase MCP since this
+      worktree has no DATABASE_URL_HOSTED. All green; zero leftover
+      fixture rows.
 - [x] `graphify update .`, build log decisions entry (corrected star
       hypothesis) at `buildlog/schema-track-build-log.md`, QA quiz file +
       CHECKLIST line
