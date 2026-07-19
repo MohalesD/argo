@@ -1,16 +1,24 @@
 import {
   Document,
+  Link,
   Page,
   renderToBuffer,
   StyleSheet,
   Text,
   View,
 } from '@react-pdf/renderer';
-import type { BriefContent, BriefResponseInput } from './brief.js';
+import type { BriefClaim, BriefContent, BriefResponseInput } from './brief.js';
 
 // Server-side PDF of a candidate brief (PRD 5.7): the same content as
 // the web brief, one renderer, no divergent copy. Citations render as
-// numbered references resolving to the captured response text.
+// numbered references, linked to a verbatim appendix on its own page.
+//
+// Layout redesign per docs/design/argo-brief-pdf-design-brief-v1_0-2026-07-12.md
+// and the approved plan: measure constrained to ~66-72ch (not full page
+// width), a 4-step type scale, unitless line-heights throughout (never
+// absolute pt values), single column, zero flexbox, no cards or filled
+// boxes. Built-in fonts (Times-Bold / Helvetica) for v1; brand fonts are
+// a triggered backlog item (tasks/todo.md).
 
 const gold = '#E3A81C';
 const ink = '#2B2A26';
@@ -19,36 +27,54 @@ const forest = '#2E4A3A';
 const cream = '#FBF6E9';
 
 const styles = StyleSheet.create({
-  page: { padding: 48, fontSize: 10, fontFamily: 'Helvetica', color: ink },
-  header: { borderBottom: `2 solid ${gold}`, paddingBottom: 12, marginBottom: 16 },
-  brand: { fontSize: 9, color: inkSoft, letterSpacing: 2, marginBottom: 6 },
-  title: { fontSize: 20, fontFamily: 'Times-Bold', marginBottom: 2 },
-  role: { fontSize: 11, color: inkSoft },
+  page: {
+    // Horizontal padding constrains the measure to ~66-72 characters per
+    // line at 10.5pt Helvetica (~72ch on Letter's 612pt width, ~68ch on
+    // A4's 595pt), rather than the full page width.
+    paddingTop: 54,
+    paddingBottom: 64,
+    paddingLeft: 118,
+    paddingRight: 118,
+    fontFamily: 'Helvetica',
+    color: ink,
+  },
+  header: { borderBottom: `1 solid ${gold}`, paddingBottom: 10, marginBottom: 18 },
+  brand: { fontSize: 8.5, color: inkSoft, letterSpacing: 1.5, marginBottom: 6 },
+  title: { fontSize: 18, fontFamily: 'Times-Bold', lineHeight: 1.15, color: ink, marginBottom: 2 },
+  role: { fontSize: 11, color: inkSoft, marginBottom: 6 },
+  provenance: { fontSize: 9, color: inkSoft, lineHeight: 1.35 },
   sectionTitle: {
     fontSize: 13,
     fontFamily: 'Times-Bold',
+    lineHeight: 1.15,
     color: forest,
-    marginTop: 14,
-    marginBottom: 6,
+    marginTop: 16,
+    marginBottom: 8,
   },
-  paragraph: { lineHeight: 1.5, marginBottom: 4 },
-  claim: { lineHeight: 1.5, marginBottom: 5, paddingLeft: 10 },
-  citation: { color: inkSoft, fontSize: 8 },
-  starredBox: {
-    backgroundColor: cream,
-    borderLeft: `3 solid ${gold}`,
-    padding: 8,
-    marginBottom: 6,
+  paragraph: { fontSize: 10.5, lineHeight: 1.4, color: ink, marginBottom: 4 },
+  // Flush-left (no indent): keeps a consistent F-pattern left edge
+  // across role context, claims, and open questions.
+  claim: { fontSize: 10.5, lineHeight: 1.4, color: ink, marginBottom: 8 },
+  citationLink: { fontSize: 9, color: forest },
+  citationUnresolved: { fontSize: 9, color: inkSoft },
+  methodNote: { fontSize: 9, color: inkSoft, lineHeight: 1.35, marginBottom: 14 },
+  refBlock: { marginBottom: 10 },
+  refId: { fontFamily: 'Helvetica-Bold', fontSize: 9, color: ink, marginBottom: 2 },
+  refQuestion: { fontSize: 9, color: forest, marginBottom: 3 },
+  // The one place a rule earns its keep (design brief section 7): a
+  // hairline left rule on the verbatim quote block.
+  refNote: {
+    fontSize: 10.5,
+    lineHeight: 1.4,
+    color: ink,
+    borderLeft: `0.75 solid ${forest}`,
+    paddingLeft: 10,
   },
-  refBlock: { marginBottom: 8 },
-  refId: { fontFamily: 'Helvetica-Bold', fontSize: 9, marginBottom: 2 },
-  refQuestion: { fontSize: 9, color: forest, marginBottom: 2 },
-  refText: { fontSize: 9, color: inkSoft, lineHeight: 1.4 },
   footer: {
     position: 'absolute',
-    bottom: 24,
-    left: 48,
-    right: 48,
+    bottom: 28,
+    left: 118,
+    right: 118,
     fontSize: 8,
     color: inkSoft,
     borderTop: `1 solid ${cream}`,
@@ -62,6 +88,7 @@ interface BriefPdfProps {
   content: BriefContent;
   responses: BriefResponseInput[];
   generatedByModel: string | null;
+  pageSize?: 'LETTER' | 'A4';
 }
 
 function citationLabels(content: BriefContent): Map<string, number> {
@@ -74,88 +101,218 @@ function citationLabels(content: BriefContent): Map<string, number> {
   return labels;
 }
 
-function BriefPdf({ candidateName, role, content, responses, generatedByModel }: BriefPdfProps) {
+// Renders each citation id as a linked [n] marker jumping to its
+// appendix entry (verified live: react-pdf 4.5.1 emits a real /GoTo
+// action + named destination for <Link src="#id"> + <Text id="id">).
+// An id with no resolved label (should not occur; citations are
+// stripped to known ids at generation time, brief.ts) falls back to a
+// plain, unlinked [?] rather than a broken link.
+function Citations({ ids, labels }: { ids: string[]; labels: Map<string, number> }) {
+  if (ids.length === 0) return null;
+  return (
+    <>
+      {ids.map((id) => {
+        const n = labels.get(id);
+        return n ? (
+          <Link key={id} src={`#ref-${n}`} style={styles.citationLink}>
+            {' '}
+            [{n}]
+          </Link>
+        ) : (
+          <Text key={id} style={styles.citationUnresolved}>
+            {' '}
+            [?]
+          </Text>
+        );
+      })}
+    </>
+  );
+}
+
+function Claim({
+  text,
+  citations,
+  labels,
+}: {
+  text: string;
+  citations: string[];
+  labels: Map<string, number>;
+}) {
+  return (
+    <Text style={styles.claim}>
+      {text}
+      <Citations ids={citations} labels={labels} />
+    </Text>
+  );
+}
+
+function Header({ candidateName, role }: { candidateName: string; role: string }) {
+  return (
+    <View style={styles.header}>
+      <Text style={styles.brand}>ARGO CANDIDATE BRIEF</Text>
+      <Text style={styles.title}>{candidateName}</Text>
+      <Text style={styles.role}>{role}</Text>
+      <Text style={styles.provenance}>
+        This brief contains only claims drawn from interviewer-captured
+        notes. Every claim cites a specific captured response. Argo does
+        not score, rank, or recommend.
+      </Text>
+    </View>
+  );
+}
+
+function RoleContext({ text }: { text: string }) {
+  if (!text) return null;
+  return (
+    <View>
+      <Text style={styles.sectionTitle}>Role context</Text>
+      <Text style={styles.paragraph}>{text}</Text>
+    </View>
+  );
+}
+
+function ThematicSection({
+  category,
+  claims,
+  labels,
+}: {
+  category: string;
+  claims: BriefClaim[];
+  labels: Map<string, number>;
+}) {
+  return (
+    <View>
+      <Text style={styles.sectionTitle}>{category}</Text>
+      {claims.map((claim, j) => (
+        <Claim key={j} text={claim.text} citations={claim.citations} labels={labels} />
+      ))}
+    </View>
+  );
+}
+
+// De-carded (no cream fill, no gold left border): demoted by position
+// after the thematic sections, never by a graphic device that could
+// read as a rating (design brief section "Visual devices").
+function StarredMoments({
+  claims,
+  labels,
+}: {
+  claims: BriefClaim[];
+  labels: Map<string, number>;
+}) {
+  if (claims.length === 0) return null;
+  return (
+    <View>
+      <Text style={styles.sectionTitle}>Starred moments</Text>
+      {claims.map((claim, i) => (
+        <Claim key={i} text={claim.text} citations={claim.citations} labels={labels} />
+      ))}
+    </View>
+  );
+}
+
+function OpenQuestions({ items }: { items: string[] }) {
+  if (items.length === 0) return null;
+  return (
+    <View>
+      <Text style={styles.sectionTitle}>Open questions for the team</Text>
+      {items.map((q, i) => (
+        <Text key={i} style={styles.claim}>
+          {i + 1}. {q}
+        </Text>
+      ))}
+    </View>
+  );
+}
+
+function MethodNote({ generatedByModel }: { generatedByModel: string | null }) {
+  return (
+    <Text style={styles.methodNote}>
+      Every claim above is retrieved from a specific interviewer-captured
+      response and cited by number
+      {generatedByModel ? `, drafted with ${generatedByModel}` : ''}. Argo
+      does not score, rank, or recommend candidates for hire, and does
+      not infer protected characteristics from anything captured. Argo
+      structures what was said. Humans decide.
+    </Text>
+  );
+}
+
+function CitedResponsesAppendix({
+  labels,
+  byId,
+  generatedByModel,
+}: {
+  labels: Map<string, number>;
+  byId: Map<string, BriefResponseInput>;
+  generatedByModel: string | null;
+}) {
+  return (
+    <View break>
+      <MethodNote generatedByModel={generatedByModel} />
+      <Text style={styles.sectionTitle}>Cited responses</Text>
+      {[...labels.entries()].map(([id, n]) => {
+        const r = byId.get(id);
+        return (
+          <View key={id} style={styles.refBlock}>
+            <Text id={`ref-${n}`} style={styles.refId}>
+              [{n}]
+            </Text>
+            {r ? (
+              <>
+                <Text style={styles.refQuestion}>{r.questionText}</Text>
+                <Text style={styles.refNote}>{r.responseText}</Text>
+              </>
+            ) : (
+              <Text style={styles.refNote}>Response {id}</Text>
+            )}
+          </View>
+        );
+      })}
+    </View>
+  );
+}
+
+function BriefFooter({ candidateName, role }: { candidateName: string; role: string }) {
+  return (
+    <Text
+      style={styles.footer}
+      fixed
+      render={({ pageNumber, totalPages }) =>
+        `${candidateName} · ${role} · Confidential hiring record · Page ${pageNumber} of ${totalPages}`
+      }
+    />
+  );
+}
+
+function BriefPdf({
+  candidateName,
+  role,
+  content,
+  responses,
+  generatedByModel,
+  pageSize = 'LETTER',
+}: BriefPdfProps) {
   const labels = citationLabels(content);
   const byId = new Map(responses.map((r) => [r.id, r]));
-  const cite = (ids: string[]) =>
-    ids.map((id) => `[${labels.get(id) ?? '?'}]`).join(' ');
 
   return (
     <Document title={`Candidate brief: ${candidateName}`}>
-      <Page size="A4" style={styles.page}>
-        <View style={styles.header}>
-          <Text style={styles.brand}>ARGO CANDIDATE BRIEF</Text>
-          <Text style={styles.title}>{candidateName}</Text>
-          <Text style={styles.role}>{role}</Text>
-        </View>
-
-        {content.role_context ? (
-          <View>
-            <Text style={styles.sectionTitle}>Role context</Text>
-            <Text style={styles.paragraph}>{content.role_context}</Text>
-          </View>
-        ) : null}
-
+      <Page size={pageSize} style={styles.page}>
+        <Header candidateName={candidateName} role={role} />
+        <RoleContext text={content.role_context} />
         {content.sections.map((section, i) => (
-          <View key={i}>
-            <Text style={styles.sectionTitle}>{section.category}</Text>
-            {section.claims.map((claim, j) => (
-              <Text key={j} style={styles.claim}>
-                {claim.text} <Text style={styles.citation}>{cite(claim.citations)}</Text>
-              </Text>
-            ))}
-          </View>
+          <ThematicSection
+            key={i}
+            category={section.category}
+            claims={section.claims}
+            labels={labels}
+          />
         ))}
-
-        {content.starred_moments.length > 0 ? (
-          <View>
-            <Text style={styles.sectionTitle}>Starred moments</Text>
-            {content.starred_moments.map((claim, i) => (
-              <View key={i} style={styles.starredBox}>
-                <Text style={styles.paragraph}>
-                  {claim.text} <Text style={styles.citation}>{cite(claim.citations)}</Text>
-                </Text>
-              </View>
-            ))}
-          </View>
-        ) : null}
-
-        {content.open_questions.length > 0 ? (
-          <View>
-            <Text style={styles.sectionTitle}>Open questions for the team</Text>
-            {content.open_questions.map((q, i) => (
-              <Text key={i} style={styles.claim}>
-                {i + 1}. {q}
-              </Text>
-            ))}
-          </View>
-        ) : null}
-
-        <View break>
-          <Text style={styles.sectionTitle}>Cited responses</Text>
-          {[...labels.entries()].map(([id, n]) => {
-            const r = byId.get(id);
-            return (
-              <View key={id} style={styles.refBlock}>
-                <Text style={styles.refId}>[{n}]</Text>
-                {r ? (
-                  <>
-                    <Text style={styles.refQuestion}>{r.questionText}</Text>
-                    <Text style={styles.refText}>{r.responseText}</Text>
-                  </>
-                ) : (
-                  <Text style={styles.refText}>Response {id}</Text>
-                )}
-              </View>
-            );
-          })}
-        </View>
-
-        <Text style={styles.footer} fixed>
-          Captured responses structured by Argo
-          {generatedByModel ? `, drafted with ${generatedByModel}` : ''}. Humans decide; this
-          brief contains no scores, rankings, or recommendations from AI.
-        </Text>
+        <StarredMoments claims={content.starred_moments} labels={labels} />
+        <OpenQuestions items={content.open_questions} />
+        <CitedResponsesAppendix labels={labels} byId={byId} generatedByModel={generatedByModel} />
+        <BriefFooter candidateName={candidateName} role={role} />
       </Page>
     </Document>
   );

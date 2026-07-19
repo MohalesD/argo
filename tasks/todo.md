@@ -134,6 +134,22 @@ Agreed, not yet built, not yet scheduled as a theme.
     pass, not fixed there because error-surfacing is a behavioral
     change. This is the same banned silent no-op class Goal 2 fixed
     three times, so it should be scheduled, not parked indefinitely.
+14. Verify a custom sending domain in Resend (SPF/DKIM/DMARC) before any
+    real launch-of-friends invites go out. The current SMTP test is
+    confirmed working end to end but still sends from
+    `onboarding@resend.dev`, Resend's shared test domain, not a domain
+    Mo controls. Fine for testing, not for real invites, per the
+    existing mailer backlog item's own stated bar.
+15. Brand-font registration for the candidate brief PDF. Register Source
+    Serif 4 (headings) + Inter (body) via `Font.register` in
+    `src/lib/pdf.tsx`, replacing the built-in Times-Bold / Helvetica the
+    v1 hierarchy redesign shipped with, to match Argo's design anchors
+    (`docs/design-and-voice-philosophy-v3_260703.md`, CLAUDE.md).
+    Trigger: after the PDF hierarchy redesign ships and Mo has reviewed
+    it rendered against a real brief — not before. Requires
+    bundling/hosting the TTF/WOFF files, a `Font.register` call, and a
+    spike confirming word-break / soft-hyphen rendering stays clean in
+    react-pdf v4.5.1.
 
 ## Icebox
 

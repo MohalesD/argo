@@ -58,6 +58,12 @@ export async function GET(
     content: brief.content as BriefContent,
     responses: responseInputs,
     generatedByModel: (brief.generated_by_model as string) ?? null,
+    // Letter is the default per renderBriefPdf; explicit here since the
+    // brief's own EEOC/discoverability framing treats this as primarily
+    // a US hiring record. A4 is available (pageSize param) for a future
+    // request-driven choice (e.g. a `?size=a4` query param), not wired
+    // to a request input yet.
+    pageSize: 'LETTER',
   });
 
   return new NextResponse(new Uint8Array(pdf), {

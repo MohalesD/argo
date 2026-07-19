@@ -553,3 +553,112 @@ The two earlier, blocked attempts (Part 2, second and third paragraphs
 above) made no model calls; both were stopped before reaching the
 brief-generation step.
 
+---
+
+# Candidate brief PDF: layout & hierarchy redesign
+**July 13, 2026 · Authored during the run by Claude Sonnet 5 · Backlog item 11, per the approved plan `argo-candidate-brief-pdf-idempotent-rabbit.md`**
+**Status: COMPLETE. Redesign implemented, verified against the real hosted fixture, grayscale-checked.**
+
+## What was built
+
+Redesigned `src/lib/pdf.tsx` end to end per the evidence-based design
+brief (`docs/design/argo-brief-pdf-design-brief-v1_0-2026-07-12.md`) and
+the approved implementation plan. The PDF was content-complete but
+visually flat (backlog item 11); this pass gives it real hierarchy
+without adding any card/box system:
+
+1. **Measure fix (the biggest lever).** Horizontal page padding raised
+   to 118pt each side, constraining body text to ~66-72 characters per
+   line instead of running the full page width. This was the actual
+   cause of the "visually plain" complaint, not a lineHeight bug (see
+   Conflicts below).
+2. **4-step type scale**, all `fontSize` in pt, all `lineHeight`
+   unitless: Display 18pt (candidate name), Section 13pt (every content
+   heading), Body 10.5pt (claims, paragraphs), Fine 9pt (citations,
+   appendix question text, footer). Leading tightened from 1.5 to 1.4
+   for body text.
+3. **Starred moments de-carded.** Removed the cream fill + 3pt gold left
+   border; it now renders identically to a thematic section (heading +
+   claims), demoted by position only, never by a graphic device.
+4. **Header provenance line** (new): *"This brief contains only claims
+   drawn from interviewer-captured notes. Every claim cites a specific
+   captured response. Argo does not score, rank, or recommend."* Header
+   rule reduced from 2pt to 1pt gold.
+5. **Method note** (new, top of the appendix page): states how claims
+   are produced, the model used (if any), and closes with *"Argo
+   structures what was said. Humans decide."* The no-scores/no-ranking
+   disclaimer moved here from the old footer.
+6. **Citations became real internal PDF links** (`<Link src="#ref-n">`
+   to `<Text id="ref-n">` in the appendix), styled forest instead of
+   muted gray, replacing plain `[n]` text markers. `citationLabels()`
+   (dedup/numbering) was kept verbatim — it was already correct.
+7. **Appendix verbatim quote blocks** now carry a 0.75pt forest left
+   rule (the one border device the design brief explicitly endorses for
+   print), replacing plain unbordered text.
+8. **Footer redesigned**: fixed, 1pt hairline top rule, composed via the
+   `render` prop into a single line — `"{candidateName} · {role} ·
+   Confidential hiring record · Page {n} of {total}"` — adding page
+   numbers, which the old footer lacked entirely.
+9. **`pageSize` made a parameter** (`'LETTER' | 'A4'`, default
+   `'LETTER'`) on `renderBriefPdf`; `app/api/briefs/[id]/pdf/route.ts`
+   passes `'LETTER'` explicitly. A4 remains fully available; nothing
+   about the redesign is Letter-specific (the 118pt padding works for
+   both page widths).
+
+Component structure was broken into small, flexbox-free, block-stacked
+pieces (`Header`, `RoleContext`, `ThematicSection`, `StarredMoments`,
+`OpenQuestions`, `MethodNote`, `CitedResponsesAppendix`, `BriefFooter`,
+plus a shared `Claim`/`Citations` pair), all in the same single file, per
+the plan's component breakdown.
+
+## The two resolved forks
+
+| Fork | Resolution | Reasoning |
+| --- | --- | --- |
+| Typeface | Built-in `Times-Bold` (headings) / `Helvetica` (body), unchanged from the original | Zero spike risk, ships immediately, no font files to bundle. Brand fonts (Source Serif 4 + Inter) are a real, triggered backlog item (tasks/todo.md item 15), not a vague someday: the trigger is explicitly "after this redesign ships and Mo has reviewed it rendered against a real brief." |
+| Page size | Parametric `pageSize: 'LETTER' \| 'A4'`, default `LETTER` | The document is primarily a US hiring record (the design brief's own EEOC/Title VII/discoverability framing); Letter is the sane default. A4 stays fully supported for international use without a separate code path — same 118pt padding lands both in the 66-72ch target range. |
+
+## Brief-vs-renderer conflicts, as flagged in the plan, resolved as specified
+
+1. **"lineHeight absolute-units bug" did not exist in this code.** Verified before touching anything: the pre-existing `lineHeight` values were already unitless (1.5, 1.4). The real cause of the flat, plain feel was the ~100-character measure, not a units bug. Fixed the measure; kept lineHeight unitless (now 1.4 for body, 1.15 for headings, 1.35 for fine print) — never introduced an absolute-pt lineHeight anywhere.
+2. **Internal links vs. flexbox+`wrap` renderer risk.** No flexbox was used anywhere in the redesign (confirmed by `grep -n "flex" src/lib/pdf.tsx`, zero real matches — only a comment mentioning "zero flexbox"). Links needed no flex layout, so this risk never applied.
+3. **Two heading tiers vs. flat data shape.** `content.sections` is a flat array with no subgroup nesting; implemented one content-heading tier (13pt) plus the 18pt document title, exactly as the plan specified. No subhead tier was added.
+4. **Citation accent color and grayscale survival.** Citations render in forest (`#2E4A3A`), not gold — gold was reserved for the single header rule only. Confirmed via the grayscale check below that forest markers stay legible without color.
+5. **Cards vs. rules.** Starred moments fully de-carded (no fill, no border). The only three border devices in the entire document are the 1pt gold header rule, the 0.75pt forest left rule on appendix quote blocks, and the 1pt footer top rule — matching the plan's "whitespace + occasional hairline rule" prescription exactly.
+6. **No new section eyebrows.** The single "ARGO CANDIDATE BRIEF" header mark was kept as the only brand eyebrow in the document; no per-section eyebrows were added.
+
+## Verification results
+
+1. **Link anchor spike (react-pdf 4.5.1), run first as required.** Two spikes, both passed: (a) `<Link src="#ref-1">` as a sibling of `<Text>` produced a real `/GoTo` action with a resolvable named destination (`/Names [(ref-1) [16 0 R /XYZ null 792 null]]`) in the raw PDF bytes — a standards-compliant internal PDF link; (b) `<Link>` nested *inline inside* `<Text>` (the actual usage pattern needed for claim text + trailing citation markers) also produced a valid `/GoTo` + named destination. **Result: citations shipped as real internal links**, not the numeric-only fallback the plan allowed for if the spike had failed.
+2. **Flexbox/`wrap` check.** `grep -n "flex" src/lib/pdf.tsx` returns only the descriptive comment ("zero flexbox"); no `flexDirection` or `flex` style property exists anywhere in the file. The forced `<View break>` before the appendix and the `fixed` footer both paginate correctly (see real-render check below — page 1 ends cleanly, the fixed footer appears with the correct "Page 1 of 3" on the first page).
+3. **Type-check.** `npm run type-check` clean on `src/lib/pdf.tsx` and `app/api/briefs/[id]/pdf/route.ts`, zero new errors introduced. The same 8 pre-existing errors in `tests/e2e/interview-keyboard.spec.ts`/`interview-touch.spec.ts` remain (flagged, unrelated, carried from the prior Theme 2 entry).
+4. **Real render against the hosted fixture brief.** Regenerated the PDF for the permanent QA fixture brief `e0de276f-487d-4b5c-a821-41a8d271906e` (dev-account sign-in via `generateLink`, fetch `/api/briefs/[id]/pdf`, render page 1 to PNG via headed Chromium with `colorScheme: 'light'` forced — Chrome's built-in PDF viewer auto-inverts to a dark theme when the OS is in dark mode, which produced an all-black first attempt; forcing light color scheme in the browser context fixed it). Checked against every stated benchmark: headings and first line of each claim scannable at a glance; measure visibly narrower than full page width (~66-72ch); no cards or fills anywhere; leading visibly tighter than the prior version; `[1]`/`[2]` citation markers present, underlined, forest-colored, and confirmed as real links (not plain text) by the spike above; footer shows "QA Fixture Candidate (permanent, synthetic) · Senior Engineer · Confidential hiring record · Page 1 of 3"; header shows the new provenance line; starred moments render with zero box/border, identical in form to the thematic sections above them. Screenshots saved: `docs/qa/assets/pdf-redesign-web.png` (web view, unchanged, confirming scope discipline — only `pdf.tsx` and the route were touched) and `docs/qa/assets/pdf-redesign-pdf-page1.png` (redesigned PDF, page 1 of 3).
+5. **Grayscale check.** `docs/qa/assets/pdf-redesign-pdf-page1-grayscale.png` — a full desaturation of the page-1 render. **Result: passes.** Section headings stay clearly distinguishable from body text by weight and family (bold serif vs. regular sans) independent of color; citation markers stay legible via underline styling and weight, not solely via the forest color; the header rule remains visible as a thin gray line. Color was always meant as a secondary signal per the plan ("grayscale-distinguishable by darkness"); typography carries the hierarchy on its own.
+
+## Brand-font backlog item
+
+Added as `tasks/todo.md` Backlog item 15, verbatim per the plan: register
+Source Serif 4 (headings) + Inter (body) via `Font.register` in
+`src/lib/pdf.tsx`, replacing the built-in Times-Bold/Helvetica this
+redesign shipped with. **Trigger, stated explicitly in the item itself**:
+after this redesign ships and Mo has reviewed it rendered against a real
+brief — not before. Requires bundling/hosting font files and a spike
+confirming word-break/soft-hyphen rendering stays clean in react-pdf
+4.5.1.
+
+## Decisions table (this entry)
+
+| # | Decision | Reasoning |
+| --- | --- | --- |
+| D-PDF-1 | Fix the measure via page padding, not a separate inner column `<View>` | Keeps the document flexbox-free (constraint honored) and margins symmetric; a wrapper view would add a layout indirection the flat content structure doesn't need. |
+| D-PDF-2 | Citations shipped as real `<Link>` elements after both spikes passed | The plan's own fallback (numeric-only) was conditional on the spike failing; it didn't, so the stronger, more useful design (real jump-to-appendix links) shipped instead of the degraded default. |
+| D-PDF-3 | Model attribution ("drafted with {model}") moved into the new method note, not kept as a separate footer clause | The old footer combined model attribution and the no-scores disclaimer in one place; the plan moved the no-scores statement to the method note but didn't specify where model attribution goes. The method note is about how claims were produced, so the model clause belongs there, not in the now-compact footer line. |
+| D-PDF-4 | `pageSize: 'LETTER'` passed explicitly in the route, not omitted to rely on the function default | Plan allowed either; explicit is self-documenting at the call site and costs nothing. |
+
+## Cost review (ai_calls)
+
+No production model calls were made this run. All verification used the
+existing permanent QA fixture brief (`e0de276f-487d-4b5c-a821-41a8d271906e`,
+created and cost-logged in the prior Theme 2 entry); no new brief was
+generated.
+
