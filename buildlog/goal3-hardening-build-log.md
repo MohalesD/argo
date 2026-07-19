@@ -662,3 +662,128 @@ existing permanent QA fixture brief (`e0de276f-487d-4b5c-a821-41a8d271906e`,
 created and cost-logged in the prior Theme 2 entry); no new brief was
 generated.
 
+
+## What this run builds
+
+Two independent, unrelated fixes scoped to harden-track only (no
+marketplace, listing, or seller files touched): the TypeScript cleanup
+Mo flagged in `interview-keyboard.spec.ts`/`interview-touch.spec.ts`,
+and the concurrent-starring could-not-verify item carried from Goal 2
+(`buildlog/goal2-build-log.md`, echoed in
+`docs/qa/goal3-hardening-inventory-2026-07-12.md` item 1.2).
+
+## Part 1: TypeScript cleanup
+
+**Before:** `npm run type-check` reported 8 `TS2532: Object is possibly
+'undefined'` errors, 4 in each file, at the same two call sites in both:
+the `questionOneText`/`questionTwoText` assignment from `questions[0]`/
+`questions[1]`, and the two `question_id: questions[0/1].id` fixture
+inserts.
+
+```
+tests/e2e/interview-keyboard.spec.ts(91,23): error TS2532: Object is possibly 'undefined'.
+tests/e2e/interview-keyboard.spec.ts(92,23): error TS2532: Object is possibly 'undefined'.
+tests/e2e/interview-keyboard.spec.ts(105,22): error TS2532: Object is possibly 'undefined'.
+tests/e2e/interview-keyboard.spec.ts(112,22): error TS2532: Object is possibly 'undefined'.
+tests/e2e/interview-touch.spec.ts(89,23): error TS2532: Object is possibly 'undefined'.
+tests/e2e/interview-touch.spec.ts(90,23): error TS2532: Object is possibly 'undefined'.
+tests/e2e/interview-touch.spec.ts(103,22): error TS2532: Object is possibly 'undefined'.
+tests/e2e/interview-touch.spec.ts(110,22): error TS2532: Object is possibly 'undefined'.
+```
+
+**Root cause:** `tsconfig.json` sets `noUncheckedIndexedAccess: true`.
+Both files already guard `if (!questions || questions.length < 2) throw
+...` before indexing, which is a real runtime guarantee, but TypeScript
+cannot narrow a plain array's element type from a `.length` check, so
+`questions[0]`/`questions[1]` still type as `Question | undefined`
+afterward. This is a pure type-narrowing gap, not a missing runtime
+check; no behavioral change was needed or made.
+
+**Fix:** non-null assertions at the four flagged sites in each file
+(`questions[0]!`, `questions[1]!`), matching the file's own existing
+cast style two lines above each site (`membership.org_id as string`,
+`qstack.id as string`). Not `@ts-ignore`, not a tsconfig exclusion.
+
+**After:** `npm run type-check` clean, zero errors.
+
+```
+> argo@0.1.0 type-check
+> tsc --noEmit && tsc -p tsconfig.scripts.json
+```
+
+Both specs re-run against the local dev server afterward to confirm the
+type-only fix changed nothing behaviorally: both pass.
+
+```
+✓ interview-keyboard.spec.ts: a full session runs start to finish using only the keyboard (9.1s)
+✓ interview-touch.spec.ts: a full session runs start to finish using only touch (6.1s)
+```
+
+## Part 2: concurrent starring under real concurrency
+
+New spec: `tests/e2e/concurrent-starring.spec.ts`, two tests, driving
+genuine concurrency via real independent browser contexts (real
+sessions, real cookies), not sequential requests dressed up as
+concurrent.
+
+1. **N distinct users racing the same QStack.** 4 distinct test users,
+   each in their own `BrowserContext`, each signed in via
+   `signInAsTestUser` and landed on `/market`, all fire the real
+   `star-button` click via a single `Promise.all` at effectively the
+   same instant. Verified two ways: the app's own optimistic
+   `star-count` (each page settles to `1`, its own delta, since
+   `market/page.tsx` has no realtime subscription and never reflects
+   other sessions' inserts without a reload -- confirmed this is the
+   correct expectation, not a bug, before asserting on it), and, as
+   ground truth, a service-role read of `stars` (exactly 4 rows, 4
+   distinct `user_id`s) and `qstacks.star_count` (exactly 4).
+2. **The same user racing two sessions against the same QStack.** One
+   user, two independent `BrowserContext`s (two real, separate sessions
+   for the same `user_id`), both fire `star-button` via `Promise.all`
+   at the same instant -- the actual race the unique index
+   `(user_id, qstack_id)` exists to prevent. Verified: both sessions'
+   `star-count` settle to `1` (the losing insert's unique violation
+   surfaces through `toggleStar`'s existing error branch, which calls
+   `load()` to reconcile rather than silently no-oping), and a
+   service-role read confirms exactly 1 row in `stars` and
+   `qstacks.star_count === 1`, not 0 or 2.
+
+First run of test 1 failed on a bad assumption in the test itself, not
+an app bug: the initial assertion expected each of the 4 pages' own
+`star-count` to read `4`, which assumes cross-session live sync that
+`market/page.tsx` does not have and was never supposed to have. Fixed
+the assertion to check what the architecture actually guarantees (each
+page's own optimistic count moves from its own 0 baseline to 1) and let
+the service-role database read verify the real aggregate. Both tests
+pass after the fix, against the hosted backend, no mocking:
+
+```
+✓ concurrent starring: N distinct users racing the same QStack land exactly N stars, no over- or under-count (21.1s)
+✓ concurrent starring: the same user racing two sessions against the same QStack lands exactly one star, the unique constraint rejects the loser (7.2s)
+```
+
+Read-only verification queries use a service-role client to check
+ground truth in `stars`/`qstacks.star_count` after each race settles;
+every write in both tests goes through the real authenticated session
+and the real `toggleStar` code path in `app/market/page.tsx`, the same
+path end users hit.
+
+**Result: Goal 2 could-not-verify item 2 is now verified.** The unique
+constraint plus `maintain_star_count` trigger hold under genuine
+multi-session concurrency, both for distinct users racing the same
+target and for the same user racing itself.
+
+## Decisions table (this entry)
+
+| # | Decision | Reasoning |
+| --- | --- | --- |
+| D-HD-1 | Fixed the 8 type errors with `questions[0]!`/`questions[1]!` rather than restructuring the fixture setup or adding a redundant runtime check | The runtime guarantee already exists (the length check two lines above); a second check would be dead code, and a broader restructure was out of scope for a type-only fix |
+| D-HD-2 | Concurrency driven via real independent `BrowserContext`s clicking the production `star-button`, not direct concurrent REST/API calls bypassing the UI | The task brief allowed either; browser contexts exercise the actual client code path (`toggleStar`, including its existing unique-violation reconciliation branch) end users hit, which is a stronger proof than bypassing it |
+| D-HD-3 | Two separate QStack fixtures (`distinctTitle`, `duplicateTitle`) rather than one shared target for both races | Keeps each test's assertions simple and isolated; a shared target would require disentangling which race contributed which rows |
+| D-HD-4 | Read ground truth via a service-role client, writes only ever go through real authenticated sessions | The service-role client is verification-only, mirroring `evals/suites`' own admin-bypass convention for checking outcomes, never for producing the race itself |
+
+## Cost review (ai_calls)
+
+No production model calls were made this run. Part 1 was a mechanical
+type fix; Part 2 used only fixture QStacks with no AI-generated content
+and no brief/interview pipeline calls.

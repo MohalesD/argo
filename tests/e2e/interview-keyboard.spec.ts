@@ -88,8 +88,8 @@ test.describe.serial('Full interview session, keyboard only', () => {
         `fixture needs at least 2 screening_status='passed' questions to exercise prev/next navigation; found ${questions?.length ?? 0}. Seed the question bank first.`,
       );
     }
-    questionOneText = questions[0].text as string;
-    questionTwoText = questions[1].text as string;
+    questionOneText = questions[0]!.text as string;
+    questionTwoText = questions[1]!.text as string;
 
     const { data: qstack, error: qsErr } = await admin
       .from('qstacks')
@@ -102,14 +102,14 @@ test.describe.serial('Full interview session, keyboard only', () => {
     const { error: itemsErr } = await admin.from('qstack_items').insert([
       {
         qstack_id: qstackId,
-        question_id: questions[0].id,
+        question_id: questions[0]!.id,
         position: 0,
         rubric: { anchors: DEFAULT_ANCHORS },
         followups: [],
       },
       {
         qstack_id: qstackId,
-        question_id: questions[1].id,
+        question_id: questions[1]!.id,
         position: 1,
         rubric: { anchors: DEFAULT_ANCHORS },
         followups: [],
